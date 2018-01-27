@@ -1,11 +1,6 @@
-<center class="main_header"><h1> Grow with Google Challenge Notes: Chapter 2</h1>
+﻿<center class="main_header"><h1> Grow with Google Challenge Notes: Chapter 2</h1>
 
 <h2>The Benefits of Offline First</h2></center>
-<div id="toc">
-    Table of contents:
-    <ul>
-</div>
-<div id="contents">
 <h1>2.1</h1>
 <h2>Intro</h2>
 
