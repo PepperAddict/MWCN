@@ -6,7 +6,8 @@ Grow with Google Challenge Notes: Chapter 2
 The Benefits of Offline First
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-toc::[]
+:toc:
+:toc-placement: preambe
 
 == 2.1: Intro
 
