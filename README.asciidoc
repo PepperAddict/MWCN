@@ -8,14 +8,7 @@ The Benefits of Offline First
 
 :toc:
 
-[[contents]]
-[[section]]
-2.1
----
-
-[[intro]]
-Intro
-~~~~~
+==2.1: Intro
 
 We first meet our instructors: *Jake Archibald* from London who will do
 most of the teaching. *Mike Wales* from USA who gives us the quizzes.
@@ -25,13 +18,7 @@ connection. We will be working on the dev tools, IDB the in browser
 database, use user interface strategy to deal varying network conditions
 and updates.
 
-[[section-1]]
-2.2
----
-
-[[the-problem]]
-The Problem
-~~~~~~~~~~~
+==2.2: The Problem
 
 Jake talks about an app we will be working on. It's not quite a
 progressive app yet, but what we will work on is to make it progressive.
@@ -89,13 +76,8 @@ An icon at least 144×144 large in png format. E.g.: "icons": [ \{ "src":
 "/images/icon-144.png", "sizes": "144x144", "type": "image/png" } ] +
 ___________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
 
-[[section-2]]
-2.3
----
 
-[[the-benefits-of-offline-first-1]]
-The Benefits of Offline First
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+==2.3: The Benefits of Offline First
 
 Offline first means getting as much content as possible from the cache
 then the internet ONLY IF we get content from the network. If you do get
@@ -104,24 +86,13 @@ cache. If you just can't get content from the network, we just use what
 is in the cache. It might be outdated, but at least it's better than
 nothing.
 
-[[section-3]]
-2.4
----
 
-[[quiz-what-can-slow-us-down]]
-Quiz: What can Slow Us Down
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+==2.4: Quiz: What can Slow Us Down
 
 Pretty much anything might slow down your connection. This page was
 pretty much stressing us the importance of offline first.
 
-[[section-4]]
-2.5
----
-
-[[quiz-what-does-online-first-look-like]]
-Quiz: What Does Online First Look Like
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+==2.5: Quiz: What Does Online First Look Like
 
 The quiz website is online first, but if it's offline, it will pull
 something from the cache for fallback content or special page for
@@ -133,9 +104,8 @@ In which of the following conditions will our app work well? +
 is better since online first will struggle horribly on bad connection
 type of networks.
 
-[[section-5]]
-2.6
----
+==2.6
+
 
 [[quiz-what-are-ways-to-be-offline-first]]
 Quiz: What are Ways To Be Offline First
