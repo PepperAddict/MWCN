@@ -1,7 +1,3 @@
-ifdef::env-github[]
-:imagesdir: foo/
-endif::[]
-
 :toc:
 :toc-placement!:
 
