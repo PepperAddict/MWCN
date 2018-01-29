@@ -1,3 +1,6 @@
+:toc:
+:toc-placement!:
+
 [[grow-with-google-challenge-notes-chapter-2]]
 Grow with Google Challenge Notes: Chapter 2
 -------------------------------------------
