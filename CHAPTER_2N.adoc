@@ -1,6 +1,5 @@
 :library: Asciidoctor
-:toc:
-:toc-placement!:
+
 
 [[grow-with-google-challenge-notes-chapter-2]]
 Grow with Google Challenge Notes: Chapter 2
@@ -10,7 +9,7 @@ Grow with Google Challenge Notes: Chapter 2
 The Benefits of Offline First
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-toc::[]
+:toc:
 
 == 2.1: Intro
 
@@ -84,8 +83,8 @@ ________________________________________________________________________________
 == 2.3: The Benefits of Offline First
 
 Offline first means getting as much content as possible from the cache
-then the internet ONLY IF we get content from the network. If you do get
-content from the network, all new information will get stored into the
+then the internet ONLY IF we get content from the network. 
+If you do get content from the network, all new information will get stored into the
 cache. If you just can't get content from the network, we just use what
 is in the cache. It might be outdated, but at least it's better than
 nothing.
@@ -104,69 +103,213 @@ offline. +
 In which of the following conditions will our app work well? +
 1. Good connection. +
 2. Bad connection. +
-3. Offline Summary: Mike is mainly trying to tell you that offline first
+3. Offline +
+
+*Summary:* Mike is mainly trying to tell you that offline first
 is better since online first will struggle horribly on bad connection
 type of networks.
 
-== 2.6
+== 2.6: Quiz: What are Ways To Be Offline First
+Which of these are offline first techniques? 
+
+*a*. Deliver the page's header and content from a cache on the device, then attempt to fetch updated content from the network +
+*b*. Deliver the page's header from the a cache, then attempt to fetch the content from the network. +
+*c*. attempt to fetch the page from the network, and if that fails, show cached content. +
+*d*. attempt to fetch the page from the network, if that fails, show an error page from a cache. +
+
+The answers are A and B because both of these attempt the cache before the network.  The others are not because they require a wait from the network to succeed or fail thus not giving us
+the best performance if we were having network issues. 
 
 
-[[quiz-what-are-ways-to-be-offline-first]]
-Quiz: What are Ways To Be Offline First
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-[[section-6]]
-2.7
----
-
-[[introducing-the-demo-app]]
-Introducing the Demo App
-~~~~~~~~~~~~~~~~~~~~~~~~
+== 2.7: Introducing the Demo App
+Jake shows us the app we will be customizing. We will be turning the app from online first to offline first. The app is called wittr
 
 [[section-7]]
-2.8
----
+== 2.8: Quiz: Installing the Demo App
+This section is mainly a to-do list to get the wittr app installed on your computer so you can be able to follow along+
 
-[[quiz-installing-the-demo-app]]
-Quiz: Installing the Demo App
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*1st step:* install link:https://nodejs.org/en/[node.js] because all the servers and build scripts are written in javascript.
 
-[[section-8]]
-2.9
----
+*2nd step:* open up git bash, terminal, or command prompt and make sure you're already on the directory you want all the files to be placed. 
+To go to that directory just type __cd directory__ +
+example:
+****
+ cd C:\Users\username\Desktop
+****
+If you're on windows and you have git, you can easily navigate to the actual folder and right click. You will see the option for git bash here to automatically have the bash selected for that directory.
+image:img/bashgui.png["screenshot"] +
 
-[[quiz-running-the-demo-app]]
-Quiz: Running the Demo app
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+*3rd step:* Now that you're on the right directory, clone the project to that folder. 
+type: 
+****
+git clone https://github.com/jakearchibald/wittr
+****
 
-[[section-9]]
-2.10
-----
+*Summary:* Install node.js and clone the project.
 
-[[exploring-the-demo-apps-code]]
-Exploring the Demo Apps Code
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+NOTE: Jake says if you want to learn git, there's a free class: link:https://www.udacity.com/course/how-to-use-git-and-github--ud775[udacity class]
+If you want a very quick one to teach you the basics in 15 minutes, I recommend link:https://try.github.io/levels/1/challenges/1[Try Git].   For this class, however, you don't really need to know git.
+All you really need to do is make sure you're in the correct directory, git reset --hard, and then git checkout with the proper task branch that they will give. 
 
-[[section-10]]
-2.11
-----
+== 2.9: Quiz: Running the Demo app
+Same as the previous lesson, here are the steps to continue on.
 
-[[quiz-changing-connection-types]]
-Quiz: Changing Connection Types
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*Step 1*: After you've installed node.js and got the complete package of wittr, you'll see your folder added a new folder called "wittr".
+Now you need to navigate to the wittr folder.
+****
+cd wittr
+****
 
-[[section-11]]
-2.12
-----
+*Step 2*: Once inside the folder, you need to type:
+****
+npm install
+****
+This will fetch all the 3rd party code that is needed to run the app.
+*note*: There may be some errors and warnings for optional dependencies. Just ignore them.
 
-[[quiz-testing-lie-fi-mode]]
-Quiz: Testing Lie Fi Mode
-~~~~~~~~~~~~~~~~~~~~~~~~~
+*Step 3*: Once npm install is complete, type:
+****
+npm run serv
+****
+IMPORTANT: From here on, you will always need to navigate to the wittr folder and type *npm run serve* every single time
+when resuming the lesson. Once you type it, the console will let you know two servers are running:
+*localhost:8888* and *localhost:8889*. If you ever need to restart or shut down the server, press *ctrl c*.
+If for whatever reason your server doesn't start, shut down the server, and type 
+*git reset --hard* into the console.
+
+*Step 4*: Now that the server is up and running, open up a browser and enter the address: *localhost:8888*. If you see the website, you're done!
+
+== 2.10: Exploring the Demo Apps Code
+Jake explains that the app currently runs as online first +
+*1st step*: browser makes a request which goes via http-cache. +
+*2nd step*: If http-cache doesn't have a match, it goes to the internet. +
+*3rd step*: internet will then send information to http-cache +
+*fourth step*: http-cache then sends the response to the browser. +
+
+Once those steps are fulfilled, we'll have a website full of content. html, css, javascript, etc. +
+The javascript opens up a websocket that will continually stream data from the internet to the browser for any new updates.
+
+=== The javascript files
+In the class, we will be modifying the javascripts *Index.js* and *IndexController.js*. To navigate to the javascript file, it can be found
+in wittr > public > js > main
+
+*index.js* is the starting point. It includes some polyfills, promises, and URL API that we will cover later on +
+*indexController.js* is where most of the magic happens. +
+
+Jake describes what the content inside the indexController does. 
+They are the notes inside this code. 
+
+WARNING: The code uses link:https://en.wikipedia.org/wiki/ECMAScript[ECMAScript aka ES(5)] and then used link:https://babeljs.io/[babel]. I'm not entirely certain what that all means, but once I do, hopefully I'll edit this all out or just link to the clarification.
+....
+import PostsView from './views/Posts'; 
+import ToastsView from './views/Toasts'; 
+import idb from 'idb'; 
+
+export default function IndexController(container) {
+  this._container = container;
+  this._postsView = new PostsView(this._container);
+  this._toastsView = new ToastsView(this._container);
+  this._lostConnectionToast = null;
+  this._openSocket();
+}
+
+// open a connection to the server for live updates
+IndexController.prototype._openSocket = function() {
+  var indexController = this;
+  var latestPostDate = this._postsView.getLatestPostDate();
+
+  // create a url pointing to /updates with the ws protocol
+  var socketUrl = new URL('/updates', window.location);
+  socketUrl.protocol = 'ws';
+
+  if (latestPostDate) {
+    socketUrl.search = 'since=' + latestPostDate.valueOf();
+  }
+
+  // this is a little hack for the settings page's tests,
+  // it isn't needed for Wittr
+  socketUrl.search += '&' + location.search.slice(1);
+
+  var ws = new WebSocket(socketUrl.href);
+
+  // add listeners
+  ws.addEventListener('open', function() {
+    if (indexController._lostConnectionToast) {
+      indexController._lostConnectionToast.hide();
+    }
+  });
+
+  ws.addEventListener('message', function(event) {
+    requestAnimationFrame(function() {
+      indexController._onSocketMessage(event.data);
+    });
+  });
+
+  ws.addEventListener('close', function() {
+    // tell the user
+    if (!indexController._lostConnectionToast) {
+      indexController._lostConnectionToast = indexController._toastsView.show("Unable to connect. Retrying…");
+    }
+
+    // try and reconnect in 5 seconds
+    setTimeout(function() {
+      indexController._openSocket();
+    }, 5000);
+  });
+};
+
+// called when the web socket sends message data
+IndexController.prototype._onSocketMessage = function(data) {
+  var messages = JSON.parse(data);
+  this._postsView.addPosts(messages);
+};
+....
+
+=== The two servers
+localhost:8888 is the actual website that we can view the changes. +
+localhost:8889 has the options to control 8888's atmosphere. You can imitate perfect internet, slow internet, liefi, and offline.
+At the bottom there's test results to see if you passed the test by inserting the proper test ID.
+
+== 2.11: Quiz: Changing Connection Types
+In this little lesson, they want you to play around with localhost:8889's features.
+
+*Test 1*: +
+*Step 1*: While you're on the control website, localhost:8889 make sure you select perfect +
+*Step 2*: In the Test ID, enter the text: *demo* +
+*Step 3*: You should see the result: *"Yep, the demo's working"*. 
+
+*Test 2*: +
+*Step 1*: While you're still in the control page, refresh the page and select *"offline"* instead of perfect. + 
+*Step 2*: Head over to the app webpage at localhost:8888 and refresh the page. There should be a blank webpage. +
+*Step 3*: Head back over to the control site and type: *offline* into the test ID. +
+*Step 4*: You should see a message: *"Yep! The server is totally dead!"*
+
+
+== 2.12: Quiz: Testing Lie Fi Mode
+
+Same as the previous lesson. +
+*Step 1*: Instead of selecting perfect or offline, select *Lie-fi*. +
+*Step 2*: In the Test ID, insert *lie-fi*. +
+*Step 3*: You should see the result: *"Yeeeep, that's lie-fi alright."* +
+*Step 4*: Go to the app website, refresh, and get angry.
 
 [[section-12]]
-2.13
-----
+== 2.13: Introducing Service Worker
 
-[[introducing-service-worker]]
-Introducing Service Worker
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+Service worker helps you control the network.  What exactly IS a service worker?
+
+link:https://developers.google.com/web/fundamentals/primers/service-workers/[SW intro by Matt]
+____
+A service worker is a script that your browser runs in the background, separate from a web page, opening the door to features that don't need a web page or user interaction. Today, they already include features like link:https://developers.google.com/web/updates/2015/03/push-notifications-on-the-open-web[push notifications] and link:https://developers.google.com/web/updates/2015/12/background-sync[background sync]. In the future, service workers will support other things like periodic sync or geofencing. The core feature discussed in this tutorial is the ability to intercept and handle network requests, including programmatically managing a cache of responses.
+
+The reason this is such an exciting API is that it allows you to support offline experiences, giving developers complete control over the experience.
+
+Before service worker, there was one other API that gave users an offline experience on the web called link:https://www.html5rocks.com/en/tutorials/appcache/beginner/[AppCache]. There are a number of issues with the AppCache API that service workers were designed to avoid.
+
+Things to note about a service worker:
+
+It's a link:https://www.html5rocks.com/en/tutorials/workers/basics/[JavaScript Worker], so it can't access the link:https://css-tricks.com/dom/[DOM] directly. Instead, a service worker can communicate with the pages it controls by responding to messages sent via the link:https://html.spec.whatwg.org/multipage/workers.html#dom-worker-postmessage[postMessage] interface, and those pages can manipulate the DOM if needed.
+Service worker is a programmable network proxy, allowing you to control how network requests from your page are handled.
+It's terminated when not in use, and restarted when it's next needed, so you cannot rely on global state within a service worker's onfetch and onmessage handlers. If there is information that you need to persist and reuse across restarts, service workers do have access to the link:https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API[IndexedDB API].
+Service workers make extensive use of promises, so if you're new to promises, then you should stop reading this and check out link:https://developers.google.com/web/fundamentals/primers/promises[Promises, an introduction].
+____
