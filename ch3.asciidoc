@@ -12,10 +12,214 @@ To go back to the README where all the chapters are: click link:README.asciidoc[
 toc::[]
 
 == 3.1: An Overview of Service Worker
+All service worker really is is a single javascript file that sits between the website and the network.
+SW is a web worker which means it runs separately from the website. The user cannot see it. The SW cannot access the DOM. +
+It does control web pages and by control, it intercepts requests and sends it to wherever you tell it to.
+
+=== Registering the SW
+
+The first step you need to do is register the service worker by giving the location of the service worker.
+Inside the () is the location of the service worker.
+
+----
+navigator.serviceWorker.register('/sw.js')
+----
+
+After registering it, it will then return a promise so you can get call backs for success or failure.
+
+----
+    navigator.serviceWorker.register('/sw.js').then(function(reg) {
+    console.log('yay');
+    }).catch(function(err) {
+    console.log('Boo!');
+    });
+----
+
+NOTE: If by any chance you accidentally registerred it when there's already a SW running,
+it will just return a promise from the existing registration. Not a big deal.
+
+''''
+
+You can also provide a scope for the SW during registration.
+A scope are the directory/files that SW can control. It will ignore anything else.
+
+----
+navigator.serviceWorker.register('/sw.js', {
+    scope: '/my-app/'
+})
+----
+
+If given a scope /my-app/, scope will only go to these: +
+/my-app/ +
+/my-app/hello/world/ +
+
+It cannot go to these: +
+/ +
+/another-app/ +
+/my-app (same as '/' because it doesn't have the trailing slash)
+
+NOTE: You do not need scope. The default scope is where the path sits in. So be sure to put it in the correct place +
+example: */foo/sw.js* will affect */foo/* +
+example 2:  */foo/bar/sw.js* will affect */foo/bar/*
+
+=== What goes on in the SW?
+
+SW listens for events. Just like regular Javascript, you can react to them or even prevent the default and do your own thing.
+Here's a sample code he featured for listening events that he will elaborate later.
+
+----
+self.addEventListener('install', function(event) {});
+self.addEventListener('activate', function(event) {});
+self.addEventListener('fetch', function(event) {});
+----
+
+=== What browsers support service worker?
+Here's the link:https://jakearchibald.github.io/isserviceworkerready/[link] to see which browsers support Service Worker.
+By the looks of it, all of the major ones do, but only chrome supports Background sync.
+
+Jake mentions that SW is progressive enhancement ready. Which means it won't hurt those browsers that doesn't support it. They just won't get the benefits. 
+To do so, wrap your registration in an if feature detect.
+
+----
+if (navigator.serviceWorker) {
+    navigator.serviceWorker.register('/sw.js');
+}
+----
+
 == 3.2: Quiz: Scoping Quiz
+
+Mike wants to remind us the importance of where the scope affects.
+So if the scope is /foo/, which of these would it affect? 
+
+*a*: / +
+*b*: /sw.js +
+*c*: /foo +
+*d*: /foo.html +
+*e*: /foo/ +
+*f*: /foo/bar/index.html +
+*g*: /foo/bar +
+
+The answer is /foo/ or anything after /foo/ which would be E, F, and G.
+
 == 3.3: Adding a Service Worker to the Project
+
+We are finally diving into the code. 
+
+=== Testing
+
+*Step 1*: The first thing we need to do is head over to our index.js file. +
+public> js > sw > index.js +
+*Step 2*: Currently, the file is empty. Jake wants us to add a simple console.log("hello") 
+so the build system picks it up and shoots it to the root of the server in sw.js which is located in +
+build>public> sw.js +
+*Step 3*: After adding the console.log() into the index, you will see that it was also inserted into sw.js. 
+The extra code in sw.js is from the output of Babel which the script runs through.
+
+=== addEventListener fetch
+
+We are going to work on fetch.
+
+*Step 1*: Head back over to *index.js* in *public>js>sw>* +
+*Step 2*: delete the previous test console.log and add in a listener.
+
+----
+self.addEventListener('fetch', function() {
+}
+----
+
+''''
+
+Once you have a service worker, and a user navigates to the page within the SW's scope, it controls the web page.
+The website goes to the SW and triggers a fetch event. It will also retrieve every request event triggered by that page such as css, js, images. You get a fetch event for each, even if the requests were to another origin.
+We can inspect the requests with Javascript and give it a fetch like so...
+
+----
+self.addEventListener('fetch', function(event) {
+    console.log(event.request);
+});
+----
+
+
 == 3.4: Quiz: Registering a Service Worker
+
+This quiz session wants you to register the service worker so it can run as soon as we start our app. We reviewed it in the previous
+lesson and now we just have to put it in practice. First we have to set up the template by
+
+*Step 1*: If you already have the server running, open up another console and navigate to the wittr folder.
+Type in: +
+----
+git reset --hard
+git checkout task-register-sw
+----
+*Step 2*: Open public> js> main> IndexController.js and find:
+----
+IndexController.prototype._registerServiceWorker = function() {
+// Todo: register service worker
+};
+----
+
+NOTE: The IndexController.js file takes care of the setup of the app. That's where we can setup a web socket for live updates.
+Javascript does not have private methods. It's good to start methods with an underscore if they will only ever be called by other methods of this object.
+
+*Step 3*: 
+Mike wants you to register the SW where he says to "register service worker" inside the code. +
+He also wants the scope to be the whole origin, so you can leave scope out and it will default. 
+
+Fortunately, Jake had already given us the necessary code to register sw. All we had to do is combine them into line 15: +
+Here's a refresher of the code:
+
+Here's the if statement to check if the browser supports service worker. If it doesn't, it outputs nothing.
+----
+  if (navigator.serviceWorker) {
+    navigator.serviceWorker.register('/sw.js');
+----
+
+A normal registration returns a promise so you can use it to get call backs if it was a success or failure:
+----
+    navigator.serviceWorker.register('/sw.js').then(function(reg) {
+    console.log('yay');
+    }).catch(function(err) {
+    console.log('Boo!');
+    });
+----
+
+*Step 4*: To see if there are any errors, it's best to get used to pulling out the devtools in chrome. +
+To find dev tools, go to the 3 dots on the far right side next to all the extensions > more tools > Developer Tools. +
+There, you can find your hotkey to open up dev tools since it's definitely different from what Mike told us it was. +
+image:img/devtools.png[] +
+*Step 5*:
+Once registered, test to see if it was successful by going over to localhost:8889 and enter *registered* in the test ID. +
+*Step 6*:
+You should see *"Service worker successfully registered"*
+
+=== The way Jake registers SW
+
+Jake decided not to wrap the code in a browser support check and just put the check in a single line. +
+With the registration returning a promise, he wants it to spit out a message to see if it failed or succeeded.
+----
+if (!navigator.serviceWorker) return;
+
+navigator.serviceWorker.register('/sw.js').then(function(reg) {
+    console.log('Registration worked!');
+}).catch(function() {
+    console.log('Registration failed');
+});
+----
+
+If it succeeded, the console in the devtools should spit out: "Registration worked!" +
+The Test ID in localhost:8889 should spit out: "Service worker successfully registered!"
+
+=== Dev tools Console Requests logs 
+
+After the success of Jake's code, you will notice in the console after a refresh, it shows all the requests logs.
+The scope restricts the pages it controls, but it will intercept any request made by controlled pages regardless of the URL.
+You can change these requests and respond to it with something entirely different. +
+Service Worker is limited to HTTPS, because if it wasn't encrypted, any user could add/remove/modify the content.
+
 == 3.5: The Service Worker Lifecycle
+
+
+
 == 3.6: Quiz: Enabling Service Worker Dev Tools
 == 3.7: Quiz: Service Worker Dev Tools
 == 3.8: Quiz: Service Worker Dev Tools 2

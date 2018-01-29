@@ -135,7 +135,7 @@ example:
 ****
  cd C:\Users\username\Desktop
 ****
-If you're on windows and you have git, you can easily navigate to the actual folder and right click. You will see the option for git bash here to automatically have the bash selected for that directory.
+If you're on windows and you have git, you can easily navigate to the actual folder and right click. You will see the option for git bash here to automatically have the bash selected for that directory. +
 image:img/bashgui.png["screenshot"] +
 
 *3rd step:* Now that you're on the right directory, clone the project to that folder. 
