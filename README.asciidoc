@@ -2,7 +2,7 @@
 :toc:
 :toc-placement!:
 
-== Welcome to my notes on the Udacity course: Grow with Google Challenge Scholarship: Mobile Web
+= Welcome to my notes on the Udacity course: Grow with Google Challenge Scholarship: Mobile Web
 toc::[]
 == Chapters
 Here I have my formatted notes on the following chapters: 

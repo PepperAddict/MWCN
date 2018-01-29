@@ -2,7 +2,7 @@
 :toc:
 :toc-placement!:
 
-== Grow with Google Challenge Notes: Chapter 2
+= Grow with Google Challenge Notes: Chapter 2
 
 The Benefits of Offline First +
 To go back to the README where all the chapters are: click link:README.asciidoc[here].
