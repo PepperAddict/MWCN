@@ -1,0 +1,22 @@
+:library: Asciidoctor
+:toc:
+:toc-placement!:
+
+== Welcome to my notes on the Udacity course: Grow with Google Challenge Scholarship: Mobile Web
+toc::[]
+== Chapters
+Here I have my formatted notes on the following chapters: 
+
+link:ch2.asciidoc[Chapter 2] : The Benefits of Offline First +
+link:ch3.asciidoc[Chapter 3] : Introducing the Service Worker +
+Chapter 4 : IndexedDb and Caching +
+Chapter 5 : Next Up +
+Chapter 6 : Syntax +
+Chapter 7 : Functions + 
+Chapter 8 : Built-Ins + 
+Chapter 9 : Professional Developer-fu +
+Chapter 10 : Challenge Course Wrap Up
+
+== Useful Links
+
+Here are some links that I found to be useful. 

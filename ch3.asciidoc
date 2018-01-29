@@ -1,0 +1,36 @@
+:library: Asciidoctor
+:toc:
+:toc-placement!:
+
+== Grow with Google Challenge Notes: Chapter 3
+
+Introducing the Service Worker Notes +
+To go back to the README where all the chapters are: click link:README.asciidoc[here].
+
+toc::[]
+== 3.1: An Overview of Service Worker
+== 3.2: Quiz: Scoping Quiz
+== 3.3: Adding a Service Worker to the Project
+== 3.4: Quiz: Registering a Service Worker
+== 3.5: The Service Worker Lifecycle
+== 3.6: Quiz: Enabling Service Worker Dev Tools
+== 3.7: Quiz: Service Worker Dev Tools
+== 3.8: Quiz: Service Worker Dev Tools 2
+== 3.9: Service Worker Dev Tools Continued
+== 3.10: Hijacking Requests
+== 3.11: Quiz: Hijacking REquests 1 Quiz
+== 3.12: Hijacking Requests 2
+== 3.13: Quiz: Hijacking Requests 2 Quiz
+== 3.14: Hijacking Requests 3
+== 3.15: Quiz: Hijacking Requests 3 Quiz
+== 3.16: Caching and Serving Assets
+== 3.17: Quiz: Install and Cache Quiz
+== 3.18: Quiz: Cache Response Quiz
+== 3.19: Updating the Static Cache
+== 3.20: Quiz: Update Your CSS Quiz
+== 3.21: Quiz: Update Your CSS 2
+== 3.22: Adding UX to the Update Process
+== 3.23: Quiz: Adding UX Quiz
+== 3.24: Trigger an Update
+== 3.25: Quiz: Triggering an Update Quiz
+== 3.26: Quiz: Caching the Page Skeleton

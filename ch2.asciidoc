@@ -2,15 +2,10 @@
 :toc:
 :toc-placement!:
 
-[[grow-with-google-challenge-notes-chapter-2]]
-Grow with Google Challenge Notes: Chapter 2
--------------------------------------------
+== Grow with Google Challenge Notes: Chapter 2
 
-[[the-benefits-of-offline-first]]
-The Benefits of Offline First
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
+The Benefits of Offline First +
+To go back to the README where all the chapters are: click link:README.asciidoc[here].
 toc::[]
 
 == 2.1: Intro
@@ -85,7 +80,7 @@ ________________________________________________________________________________
 == 2.3: The Benefits of Offline First
 
 Offline first means getting as much content as possible from the cache
-then the internet ONLY IF we get content from the network. 
+then the internet only _if_ we _can_ get content from the network. + 
 If you do get content from the network, all new information will get stored into the
 cache. If you just can't get content from the network, we just use what
 is in the cache. It might be outdated, but at least it's better than
@@ -99,17 +94,18 @@ pretty much stressing us the importance of offline first.
 
 == 2.5: Quiz: What Does Online First Look Like
 
-The quiz website is online first, but if it's offline, it will pull
+The quiz website is online first, so if the network is offline, it will pull
 something from the cache for fallback content or special page for
 offline. +
+
 In which of the following conditions will our app work well? +
-1. Good connection. +
-2. Bad connection. +
-3. Offline +
+*a*. Good connection. +
+*b*. Bad connection. +
+*c*. Offline +
 
 *Summary:* Mike is mainly trying to tell you that offline first
 is better since online first will struggle horribly on bad connection
-type of networks.
+type of networks. So the answers are A and C.
 
 == 2.6: Quiz: What are Ways To Be Offline First
 Which of these are offline first techniques? 
@@ -201,7 +197,7 @@ in wittr > public > js > main
 Jake describes what the content inside the indexController does. 
 They are the notes inside this code. 
 
-WARNING: The code uses link:https://en.wikipedia.org/wiki/ECMAScript[ECMAScript aka ES(5)] and then used link:https://babeljs.io/[babel]. I'm not entirely certain what that all means, but once I do, hopefully I'll edit this all out or just link to the clarification.
+WARNING: The code uses link:https://en.wikipedia.org/wiki/ECMAScript[ECMAScript aka ES(5)] and then used link:https://babeljs.io/[babel] to translate(?). I'm not entirely certain what that all means, but once I do, hopefully I'll edit this all out or just link to the clarification.
 ....
 import PostsView from './views/Posts'; 
 import ToastsView from './views/Toasts'; 
