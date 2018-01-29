@@ -7,7 +7,8 @@ The Benefits of Offline First
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 :toc:
-:toc-placement: preambe
+:toc-placement:
+toc::[]
 
 == 2.1: Intro
 
