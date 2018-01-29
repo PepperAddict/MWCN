@@ -6,6 +6,7 @@
 
 The Benefits of Offline First +
 To go back to the README where all the chapters are: click link:README.asciidoc[here].
+
 toc::[]
 
 == 2.1: Intro

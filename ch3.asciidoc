@@ -8,6 +8,7 @@ Introducing the Service Worker Notes +
 To go back to the README where all the chapters are: click link:README.asciidoc[here].
 
 toc::[]
+
 == 3.1: An Overview of Service Worker
 == 3.2: Quiz: Scoping Quiz
 == 3.3: Adding a Service Worker to the Project
