@@ -143,7 +143,7 @@ self.addEventListener('fetch', function(event) {
 == 3.4: Quiz: Registering a Service Worker
 
 This quiz session wants you to register the service worker so it can run as soon as we start our app. We reviewed it in the previous
-lesson and now we just have to put it in practice. First we have to set up the template by
+lesson and now we just have to put it in practice. First we have to set up the template by getting Jake's git branch for this lesson.
 
 *Step 1*: If you already have the server running, open up another console and navigate to the wittr folder.
 Type in: +
@@ -165,7 +165,7 @@ Javascript does not have private methods. It's good to start methods with an und
 Mike wants you to register the SW where he says to "register service worker" inside the code. +
 He also wants the scope to be the whole origin, so you can leave scope out and it will default. 
 
-Fortunately, Jake had already given us the necessary code to register sw. All we had to do is combine them into line 15: +
+Fortunately, Jake had already given us the necessary code to register SW. All we have to do is combine them into line 15: +
 Here's a refresher of the code:
 
 Here's the if statement to check if the browser supports service worker. If it doesn't, it outputs nothing.
@@ -185,7 +185,7 @@ A normal registration returns a promise so you can use it to get call backs if i
 
 *Step 4*: To see if there are any errors, it's best to get used to pulling out the devtools in chrome. +
 To find dev tools, go to the 3 dots on the far right side next to all the extensions > more tools > Developer Tools. +
-There, you can find your hotkey to open up dev tools since it's definitely different from what Mike told us it was. +
+There, you can find your hotkey to open up dev tools. Mine is *Ctrl + Shift + I* +
 image:img/devtools.png[] +
 *Step 5*:
 Once registered, test to see if it was successful by going over to localhost:8889 and enter *registered* in the test ID. +
@@ -206,25 +206,164 @@ navigator.serviceWorker.register('/sw.js').then(function(reg) {
 });
 ----
 
-If it succeeded, the console in the devtools should spit out: "Registration worked!" +
-The Test ID in localhost:8889 should spit out: "Service worker successfully registered!"
+If it succeeded, refresh again and in the console in the devtools should spit out: *"Registration worked!"* +
+Over at Test ID in localhost:8889, you should get the message: *"Service worker successfully registered!"* when you type in: *registered*.
+
+WARNING: I've noticed on the forums there were some issues getting this to be registered even when the code was entered correctly. Try the following: +
+*1st*: Check your bash. Restart if you see this error: +
+image:img/consoleERR1.png[] +
+*Ctrl C* and then turn it back on with *npm run serve*. +
+*2nd*: If your bash isn't spitting errors, try to do a hard refresh of chrome. +  
+*Shift + refresh.* +
+*3rd*: Try clearing the cache if the other two doesn't work.
 
 === Dev tools Console Requests logs 
 
-After the success of Jake's code, you will notice in the console after a refresh, it shows all the requests logs.
-The scope restricts the pages it controls, but it will intercept any request made by controlled pages regardless of the URL.
+After the success of Jake's code, you will notice in the devtools console after a refresh it shows all the requests logs. +
+image:img/webconsole1.png[] +
+
+The scope restricts the pages it controls, but it will intercept any request made by these controlled pages regardless of the URL.
 You can change these requests and respond to it with something entirely different. +
-Service Worker is limited to HTTPS, because if it wasn't encrypted, any user could add/remove/modify the content.
+Service Worker is limited to HTTPS, because if it wasn't encrypted, any user could intercept it and add/remove/modify the content.
 
 == 3.5: The Service Worker Lifecycle
 
+Jake let's us know that we have to do 2 refreshes to see the results. When we made changes to the service worker, SW didn't pick up that change.
+The steps that SW took when we registered it and why it took 2 refreshes. 
 
+=== Why it takes 2 refreshes to see Service Worker after registration.
+
+- website is open. We'll call it Website_1 
+- We register SW. 
+- We hit refresh on the website_1 to send out requests and get a response.
+- new window client gets made. We'll call it Website_2
+- Website_2 made a request off to the network and back.
+- Website_1 went away and Website_2.0 stays. + 
+Though if the response came back that the browser should save the resource to disk via download dialog, website_1 would have stayed. Since the response we got was just a page, the website_1 is gone.
+- The response was a page and website_1 is gone. The request went out for css, images, and also the new javascript. The registered Service Worker. +
+
+IMPORTANT: *Q*: How come we didn't see the request log after one refresh? +
+*A*: Because Service Worker only control pages when they're completely loaded, and the page was loaded
+before the service worker existed.
+
+- any request by website_2 will bypass the service worker script.
+- When we refresh again, a new website client was made. We call it website_3 and website_2 is now gone.
+- Since Service Worker was up with website_2 (but not running), it is now running with website_3.
+- Any new requests will go through Service Worker.
+
+=== Why changes to Service Worker doesn't change until after you reopen the page.
+Making changes to the service worker script is different. Jake shows us that when you 
+made changes to the script, nothing happened after a refresh.
+The new version of the service worker won't make any changes until all pages using
+ the current version are gone. because it only wants one version of the website running
+  at a given time. Such as native apps.  
+
+*Q* What does Native App mean? +
+*A*: 
+____
+According to: link:http://searchsoftwarequality.techtarget.com/definition/native-application-native-app[] +
+A native application (native app) is an application program that has been developed for use on a particular platform or device.
+
+Because native apps are written for a specific platform, they can interact with and take advantage of operating system features and other software that is typically installed on that platform. Because a native app is built for a particular device and its operating system, it has the ability to use device-specific hardware and software, meaning that native apps can take advantage of the latest technology available on mobile devices such as a global positioning system (GPS) and camera. This can be construed as an advantage for native apps over Web apps or mobile cloud apps.
+The term "native app" is often mentioned in the context of mobile computing because mobile applications have traditionally been written to work on a specific device platform. A native app is installed directly on a mobile device and developers create a separate app version for each mobile device. The native app may be stored on the mobile device out of the box, or it can be downloaded from a public or private app store and installed on the mobile device. Data associated with the native app is also stored on the device, although data can be stored remotely and accessed by the native app. Depending on the nature of the native app, Internet connectivity may not be required. 
+____
+
+Here is what's going on with Service Worker. 
+
+- Service_Worker 1 looks for changes in resources and byte identical.
+- If yes, it becomes the new version. Service_Worker 2. 
+- Service_Worker 2 doesn't take control yet because Service_Worker 1 is still running with the website.
+- Service_Worker 2 is waiting for all pages using Service Worker 1 to close to ensure only one version of the website is running.
+- Once you close that page, the new website 3 will use Service Worker 2.
+
+=== Testing changes to Service Worker
+- Head over to *public>js>sw>Index.js*
+- Modify the code to *console.log("Hello World");*.
+- Go over to the wittr app *localhost:8888*
+- One refresh you shouldn't see any changes and only see the normal requests.
+- Close the page and pull up console. You will see *"hello world"* instead of the normal requests.
+
+NOTE: SW uses the same update process as browsers such as chrome. Chrome downloads updates in the background but won't take over until the browser closes and reopens again.
+chrome will let us know there's an update ready when the icon on the top right changes color.
+
+=== Intro to an upcoming lesson with cache.
+Jake lets us know that in an upcoming lesson we will learn how to use the service worker to look for updates and then notify the user that there is an update available.
+The Service Worker will go through the browser's cache just like all requests do. Jake recommends keeping the cache time on the service worker short. Jake recommends keeping the cache time zero on all service worker projects.
+
+CAUTION: Jake lets us know that if you set the service Worker script to cache for more than a day, the browser will ignore it and set the cache to 24 hours.
+Does that mean the service worker not work after 24 hours? No, the update checks will bypass the browser cache if the service worker it has is over a day old.
 
 == 3.6: Quiz: Enabling Service Worker Dev Tools
+
+This lesson Jake wants us to install Chrome Canary. This course was taped in 2015 so most of the features are actually in the normal chrome. I'm going to skip this install.
+
 == 3.7: Quiz: Service Worker Dev Tools
+
+Here, Jake is giving us an overview of the Dev tools.
+
+=== Dev Tools Console
+
+- First is the console. Any code that is run here will be run against the documents. Though, the Service Worker lives outside the documents.
+To get to the Service Worker script in console, there is a drop down menu, you can select service worker and type anything in console for that script. +
+image:img/webconsole2.png[] 
+
+=== Dev Tools Sources
+
+- To find the debugging menu that Jake was playing around with go to sources tab. The UI is actually the same, but the navigator is hidden by default. Just press the arrow and the navigator will pop up. +
+ Navigate to sw.js>localhost:8888>public/js/sw>index.js
+- While in index.js, Jake put in a breakpoint in our fetch event by pressing 2 on the side.
+- Refresh the page and notice that the script gets paused. 
+- To unpause, just unclick the number and press the play button.
+
+=== Dev Tools Service Worker
+
+Service Worker has its very own panel. It's not in the Resources like Jake has it, but it's actually in the *Application* panel. +
+image:img/SW1.png[] +
+
+- There you will see the link *Unregister* that will refetch the Service Worker from scratch.
+- Instead of tabs, we just get a status information. Right now the status should be green. It should have the message *"activated and is running"* If you have a service worker waiting underneath it, it probably just means you made some changes. More on that on the quiz. 
+
+=== The Quiz to give you the waiting status 
+
+*Step 1*: Mike wants you to get the waiting status. First you need to ready the template if you want to.
+----
+git reset --hard
+git checkout log-requests
+----
+*Step 2*: Make any changes to the sw.js file. A different console log. anything. +
+*Step 3*: Go over to the dev tools> application> service workers +
+*Step 4*: You should now see your green status for an active one and an orange status that says it's waiting. +
+image:img/SW2.png[] +
+*Step 5*: After that, head over to the settings page: *localhost:8889* and type in the Test-ID: *sw-waiting* +
+*Step 6*: You should see the message *"Yey! There's a service worker waiting!"*.
+
 == 3.8: Quiz: Service Worker Dev Tools 2
+
+This lesson, Mike wants us to get that new service worker active. 
+
+- Mike reminds us that what we need to do is close the current pages that are using the old Service Worker. +
+- When you reopen wittr, and reopen the Dev Tools>Application>Service Workers you will now notice that there is no more service worker waiting and there's only an active one.
+- To confirm, go to settings page (localhost:8889) and type into the Test ID: *sw-active*
+- You should see the message *"No service worker waiting! Yay!"*.
+
 == 3.9: Service Worker Dev Tools Continued
+
+Jake explains that having to reopen the page during development can be annoying. +
+
+NOTE: You can do a hard refresh by *Shift + refresh*. It will reload the page but bypasses the Service Worker. It will set the waiting as the active.
+
+TIP: Instead of doing *Shift + refresh*, you can just check the *update on reload* option. +
+image:img/SW3.png[] +
+The option will change the Service Worker life cycle to be developer friendly. Now that when you hit refresh, rather than just refreshing the page, it fetches a service worker and treats it as a new version whether it was changed or not and it will become active straight away. After that, the page refreshes. +
+
+WARNING: This is only for developers. The user will be stuck with the old way of having to close the page and reopening it to get the new service worker.
+
+
 == 3.10: Hijacking Requests
+
+
+
+
 == 3.11: Quiz: Hijacking REquests 1 Quiz
 == 3.12: Hijacking Requests 2
 == 3.13: Quiz: Hijacking Requests 2 Quiz

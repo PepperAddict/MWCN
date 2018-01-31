@@ -174,9 +174,11 @@ IMPORTANT: From here on, you will always need to navigate to the wittr folder an
 when resuming the lesson. Once you type it, the console will let you know two servers are running:
 *localhost:8888* and *localhost:8889*. If you ever need to restart or shut down the server, press *ctrl c*.
 If for whatever reason your server doesn't start, shut down the server, and type 
-*git reset --hard* into the console.
+*git reset --hard* into the console. + 
+image:img/console1.png[] +
 
-*Step 4*: Now that the server is up and running, open up a browser and enter the address: *localhost:8888*. If you see the website, you're done!
+*Step 4*: Now that the server is up and running, open up a browser and enter the address: *localhost:8888*. If you see the website, you're done! +
+
 
 == 2.10: Exploring the Demo Apps Code
 Jake explains that the app currently runs as online first +
