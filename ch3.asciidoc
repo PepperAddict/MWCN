@@ -27,6 +27,9 @@ navigator.serviceWorker.register('/sw.js')
 
 After registering it, it will then return a promise so you can get call backs for success or failure.
 
+NOTE: But wait, what does a promise really mean. I had to go look it up link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises[here]. +
+_"Essentially, a promise is a returned object to which you attach callbacks, instead of passing callbacks into a function."_
+
 ----
     navigator.serviceWorker.register('/sw.js').then(function(reg) {
     console.log('yay');
@@ -361,11 +364,113 @@ WARNING: This is only for developers. The user will be stuck with the old way of
 
 == 3.10: Hijacking Requests
 
+So far we've only seen requests go from page to SW, and then from SW's fetch event to the internet through the HTTP cache. +
+Here, we're going to catch the request when it accesses the Service Worker and respond ourselves without it going to the internet.
+This is actually an important step to going offline first. 
+
+=== Introducing hijacking with event.respondWith()
+
+- To get started, Jake wants you to go to the service worker script at *public>js>sw>index.js*.
+- in the fetch script, replace what's inside with *event.respondWith()* 
+
+NOTE: event.respondWith tells the browser that we're going to handle this request ourselves. Here's more information on it link:https://developer.mozilla.org/en-US/docs/Web/API/FetchEvent/respondWith[here].
+
+- event.respondWith() takes in a response object or a promise that resolves with a response.
+- To create a response you just type in *new response()*.  +
+        * The first parameter is the body of the response. which can be a blob, a buffer, a string, or some other thing. Here's a documentation of how we can use link:https://developer.mozilla.org/en-US/docs/Web/API/Response/Response[new Response()]
+- In Jake's example, he's going to play with a string.
+----
+event.respondWith(
+    new Response("Hello World")
+    );
+----
+
+- Once the hello world is entered, go over to the wittr page and refresh it. You will notice that it has been completely hijacked with the simple message: "Hello World". If you go to a different directory, you will still get "Hello World" because we have intercepted all requests.
+
+=== Adding html to the hijacker
+
+Jake edited the new Response string to have HTML, but it passed as plain text instead. +
+image:img/webconsole3.png[] +
+
+You can easily change it to HTML by setting the header as part of the new Response. 
+
+- The second parameter of new Response is an object.
+- the header's property takes an object of headers and values.
+- set the foo header to be bar like this: 'foo': 'bar'
+
+----
+new Response('Hello <b>World</b>', {
+    headers: {'foo': 'bar'}
+}
+);
+----
+
+== 3.11: Quiz: Hijacking Requests 1 Quiz
+
+Here we will be hijacking the requests the way Mike wants us to. 
+
+=== Hijack the website with a string and changing it to read in HTML.
+
+*Step 1*: Mike wants us to prepare our template.
+----
+git reset --hard
+git checkout task-custom-response
+----
+*Step 2*: Over at public>js>sw>Index.js Mike will have a todo in the fetch event. +
+*Step 3*: Mike wants us to make the event listener be able to read HTML. The HTML element can be anything as long as the class name is *"a-winner-is-me"*. +
+
+''''
+code refresher: +
+the new Response
+----
+event.respondWith(
+    new Response(
+    // The new Response takes in two parameters.
+    // The first parameter is the body so it can be a string
+    // The second parameter can be an object)
+    )
+----
+''''
+code refresher: +
+The basic bold html element string with a fubar class. This will be put into parameter # 1. 
+Mike says it can be any HTML element as long as it has the class *"a-winner-is-me"*. +
+----
+<b class="fubar"> Hello World </b>
+
+----
+''''
+code refresher: +
+
+adding a new header object. This would go into parameter # 2
+----
+{ headers: {'foo': 'bar'} }
+----
+''''
+
+NOTE: We need to overwrite the old header name: *Content-Type* to read HTML. +
+The default is text/plain. We need to change it to *text/HTML*. 
 
 
+*Step 4*: Once you're done with the code, Mike wants you to go to the webpage and refresh. +
+*Step 5*: The HTML of that page should be applied and see if the header changed to read HTML by going to devtools>network>response headers. +
+*Step 6*: Once you see the result, confirm it by going to the settings page (localhost:8889) and put in the test ID: *html-response* +
+*Step 7*: You should see the result: *"Custom HTML response found! Yay!"*
 
-== 3.11: Quiz: Hijacking REquests 1 Quiz
+=== How Jake hijacked the request to read html
+
+----
+event.respondWith(
+    new Response('Hello <b class="a-winner-is-me">world</b>', {
+        headers: {'Content-Type': 'text/html'}}
+    ))
+----
+
+With the new hijacking, you can still see hello world offline and every other network condition. 
+
 == 3.12: Hijacking Requests 2
+
+
+
 == 3.13: Quiz: Hijacking Requests 2 Quiz
 == 3.14: Hijacking Requests 3
 == 3.15: Quiz: Hijacking Requests 3 Quiz
