@@ -385,7 +385,7 @@ event.respondWith(
     );
 ----
 
-- Once the hello world is entered, go over to the wittr page and refresh it. You will notice that it has been completely hijacked with the simple message: "Hello World". If you go to a different directory, you will still get "Hello World" because we have intercepted all requests.
+- Once the hello world is entered, go over to the wittr page and refresh it. You will notice that it has been completely hijacked with the simple message: "Hello World".
 
 === Adding html to the hijacker
 
@@ -469,9 +469,132 @@ With the new hijacking, you can still see hello world offline and every other ne
 
 == 3.12: Hijacking Requests 2
 
+=== Introducing fetch
+Here we will go to the network for the response, but give something else that was requested using +
+*fetch(url)* +
+fetch let's you make network requests and let's you read the response. Here is how you write a fetch request: +
+
+----
+fetch('/foo').then(function(response) {
+    return response.json();
+}).then(function(data) {
+    console.log(data);
+}).catch(function() {
+    console.log('It failed');
+})
+----
+
+=== Describing what's going on with the fetch code: 
+
+*fetch('foo')* - it will return a promise +
+*.then(function(response)* - which will resolve to a response. +
+*return response.json();* - then we will read the response's JSON. +
+*.then(function(data) { console.log(data)* - Here is the results. +
+*.catch(function() { console.log("It failed")* - You can catch errors from either the request or reading the response. 
+
+=== back to our code event.respondWith()
+Jake reminds us that event.respondWith takes either a response or a promise that resolves to a response. +
+Fetch returns a promise that resolves to a response. So fetch and event.respondWith() work together very well. +
+Here, we're going to respond with a fetch for a gif image. 
+----
+event.respondWith(
+    fetch('/imgs/dr-evil.gif)
+----
+
+The fetch API performs a normal browser fetch. When this is inserted to our current SW script, it gave the gif response to everything.
 
 
 == 3.13: Quiz: Hijacking Requests 2 Quiz
+
+Mike wants us to give this gif response to only a particular request. +
+
+*Step 1*: To ready the template: +
+----
+git reset --hard
+git checkout gif-response
+----
+*Step 2*: Head over to public>js>sw>index.js and read the TODO: +
+*Step 3*: The task s to respond with a gif if the request URL ends with .jpg. +
+
+We will definitely need a fetch method to take a full request object as well as a URL
+----
+event.respondWith(
+    fetch(event.request).then(function(response) {
+    if () {
+    return;
+    }
+    else {
+    return; 
+    }
+}).catch(function() {
+    return;
+    })
+);
+
+----
+
+NOTE: The main thing we had to modify is the if statement and what it returns. +
+ *.then* is for success and *.catch* is for failure
+
+'''' 
+
+code refresher: +
+We will have to check for an url that ends with .jpg.
+----
+if (event.request.url.endsWith('.jpg'))
+or
+if (/.jpg$/.test(event.request.url))
+
+----
+NOTE: To learn more about RegExr, here's a great link:https://regexr.com/[link].
+
+''''
+code refresher: +
+Here's how to fetch the image to replace with:
+----
+fetch('url')
+----
+
+*Step 4*: Once you have it working, go over to the settings page (localhost:8889) and type in the test ID: *gif-response* +
+*Step 5*: You should see the message *"Images are being intercepted!"*
+
+=== Here's how it worked
+Well unfortunately Jake didn't give us the answer of how he did this, but the forums and slack helped me get it working.
+
+----
+  event.respondWith(
+    fetch(event.request).then(function(response) {
+      if (event.request.url.endsWith('.jpg')) {
+        return fetch('/imgs/dr-evil.gif');
+      }
+    return response;
+    }).catch(function() {
+      return new Response("Nope! You broke something, idiot!");
+    })
+  );
+----
+
+=== My struggle on this
+
+I struggled with this for a few hours trying to get it to work. My main issue was what to return. +
+* turns out _return response fetch(url)_ didn't work. +
+*  _return new Response(fetch(url))_ didn't work. +
+* and _new Response 'url'_ didn't work. +
+
+Boy did it get very frustrating. Turns out I didn't really understand *new Response()*. I can't find any good documentations about new Response(), but to quote someone who understands it better: +
+____
+Mario Ruiz: +
+this line *return new Response(fetch('/imgs/dr-evil.gif'));* should be something like
+
+----
+return fetch('/imgs/dr-evil.gif');
+----
+
+fetch already returning a response promise, is not necesarry to wrap it again into a Response object.
+____
+
+
+
 == 3.14: Hijacking Requests 3
 == 3.15: Quiz: Hijacking Requests 3 Quiz
 == 3.16: Caching and Serving Assets
