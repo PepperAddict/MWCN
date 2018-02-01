@@ -581,9 +581,9 @@ I struggled with this for a few hours trying to get it to work. My main issue wa
 *  _return new Response(fetch(url))_ didn't work. +
 * and _new Response 'url'_ didn't work. +
 
-Boy did it get very frustrating. Turns out I didn't really understand *new Response()*. I can't find any good documentations about new Response(), but to quote someone who understands it better: +
+Boy did it get very frustrating. Turns out I didn't really understand *fetch()*. I can't find any good documentations about new Response() and fetch(), but to quote someone who understands it better: +
 ____
-Mario Ruiz: +
+Mario Ruiz on Slack: +
 this line *return new Response(fetch('/imgs/dr-evil.gif'));* should be something like
 
 ----
@@ -593,9 +593,24 @@ return fetch('/imgs/dr-evil.gif');
 fetch already returning a response promise, is not necesarry to wrap it again into a Response object.
 ____
 
+Then I remembered on my notes when I wrote: +
+____
+event.respondWith takes either a response or a promise that resolves to a response.
+Fetch returns a promise that resolves to a response. So fetch and event.respondWith() work together very well.
 
+----
+event.respondWith(
+    fetch('/imgs/dr-evil.gif)
+----
+____
+
+So if I understand this correctly: + 
+ *.fetch()* _is_ a response. And having them together in _return response fetch()_ is repetitive. Okay, I think I can finally move on now..
 
 == 3.14: Hijacking Requests 3
+
+
+
 == 3.15: Quiz: Hijacking Requests 3 Quiz
 == 3.16: Caching and Serving Assets
 == 3.17: Quiz: Install and Cache Quiz
