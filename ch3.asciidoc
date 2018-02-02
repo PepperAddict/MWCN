@@ -870,11 +870,342 @@ event.respondWith(
     }))
 ----
 
+With this code, we still have content during offline mode. Most of the site is still up, but not the images aren't in the cache. 
+
+Jake gives us a new TO-DO list from here to a full offline first app. 
+
+- Unobtrusive app updates 
+- Get the user to use the latest version 
+- Continually update cache of posts
+- Cache photos
+- Cache avatars
+
 == 3.19: Updating the Static Cache
+
+Jake wants us to disable the *force update on reload* option in dev tools so we can troubleshoot our app the way a user would experience it. +
+When Jake made changes to the css, the website did not update when he refreshed the page. Only when he did a *Shift + refresh* it worked because it bypassed the service worker. +
+When Jake went over to the servie worker panel, the changes in the css didn't show as a new service worker update. +
+Here we will try to get the service worker to pick up any changes we've made so the user can receive the changes as soon as possible without any obstruction. 
+
+=== To get the CSS to change 
+
+*Step 1*: We have to change the service worker, and any change to the service worker is a differnt service worker version. Service Worker 2+
+*Step 2*: Service Worker 2 will get its own install event. It will fetch the javascript, css, etc and put it cache 1. +
+*Step 3*: It's recommended to make a new cache so we won't disrupt the old cache. To create a new cache, we just have to change the name of the cache entry. +
+*Step 4*: Once Service Worker 1 gets released, we delete the old cache and the new page load will use the new cache.
+*Step 5*: That's it. Thew new website will get the new css. Though, all we have to do is edit the service worker to trigger any change in the css. 
+
+
+=== To delete the old cache 
+Jake introduces us to a new event listener. 
+
+----
+self.addEventListener('activate', function(event) {
+//
+});
+----
+
+The *activate* event runs when the new Service Worker becomes active and when it is ready to control pages, and the previous service worker is gone. +
+Inside the activate event is the best time to delete the old cache. Just like the install event, you can use the waituntil() to signal the length of the process. While activating, the browser will queue of a service worker events such as fetch. +
+By the time your service worker receives its first fetch, you know you have the caches how you want them.
+
+To delete a cache...
+----
+caches.delete(cacheName);
+----
+
+To get the names of all caches, use 
+----
+caches.keys();
+----
+Both of these methods return promises
+
 == 3.20: Quiz: Update Your CSS Quiz
+
+Mike wants us to edit the CSS without it disrupting the currently running version of the site. 
+
+*Step 1*: Ready the template
+----
+git reset --hard 
+git checkout task-handling-updates
+----
+*Step 2*: Make sure the force update on reload in dev tools is disabled. +
+*Step 3*: The TODO wants us to change the theme of the website in public>scss>theme.scss . You can change *$primary-color:* to a different color or switch theme with the commented out code. +
+*Step 4*: Once the SCSS has been changed, we need to update the Service Worker's cache version. Head on over to the service worker script public>js>sw>index.js +
+*Step 5*: While still in the index.js, we need to remove the old cache. 
+*Step 6*: To check if it's working, refresh the wittr page and in dev tools should see a new service worker waiting, but do not activate it yet. +
+*Step 7*: Go over to the settings page (localhost:8889) and type in the Test ID: *new-cache-ready* +
+*Step 8*: You should see the message *"Yay! The new cache is ready, but isn't disrupting current pages"* 
+
+
 == 3.21: Quiz: Update Your CSS 2
+
+To finish this off...
+
+With the changes in the previous lesson, we should head back to the wittr's dev tools and activate the service worker.
+
+* To activate it, we just need to do *Shift - Refresh* or reopen the page. +
+We should see the primary color has been changed. +
+
+* To confirm, go to the settings page and enter the Test ID: *new-cache-used* +
+* You should see the message *"Yay! You safely updated the CSS!"*
+
+=== What changes did Jake do to his Service Worker 
+----
+from caches.open('wittr-static-v1') to caches.open('wittr-static-v2')
+----
+
+That's the easy one, but how did he delete the old cache?
+
+in the activate eventListener he puts in
+----
+event.waitUntil(
+    caches.delete('wittr-static-v1')
+  );
+----
+
+''''
+Deleting the cacheName manually is right, but there's a better way to do this. +
+Jake suggests maintaining a safe list of cache names to keep and remove the others. Here's how he did it...
+
+*Step 1*: store the name as *staticCacheName = 'wittr-static-v2*.
+*Step 2*: Head over to caches.open and replace 'wittr-static-v2' to the variable staticCacheName. It will look like this: 
+----
+caches.open(staticCacheName)
+----
+*Step 3*: Head over to the waitUntil() in activate event listener. +
+*Step 4*: We're going to get all the cache names that exist with *caches.keys().then(function(cacheNames){}* It will return a promise. +
+*Step 5* We will filter the cache names with *cacheNames.filter(function(cacheName) {}* +
+*Step 6* Inside that we are interested in the cache name that begins with *"wittr-"* and it must not the name of the static cache. +
+
+NOTE: It's better to search for caches with *wittr-*. That way we don't accidentally delete caches from other apps that might be running on the same origin
+
+----
+return cacheName.startsWith('wittr-') &&
+    cacheName != staticCacheName
+----
+That wil give us the list of all the caches that we don't need anymore. +
+
+*Step 7*: Now we will map the collected cacheNames, and then delete them.
+----
+.map(function(cacheName) {
+    return cache.delete(cacheName}
+----
+*Step 8*: Then wraps the check and delete into a Promise.all() so we wait for the completion of all the promises. 
+
+Here's how they all look together.
+----
+var staticCacheName = 'wittr-static-v2'
+
+self.addEventListener('activate', function(event) {
+    event.waitUntil(
+        caches.keys().then(function(cacheNames) {
+            return Promise.all(
+                cachesNames.filter(function(cacheName) {
+                    return cacheName.startsWith('wittr-') &&
+                        cache != staticCacheName;
+                    }).map(function(cacheName) {
+                        return cache.delete(cacheName);
+                    })
+                );
+            })
+        );
+    });
+----
+
+
+Okay, so I had to go look up .map. +
+What link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map[map] does is create a new array with the results.
+
+''''
+WARNING: Okay I am absolutely lost at this point.
+Okay here on Jake talks about cache time which I have absolutely no idea what he's talking about. 
+I tried to find some information on *cache age* but the nearest thing I found is link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control[this]. Hopefully I can find more information and understand what Jake is talking about here.
+I'm also confused by version number being generated. A build script will automatically update the service worker's URL to the new version? I don't know. Maybe I'll update this with more information with what Jake is talking about. I'm just going to continue on with the lesson anyway. 
+
+''''
+
+Here we've checked off one item in the TO-DO list 
+
+✔ Unobtrusive app updates +
+□ Get the user to use the latest version +
+□ Continually update cache of posts +
+□ Cache photos +
+□ Cache avatars
+
 == 3.22: Adding UX to the Update Process
+
+Jake reminds us that we want our users to get the latest update as soon as possible. 
+This lesson we will give the user a button to either ignore the update or refresh the page with the new version. 
+
+Now in order to do that, we have to use an API that gives us insight into the service worker life cycle.
+
+=== The service Worker properties and methods 
+
+When we register a service worker, it returns a promise. That promise fulfills with a service worker registration object. +
+The object has properties and methods relating to the service worker registration. +
+
+We get 2 methods: 
+
+* *reg.unregister();*  - unregister the service worker 
+* *reg.update();* - programatically trigger an update. 
+
+We also get 3 properties: 
+
+* *reg.installing;* - Means it's installing but it may be thrown away if the install fails.
+* *reg.waiting;* - we know there's an updated serviceWorker ready and waiting to take over.
+* *reg.active;*
+
+These will point to a serviceWorker object or be null. They will give you insight of the ServiceWorker lifecycle and they also map directly to the dev tools view we've been working with so far.
+
+The dev tools view is actually just looking at these registration objects.
+
+The registration object will give us an event when a new update is found. 
+----
+reg.addEventListener('updatefound', function() {
+// reg.installing has changed
+}
+----
+When updatefound is running, *.installing* becomes a new worker.
+
+''''
+In the ServiceWorker object itself, you can look at their state.
+----
+var sw = reg.installing;
+console.log(sw.state);  // logs "installing" but not yet completed.
+----
+
+The state can also be: 
+
+* *installed* - installation is completed successfully but not yet activated.
+* *activating* - The activate event has been fired, but not yet completed.
+* *activated* - The service worker is ready to receive fetch events.
+* *redundant* - The service worker has been thrown away. This happens if it failed to install or has been taken over by a newer service worker.
+
+The SW fires a new event *'statechange'* whenever the value of the state property changes.
+----
+sw.addEventListener('statechange', function() {
+// sw.state has changed
+});
+----
+
+=== The service Worker that controls the page 
+
+
+*navigator.serviceWorker.controller*
+
+To tell the user when there's an update is ready, but since the serviceWorker update happens in the background, we need a way to look at the state of things when the page loads. We should actually always be listening for future changes.
+
+
+We need to look at the state of things when the page loads.
+
+----
+if (!navigator.serviceWorker.controller) {
+// this page didn't load using a service worker so instead they loaded the content from the network. 
+}
+----
+
+otherwise we need to look at the registration. 
+
+----
+if (reg.waiting) {
+// there's an update ready and we tell the user.
+}
+----
+
+otherwise if there isn't an installing worker, there's an update in progress: 
+
+----
+if (reg.installing) {
+// there's an update in progress... buuuuut the update might fail so we have to listen to the state change with: 
+reg.installing.addEventListener('statechange', function() {
+// and track it with this till it reaches an installed state:
+    if (this.state == 'installed') {
+    // Here we would tell the user when it reaches the installed state.
+    }
+})
+}
+----
+
+otherwise we listen to the updatefound event to track the state of the installing worker until it reaches the *installed* state so we can tell the user.
+
+----
+reg.addEventListener('updatefound', function() {
+    reg.installing.addEventListener('statechange', function() {
+        if (this.state == 'installed') {
+        // we tell the user about the update. 
+        }
+    });
+
+});
+----
+
+All of these is how we tell the user about the update whether they're already there, in progress, or start some time later.
+
 == 3.23: Quiz: Adding UX Quiz
+
+Oh boy, the previous lesson was a huge one. Mike wants us to tell the user that there's an update available. 
+
+*Step 1*: Ready the template: 
+----
+git reset --hard
+git checkout task-update-notify
+----
+*Step 2*: We will be editing a different file this time. Head to public>js>main>IndexController.js +
+*Step 3*: There we will see the current To Do. Jake had already written us a method *updateReady*.
+----
+IndexController.prottype._updateReady = function() {
+    var toast = this.toastsView.show("New Version available", {
+    buttons: ['whatever']
+    });
+};
+----
+We need to call updateReady to show a notification to the user. Our job is to call it at the correct time. +
+
+*Step 4*: After we finished coding, we have to unregister our SW in the Dev Tools and refresh the page. That will reCache the javascript. +
+*Step 5*: After you've unregistered, go over to ServiceWorker public>js>sw>index.js and make a simple change such as adding comment. +
+*Step 6*: Then head over to the wittr app and refresh the page. You should see the notification of an updated version. +
+*Step 7*: To confirm that it was completed, go over to the settings page (localhost:8889) and type in the Test ID: *update-notify*. +
+*Step 8*: You should see the message *"Yay! There are notifications!"*
+
+=== The way Jake created a notification of changes.
+
+These are all inside the navigator.serviceWorker.register. 
+
+''''
+First we need to check if the ServiceWorker is falsy and if so, we bail. The user already has the latest version if it wasn't loaded via a service worker.
+----
+if(!navigator.serviceWorker.controller) {
+return;
+}
+----
+''''
+Now, if there's a worker waiting, we trigger the notification and return.
+----
+if (reg.waiting) {
+    indexController._updateReady();
+    return;
+}
+----
+''''
+Now, if there's a worker installing, we should listen to the state change by creating a new method called *trackInstalling*. +
+----
+if (reg.installing) {
+    indexController._trackInstalling(reg.installing);
+    return;
+}
+----
+With the new method trackInstalling, we take the worker and listen to its state change event.
+
+''''
+If there is an update, we will use trackInstalling again.
+----
+reg.addEventListener('updatefound', function() {
+    indexController._trackInstalling(reg.installing);
+    return;
+})
+----
+
 == 3.24: Trigger an Update
 == 3.25: Quiz: Triggering an Update Quiz
 == 3.26: Quiz: Caching the Page Skeleton
