@@ -609,12 +609,202 @@ So if I understand this correctly: +
 
 == 3.14: Hijacking Requests 3
 
+Instead of th image gif hijacking any jpg url like the previous lesson, Jake wants to give us a 404 page response. Also, we can give a message if the fetch fails or our network is offline. 
+A bit of a refresher: The page can send a request then we can intercept and send to the network. Instead of sending the response back, we can look at it and send back something else. +
+=== The network fetch() for a 404 page.
 
+----
+self.addEventListener('fetch, function(event) {
+    event.respondWith(
+        fetch(event.request).then(function(response) {
+            if (response.status === 404) {
+                return new Response("Whoops, not found!");
+            }
+                return response;
+        }).catch(function() {
+                return new Response("Something went wrong");
+    })
+    );
+});
+----
+
+=== What the code in the 404 page means
+
+*Step 1*: +
+*event.respondWith()* We will respond with a network fetch for the request. This is what the browser would do anyway. +
+*Step 2*: +
+*fetch(event.request)* the fetch method will take a full request object as well as a URL. The fetch will return a promise. +
+*Step 3*: + 
+*.then(function(response) {} )* Since fetch returns a promise, we can attach a .then to get the result if it was successful. +
+*Step 4*: + 
+Whatever we put inside .then(function(response) {*here*} is the callback. It will become the value for the promise. +
+*Step 5*: +
+*if (response.status === 404)*  Here we can look at the response ourselves, and if the response is a 404 Not Found... +
+*Step 6*: +
+*return new Response* We can respond with our own message. +
+*Step 7*: +
+*return response* Otherwise we can just return the response that was received. + 
+*Step 8*: +
+*.catch(function(response) {} )* .catch will be the fallback if there was a failure in the fetch or if the network is offline +
+*Step 9*: +
+Again with the .then, you can give it a *return new Response("message");*
 
 == 3.15: Quiz: Hijacking Requests 3 Quiz
+
+In this lesson, they us to chain two fetch requests together. 
+
+*Step 1*: First we have to ready our template. +
+
+----
+git reset --hard
+git checkout error-handling
+----
+
+*Step 2*: Instead of the new response being a custom text, Mike wants us to respond with the dr-evil.gif. +
+*Step 3*: We have to fetch from the network. +
+
+code refresher:
+----
+fetch("url")
+----
+
+
+*Step 4*: Then we have to navigate to a page that doesn't exist within wittr and see if the image shows. +
+*Step 5*: Once you see it working, confirm at the settings page (localhost:8889) and enter the Test ID: *gif-404* +
+*Step 6*: You should see the message *"Yay! 404 pages get gifs!"*
+
+=== The answer to giving the gif image to the 404 request 
+
+This one was easy if we reflect back to my revelation and rant in lesson link:ch3.asciidoc#my-struggle-on-this[3.13] +
+All we needed to do was add the fetch inside the if response. +
+
+----
+return fetch('/imgs/dr-evil.gif');
+----
+
 == 3.16: Caching and Serving Assets
+
+We have been doing simple texts and images, but it's about time to actually respond with something useful. To do this we need to store the HTML, CSS, etc.
+There's a special API for this called the *cache API*.
+
+=== Special cache API 
+
+* to *Open* a cache, type the following with the name of the cache. If we've never opened that cache name before, it will create one and return it.  
+----
+caches.open('my-stuff').then(function(cache) { // } )
+----
+
+NOTE: A cache box contains requests and response pairs from any secure origin. We can use it to store fonts, scripts, images, etc from our own origin as well as elsewhere on the web.
+
+* to *add* cache items, type the following and pass in a request/URL and a response.
+
+----
+cache.put(request, response);
+
+or
+
+cache.addAll ([
+'/foo',
+'/bar'
+])
+----
+
+WARNING: the addAll with the arrays way is atomic. Which means if any of those in the arrays fail to cache, none of them will be added.
+
+NOTE: addAll uses fetch under the hood, so requests will go via the browser cache.
+
+* to *retrieve* something out of the cache, we type in the following. It will only pass a request/URL. It will then return a promise for a matching response if one is found or null.
+
+----
+cache.match(request);
+
+or
+
+caches.match(request);
+//will search in any cache starting with the oldest.
+----
+
+=== The install event
+
+Now that we have somewhere to store our stuff, but now when do we store it?
+Jake shows that there's another service worker event that will install the cache.
+
+There are steps that the service worker install has to do 
+
+*Step 1*: We run the service worker the first time. +
+*Step 2*: The browser won't let the new service worker take control pages until it's install phase has been completed. We are in control of what that involves. +
+*Step 3*: We use the opportunity to get everything we need from the network and create a cache for the content.
+
+*Step 4*: To create an install event, we make a new self.addEventListener. +
+*Step 4*: inside the install eventListener, we added in an *event.waitUntil()*. It let's us signal the progress of the install. +
+*Step 5*: We then pass it a promise. If and when the promise resolves, the browser knows the install is complete. If the promise rejects, it knows the install failed, and should be discarded.
+
+----
+self.addEventListener('install', function(event) {
+    event.waitUntil()
+
+})
+----
+
 == 3.17: Quiz: Install and Cache Quiz
+
+Here we are going to try and install and cache.
+
+*Step 1*: We have to ready the template.
+
+----
+git reset --hard
+git checkout task-install
+----
+
+*Step 2*: What Mike wants us to do is open a cache name 'wittr-static-v1' and add cache the urls from urlsToCache.
+
+code refresher: 
+
+----
+#open a cache
+caches.open('my-stuff').then(function(cache) { // } 
+
+#to add cache
+cache.put(request, response); 
+or
+cache.addALL (['x', 'y', 'z'])
+
+----
+*Step 3*: To verify if we've made the cache, head over to Dev Tools > application> Cache Storage> 'wittr-static-v1' +
+image:img/devtools2.png[] +
+*Step 4*: To confirm that it was a success, head over to the settings page (localhost:8889) and enter in the Test ID: *install-cached* +
+*Step 5*: You should see the message: *"Yay! The cache is ready to go!"*
+
+=== How Jake installed the cache 
+
+This is how Jake created the caches.
+
+----
+ event.waitUntil(
+    caches.open('wittr-static-v1').then(function(cache) {
+    return cache.addAll([
+    '/',
+    'js/main.js',
+    'css/main.css',
+    'imgs/icon.png',
+    'https://fonts.gstatic.com/s/roboto/v15/2UX7WLTfW3W8TclTUvlFyQ.woff',
+    'https://fonts.gstatic.com/s/roboto/v15/d-6IYplOFocCacKzxwXSOD8E0i7KZn-EPnyo3HZu7kw.woff'
+  ]);
+    })
+
+ )
+
+an alternative way to use the array is just to call the variable *urlsToCache* like this:
+
+return cache.allAll(urlsToCache)
+----
+
+
 == 3.18: Quiz: Cache Response Quiz
+
+Now that we have created the caches, we should be able to use it now. 
+
 == 3.19: Updating the Static Cache
 == 3.20: Quiz: Update Your CSS Quiz
 == 3.21: Quiz: Update Your CSS 2
