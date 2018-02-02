@@ -757,7 +757,7 @@ git reset --hard
 git checkout task-install
 ----
 
-*Step 2*: What Mike wants us to do is open a cache name 'wittr-static-v1' and add cache the urls from urlsToCache.
+*Step 2*: What Mike wants us to do is open a cache name 'wittr-static-v1' and cache the urls from urlsToCache.
 
 code refresher: 
 
@@ -803,7 +803,72 @@ return cache.allAll(urlsToCache)
 
 == 3.18: Quiz: Cache Response Quiz
 
-Now that we have created the caches, we should be able to use it now. 
+Now that we have created the caches, we should be able to use it now. +
+Mike tells us that they haven't taught us the code on how to respond with a cache entry, but he did remind us that they did
+show us how to get things out of the cache.match and event.respondwith(). 
+
+code refresher: 
+----
+cache.match(request);
+
+or
+
+caches.match(request);
+//will search in any cache starting with the oldest.
+----
+
+In this lesson, we are going to put these together to try and use a cache.
+Here's a handy website talking about the Cache API and more information on this subject: link:https://developers.google.com/web/ilt/pwa/caching-files-with-service-worker[caching files with service worker]
+
+*Step 1*: Ready the template 
+
+----
+git reset --hard
+git checkout task-cache-response
+----
+
+*Step 2*: All the work is going to be at the usual service worker script in public>js>sw>index.js +
+*Step 3*: The TODO is to respond with an entry from the cache if there is one, if there isn't, we will have to fetch it from the network. +
+
+*Mike's hint*: We have to call with event.respondWith() synchronously. We cannot call it with a promise handler because it's already too late to do that. 
+
+code refresher: 
+----
+
+    event.respondWith(
+        x(event.request).then(function(response) {
+            if 
+            else
+        })
+
+----
+
+code refresher: 
+----
+event.request is the original request
+fetch(event.request)
+----
+
+*Step 4*: Once you have the code going, test to see if it works by going to the settings page (localhost:8889) and try offline mode to see if the website is still up. +
+*Step 5*: While still in the setting's page, select back to online and confirm that it's working by typing in the Test ID: *cache-served*. +
+*Step 6*: You should see the message *"Yay! Cached responses are being returned!"* +
+
+=== How Jake created a cache and used it 
+
+----
+event.respondWith(
+    caches.match(event.request).then(function(response) {
+        if (response) return response;
+        return fetch(event.request)
+        }))
+
+or 
+
+event.respondWith(
+    caches.match(event.request).then(function(response) {
+        return response || fetch(event.request)
+    }))
+----
 
 == 3.19: Updating the Static Cache
 == 3.20: Quiz: Update Your CSS Quiz
