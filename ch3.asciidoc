@@ -1188,7 +1188,18 @@ if (reg.waiting) {
 }
 ----
 ''''
-Now, if there's a worker installing, we should listen to the state change by creating a new method called *trackInstalling*. +
+Now, if there's a worker installing, we should listen to the state change by using the if statement. Jake wanted to save some time so he created the method to be used. +
+----
+IndexController.prototype._trackInstalling = function() {
+  reg.installing.addEventListener('statechange', function() {
+    if (this.state == 'installed') {
+      indexController._updateReady()
+    }
+  })
+}
+----
+
+We will call trackInstalling rather than retyping that whole thing again.
 ----
 if (reg.installing) {
     indexController._trackInstalling(reg.installing);
@@ -1198,14 +1209,108 @@ if (reg.installing) {
 With the new method trackInstalling, we take the worker and listen to its state change event.
 
 ''''
-If there is an update, we will use trackInstalling again.
+If there is an update, we will use trackInstalling again using *reg.installing*. 
 ----
 reg.addEventListener('updatefound', function() {
     indexController._trackInstalling(reg.installing);
     return;
 })
 ----
-
+''''
 == 3.24: Trigger an Update
+
+We got the notification, but we need the user to be able to press the button to update the page, delete the old service worker, and refresh the page using the newest cache. +
+
+To achieve this, we get to use 3 new components.
+
+* *self.skipWaiting()* - a service worker can call this while it's waiting or installing. It means that it shouldn't queue behind another service worker. In other words: it should take over straight away. +
+We want to use self.skipWaiting() when the user hits the refresh button in the update notification. 
+
+Now there's a new question: How do we send the signal from the page to the waiting service worker?
+
+''''
+The webpage can send messages to any service worker using *postMessage*.
+
+from a page: 
+----
+reg.installing.postMessage({foo: 'bar'})
+----
+
+in the service worker: 
+----
+self.addEventListener('message', function(event) {
+    event.data; // {foo: 'bar'}
+}
+----
+
+With the postMessage and message eventListener working together the user can now click the refresh button it will send a message to our service worker telling it to call skipWaiting.
+
+''''
+
+The page gets an event when its value changes meaning that a new service worker has taken over.
+This is the signal that we should reload the page.
+
+----
+navigator.serviceWorker.addEventListener('controllerchange', function() {
+// navigator.serviceWorker.controller has changed
+}
+----
+
 == 3.25: Quiz: Triggering an Update Quiz
+
+Now we need to make that button to update the page. 
+
+*Step 1*: Ready the template
+----
+git reset --hard
+git checkout task-update-reload 
+----
+*Step 2*: head over to public>js>main>indexController.js +
+*Step 3*: Mike reminds us that there's a method called *\_updateReady* which is the message that gets shown when there's an update ready. + 
+*Step 4*: In the same \_updateReady method we have to control what pressing the *'refresh'* button will do. +
+There we will have to send a message to the new service worker and tell it to take control of pages immediately. +
+*Step 5*: back in public>main>js>sw>index.js  there's a different TODO at the very bottom. There we can listen for the message to take over page control. +
+*Step 6*: now we head back to indexController.js there's a different TODO near the top. There we need to listen for the pages controlling service worker changing and using that as a signal to reload the page.
+*Step 7*: Head over to wittr app's Dev Tools and unregister the SW. 
+*Step 8*: Make a change in index.js. maybe a comment. anything. +
+
+*The following is a bit tricky so you need to do these carefully*
+
+*Step 9*: Now you can refresh the wittr app page. You should get a notification to refresh or dismiss. Make sure you don't click the buttons yet. Keep in mind you have 8 seconds to finish the following steps. +
+*Step 10*: If you want to confirm the changes, head over to the settings page (localhost:8889) and type in Test ID *update-reload*. You should see a loading image with nothing yet. +
+*Step 11*: Quickly go back to the wittr app and hit refresh. +
+*Step 12*: You should see the message *"Yay! The page reloaded!"*
+
+=== How Jake made the button refresh 
+
+Inside indexController.js, the function when someone presses the 'refresh' button, we use the worker to send a post message. We use an *"action"* method to communicate with each other. The action will give the string *'skipWaiting'*.
+----
+    worker.postMessage({
+      action: 'skipWaiting'
+    })
+----
+
+Inside sw's script index.js we listen to see if the refresh button was pressed and the action: 'skipWaiting' was called.
+----
+self.addEventListener('message', function(event) {
+  if (event.data.action == 'skipWaiting') {
+    self.skipWaiting();
+  }
+})
+----
+
+Back inside indexController.js, we have a different listener that listens to see if there's a new service worker installed so we reload the webpage.
+----
+  navigator.serviceWorker.addEventListener('controllerchange', function() {
+    window.location.reload();
+  })
+----
+
+Now that this is complete, we can check off another on the list: 
+✔ Unobtrusive app updates
+✔ Get the user to use the latest version
+□ Continually update cache of posts
+□ Cache photos
+□ Cache avatars
+
 == 3.26: Quiz: Caching the Page Skeleton
