@@ -1314,3 +1314,60 @@ Now that this is complete, we can check off another on the list:
 □ Cache avatars
 
 == 3.26: Quiz: Caching the Page Skeleton
+
+In this lesson, we will swap out the root page for a skeleton page. 
+
+*Step 1*: Ready the template 
+----
+git reset --hard
+git checkout task-page-skeleton
+----
+*Step 2*: Head over to the SW file public>js>sw>index.js
+*Step 3*: The actual TODO: is to change which page is being served into the cache. Right now is the root page. We want a page skeleton to be fetched when the root page is requested. +
+*Step 4*: Once you're done, refresh the wittr app page and you will see a new service worker along with the notificate of a new update. +
+*Step 5*: To see if the changes worked, right click ont he page to view source on the root page. The source should be small. +
+*Step 6*: To confirm that everything was done correctly, go over to the settings page (localhost:8889) and in the Test ID type: *serve-skeleton*. +
+*Step 8*: You should see the message *"Yay! The page skeleton is being served!"*
+
+=== How Jake changed the root page to a skeleton page 
+
+*Step 1*: The first thing he did was manually change the */* to */skeleton* inside the open cache function. +
+*Step 2*: Jake up'd the version of SW. +
+*Step 3*: Now for the way of changing the URL when requested.... +
+
+This part is completely new to the lesson. Inside the new fetch event listener, he created a new variable that requests the new URL with link:https://developer.mozilla.org/en-US/docs/Web/API/URL/URL[url()].
+----
+var requestUrl = new URL(event.request.url);
+----
+
+Next he checks to see if the request origin is the same as the current origin using the variable that was created. Jake reminds us that SW handles requests for other origins too, so we would need to be more specific. In this case we want to intercept root requests for the link:https://www.w3schools.com/jsref/prop_loc_origin.asp[same origin].
+
+----
+if (requestUrl.origin === location.origin) { }
+----
+
+Now if we need to check if the response pathname we got was the root using the variable that was created.
+
+----
+if (requestUrl.pathname === '/') { }
+----
+
+If the response is the root we want to respond with the skeleton straight from the cache. We don't need to go to the network as a fallback since the skeleton cache was part of the install step.
+
+----
+event.respondWith(caches.match('/skeleton'));
+return;
+----
+
+Here's how it looks all together: 
+----
+self.addEventListener('fetch', function(event) {
+var requestUrl = new URL(event.request.url);
+
+if (requestUrl.origin === location.origin) {
+  if (requestUrl.pathname === '/') {
+    event.respondWith(caches.match('/skeleton'));
+    return;
+  }
+}
+----
