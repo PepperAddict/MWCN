@@ -11,7 +11,7 @@ link:ch2.asciidoc[Chapter 2] : The Benefits of Offline First +
 link:ch3.asciidoc[Chapter 3] : Introducing the Service Worker +
 Chapter 4 : IndexedDb and Caching +
 Chapter 5 : Next Up +
-Chapter 6 : Syntax +
+link:ch6.asciidoc[Chapter 6] : Syntax +
 Chapter 7 : Functions + 
 Chapter 8 : Built-Ins + 
 Chapter 9 : Professional Developer-fu +
