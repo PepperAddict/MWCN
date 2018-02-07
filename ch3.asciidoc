@@ -1188,7 +1188,7 @@ if (reg.waiting) {
 }
 ----
 ''''
-Now, if there's a worker installing, we should listen to the state change by using the if statement. Jake wanted to save some time so he created the method to be used. +
+Now, if there's a worker installing, we should listen to the state change by using the if statement. Jake wanted to save some time so he created the method to be used. Be sure you put this in its own and not with service worker registration. +
 ----
 IndexController.prototype._trackInstalling = function() {
   reg.installing.addEventListener('statechange', function() {
