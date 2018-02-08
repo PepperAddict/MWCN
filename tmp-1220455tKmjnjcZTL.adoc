@@ -262,7 +262,7 @@ The destructuring assignment syntax is a JavaScript expression that makes it pos
 
 ____
 
-IMPORTANT: There are different rules to *destructuring* when it comes to arrays and objects.
+The new way is a lot more simpler and goes by positions. The value of the array is now on the left side but it shares the same position as the original. If you need to leave something out, it can just have an empty #, ,# for each position you want to leave out. +
 
 ''''
 
@@ -288,10 +288,7 @@ let positions = ['Gabrielle', 'Jarrod', 'Kate', 'Fernando', 'Mike', 'Walter'];
 let [first, second, third] = positions;
 ----
 
-If you wanted to know what would run if you typed in *console.log(second)*, you would get _Jarrod_ because he is in the second slot.
-
-To further understand it, I made an image: +
-image:img/destArr.png[]
+position second is shared with Jarrod. 
 
 === Destructuring from an object
 The old way for destructuring an object was like this: 
@@ -317,9 +314,7 @@ The new way for dstructuring an object should be written like this:
 ----
 const gemstone = {
     type: 'quartz',
-    what: false,
     color: 'rose',
-    else: 'cheeseburger',
     karat: 21.29
 };
 
@@ -328,37 +323,7 @@ const {type, color, karat} = gemstone;
 console.log(type, color, karat);
 ----
 
-image:img/destOBJ.png[]
-
-Arrays destructuring went by position, but objects, you just use their property name. 
-
-NOTE: When you destructure an object and store a function into a variable, it no longer has access to *this* It will try and use the global.
-
-=== What about *this* ?
-
-----
-const circle = {
-radius: 10,
-color: ‘orange’,
-getArea: function() {
-return Math.PI * this.radius * this.radius;
-},
-getCircumference: function() {
-return 2 * Math.PI * this.radius;
-}
-};
-
-let {radius, getArea, getCircumference} = circle;
-----
-
-If we tried to do a *console.log(getArea)*, we would get a *NaN* because when we destructured circle, it no longer has access to what *this* and would try and retrieve from global instead. +
-so inside the function, _this.radius_, the call was trying to look for a _radius_ variable from global and not inside the circle object.
-
-The best way to regain access with the getArea function using *this* to listen to its mommy circle object, we can use *bind*, *apply*, and *call*. +
-To use *call* we put in *getArea.call()*. Inside the *()* we should refer to the original object with the function. So together it would look: +
-*console.log(getArea.call(circle))*
-
-
+NOTE: When you destructure an object and store a function into a variable, it no longer has access to *this*.
 
 
 == 6.7: Quiz: Destructuring Arrays(1-3)
@@ -443,7 +408,7 @@ Basically *function* keyword was unecessary and was removed.
 First half summary:
 
 * *let* and *const* are the new ways of declaring variables. *let* can be reassigned, but cannot be redeclared. *const* cannot be reassigned nor redeclared. 
-* *template literals* replaces the concatenation operator. instead of _'string' + PH + 'string' + '\n' + PH + 'string'_ , you can now envelope everything with a back tick, placeholders are just encased in ${placeholder}, and strings are just left alone. Also, any new line is preserved as part of the string. example: 
+* *template literals* replaces the concatenation operator. instead of _'string' + PH + 'string' + '\n' + PH + 'string'#, you can now envelope everything with a back tick, placeholders are just encased in ${placeholder}, and strings are just left alone. Also, any new line is preserved as part of the string. example: 
 ----
 let message = 
 `
@@ -451,33 +416,9 @@ ${placeholder} string string
 string string 
 `
 ----
-* *Destructuring* arrays and objects makes it a whole lot more simpler to unpack values.  Instead of creating a new variable for each line, now we can mash them all together and only the placement is important. However, if we need to skip one, we use an empty comma. 
-----
-const things = ['red', 'basketball', 'paperclip', 'green', 'computer', 'earth', 'udacity', 'blue', 'dogs'];
-
-const [one, , ,two, , , ,three] = things;
-----
-* *shorthand ways of initilizing an object*. If the object was going to have the same property as the name, we can now just use it once. example of the old way: _const gemstone = {type:type, color:color}_   Now we can just make it like this: *let gemstone = {type, color}*
-
-''''
-The second half of chapter 6 is is going to consist of: 
-
-* iteration
-* for...of loop 
-* rest parameter 
-* spread operator
 
 
 == 6.10: Iteration
-
-They recommend the best way to understand iteration is to look at a normal for loop. 
-
-----
-for (let i = 0; i < 10; i++) {
-    console.log(digits[i];
-}
-----
-
 == 6.11: Family of For Loops
 == 6.12: For...of Loop
 == 6.13: Quiz: Writing a For...of Loop(1-4)

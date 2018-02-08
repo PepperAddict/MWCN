@@ -42,7 +42,7 @@ NOTE: If by any chance you accidentally registerred it when there's already a SW
 it will just return a promise from the existing registration. Not a big deal.
 
 ''''
-
+=== Registration's scope 
 You can also provide a scope for the SW during registration.
 A scope are the directory/files that SW can control. It will ignore anything else.
 
