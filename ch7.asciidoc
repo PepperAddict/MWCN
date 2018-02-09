@@ -1,0 +1,307 @@
+:library: Asciidoctor
+:toc:
+:toc-placement!:
+
+= Grow with Google Challenge Notes: Chapter 7
+
+Function notes +
+To go back to the README where all the chapters are: click link:README.asciidoc[here].
+
+
+toc::[]
+
+== 7.1 Updates to Functions 
+
+Here is a little introduction to what the lesson will be about. 
+
+The checklist on the previous chapter was this. Now we can check off Syntax since we completed chapter 6.
+
+* [x] Lesson 1 - *Syntax* - changes and addition to the Javascript Syntax.
+* [ ] Lesson 2 - *Functions* - We will investigate updates to JavaScript Functions. 
+* [ ] Lesson 3 - *Built-Ins* - We will cover new ES6 built ins. 
+* [ ] Lesson 4 - *Developer-Fu* - We will wrap things up by showing you how you can incorporate these latest updates into your next JavaScript project.
+
+<<< 
+The two instructors covers what we will be trying to learn in this lesson.
+
+* We will learn the new way to write functions called *arrow functions*. 
+* We will also be learning about the new *class* keyword that lets you create functions as classes. 
+* With the new ES6 we can now set the default function parameters.
+* We can connect different classes together using the new *super* and *extends* keywords.
+
+
+== 7.2 Arrow Functions 
+
+We're introduced to a new and easier way to write functions. 
+This uses the fat arrow in place of function. 
+
+Here is the old way to write a function....
+In this example we use the link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map[.map()] method that functions on every element of an array and then gathers the returned values from each function call and makes a new array with the results.
+----
+const upperizedNames = ['Farrin', 'Kagure', 'Asser'].map(function(name) { 
+  return name.toUpperCase();
+});
+----
+
+and then here's the new way using the *=>* 
+----
+const upperizedNames = ['Farrin', 'Kagure', 'Asser'].map(
+  name => name.toUpperCase()
+);
+----
+
+This new method of creating functions makes it a whole lot more easier to understand. +
+No more need for _function(x) {code}_ now it's just *x => code*.
+
+== 7.3 Using Arrow Functions 
+
+Functions can either be link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function[function declarations] or link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/function[function expressions].
+
+Before I move on with this subject, I need to understand what those two mean. 
+
+* Function declaration is a function that doesn't require variable assignment. They are standalone and cannot be nested within non-function blocks. They also must start with *function* and then name just like how variables must start with var/let/const and then name. 
+----
+function nameOF(a, b) {
+    return a + b;
+}
+
+nameOf(3, 2) // 5
+nameOf // function 
+----
+
+
+* Function expression can be named or it can be anonymous. Function expressions cannot start with *function*. Typically function expressions are part of a larger expression syntax.
+
+example of a function expression:
+----
+var a = function() { //anonymous }
+var a = function b() { // named }
+----
+
+okay, I think I can move on now... 
+
+''''
+
+Arrow functions can only be *expressions*.  The full name of function expression is *arrow function expressions*. So that mean they have to follow the same rules as a function expression.
+
+* stored in a variable
+* passed as an argument to a function 
+* and stored in an object's property.
+
+=== Writing the arrow function 
+
+Now writing it can get a bit confusing.
+
+old way for *greet('Asser')*
+----
+const greet = (function(name)) {
+    return 'Hello' + name;
+}
+----
+
+now it's a whole lot more simpler with the arrow function
+
+Here's one with only one parameter
+----
+const greet = name => `Hello ${name}`;
+
+or
+
+const greet = (name) => `Hello ${name}`;
+----
+
+both will print: Hello Asser. In these cases they only have one parameter to worry about. Now what if there are *two or more* items in the parameter list? And what if there are none?
+
+* Here's how it would look like if it was an empty parameter. Seems to require the paranthesis or you can use an underscore in place of the empty paranthesis.
+----
+const greet = () => code 
+
+or 
+
+const greet = _ => code
+----
+
+* multiple parameters also requires the paranthesis. 
+----
+const greet = (name, age) => code
+----
+
+''''
+[NOTE]
+====
+
+The underscore was entirely new to me so I had to go look it up. 
+the underscore is very common in other languages. Having you omit parameters with () is bad practice? 
+
+Another user also mentions that () gives the impression that there will not be any arguments so it never bothered to declare any parameter.
+
+Though if you use the underscore, you're telling the function that there will be arguments, but maybe not so just leave the space open.
+
+I'm not entirely sure about all of this though, so I may have to do more research.
+
+====
+''''
+=== concise and block body syntax 
+
+They gave the quiz before talking about this which I thought was unfair. So what does concise and block body syntax mean when it comes to writing functions?
+
+* concise body function +
+Up until now, we've been using a concise body syntax which means 
+** has no curly braces surrounding the function body 
+** and automatically returns the expression. +
+
+example: 
+----
+const upperizedNames = ['Farrin', 'Kagure', 'Asser'].map(
+  name => name.toUpperCase()
+);
+----
+
+* block body function + 
+This is more if need more than a single line of code in the arrow function.
+** it uses curly braces to wrap the function body 
+** and a *return* statement needs to be used to actually return something from the function.
+
+example: 
+----
+const upperizedNames = ['Farrin', 'Kagure', 'Asser'].map( name => {
+  name = name.toUpperCase();
+  return `${name} has ${name.length} characters in their name`;
+});
+----
+
+=== arrow function quiz 1
+
+The question is "Which of the following choices have correctly formatted arrow functions?"
+
+NOTE: You can use an underscore to replace the empty paranthesis. They will both result in undefined and maybe an underscore would be better in a sea of paranthesis. I can't seem to find anymore information on this so maybe I'll update this post once I do.
+
+The way it was written confused me so I'm just going to lay it out here.
+
+----
+1   setTimeout( () => { console.log('starting the test');
+    test.start();}, 2000);
+
+    empty parameter and uses block body > yes
+
+2   setTimeout( _ => { console.log('starting the test');
+    test.start();}, 2000);
+
+    empty parameter and uses block body > yes
+
+3   const vowels = 'aeiou'.split('');
+    const bigVowels = vowels.map((letter) => letter.toUpperCase());
+
+    single parameter and uses concise body > yes
+
+4   const vowels = 'aeiou'.split('');
+    const bigVowels = vowels.map(letter => letter.toUpperCase());
+
+    single parameter and uses concise body > yes
+----
+
+=== arrow function quiz 2
+
+Let's ignore that the previous quiz didn't follow the same rules as this one... 
+
+Question: Which of these used the correctly formatted arrow functions?
+
+----
+1   const color = ['red', 'blue', 'green', 'yellow', 'orange, 'black'];
+
+   const crazyColors = colors.map( color => { 
+        const jumble = color.split('').reverse();
+        return jumble.join('') + '!';
+
+    });
+
+    block body needs a return which it does > yes
+
+2   const color = ['red', 'blue', 'green', 'yellow', 'orange, 'black'];
+
+    const crazyColors = colors.map( color => {
+        colors.split('').reverse().join('') + '!';
+
+    });
+
+    block body does not have a return > no
+
+3   const color = ['red', 'blue', 'green', 'yellow', 'orange, 'black'];
+
+    const crazyColors = colors.map( color => return color.split('').reverse().join('') + '!');
+
+
+    concise body automatically returns the expression so it doesn't need the return keyword. > no
+
+
+4   const color = ['red', 'blue', 'green', 'yellow', 'orange, 'black'];
+
+    const crazyColors = colors.map( color => color.split('').reverse().join('') + '!');
+
+    concise body with no return > yes
+----
+
+
+== 7.4 Quiz: Convert Function into an Arrow Functions 
+
+Quiz time! 
+
+This one was a breeze considering we spent so much time on the previous!
+
+All we had to do was change the old function to the arrow function 
+----
+const squares = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(function(square) {
+	return square * square;
+});
+----
+
+is now 
+
+----
+const squares = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(square => square * square);
+
+or 
+
+const squares = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(square => { return square * square};
+----
+
+== 7.5 Arrow Functions Recap 
+
+So far I am really enjoying the new arrow functions. Especially the fact we don't need to type in the function keyword anymore. And if we're using the concise version, we don't need {} and return anymore. 
+Unfortunately, it doesn't replace all functions. The arrow functions are only for for *function expressions*. 
+
+Now they're telling us that there's another drawback to arrow functions. The *this* keyword is different from the regular functions.
+
+...more on that in 7.6...
+
+== 7.6 Arrow Functions and the "this" Keyword 
+
+== 7.7 "this" and Regular Functions 
+
+== 7.8 "this" and Arrow Functions 
+
+== 7.9 Default Function Parameters
+
+== 7.10 Defaults and Destructuring 
+
+== 7.11 Quiz: Using Default Function Paramters (2 - 2)
+
+== 7.12 Class Preview
+
+== 7.13 Javascript's Illusion of Classes 
+
+== 7.14 Javascript Classes 
+
+== 7.15 Convert a Function to a Class 
+
+== 7.16 Working with JavaScript Class
+
+== 7.17 Super and Extends 
+
+== 7.18 Extending Classes from ES5 to ES6 
+
+== 7.19 Working with JavaScript Subclasses
+
+== 7.20 Quiz: Building Classes and Subclasses (2 - 3)
+
+== 7.21 Lesson 2 Summary

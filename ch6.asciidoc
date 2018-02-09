@@ -25,10 +25,10 @@ In this course, we will explore the additions to the javascript program so we ca
 
 The lesson will be broken down to four parts. 
 
-* Lesson 1 - *Syntax* - changes and addition to the Javascript Syntax.
-* Lesson 2 - *Functions* - We will investigate updates to JavaScript Functions. 
-* Lesson 3 - *Built-Ins* - We will cover new ES6 built ins. 
-* Lesson 4 - *Developer-Fu* - We will wrap things up by showing you how you can incorporate these latest updates into your next JavaScript project.
+* [ ] Lesson 1 - *Syntax* - changes and addition to the Javascript Syntax.
+* [ ] Lesson 2 - *Functions* - We will investigate updates to JavaScript Functions. 
+* [ ] Lesson 3 - *Built-Ins* - We will cover new ES6 built ins. 
+* [ ] Lesson 4 - *Developer-Fu* - We will wrap things up by showing you how you can incorporate these latest updates into your next JavaScript project.
 
 
 == 6.2: Let and Const
@@ -769,9 +769,9 @@ function sum() {
 }
 ----
 
-It would work, but it had a few issues on its readability.
-1. It has no parameters even though what we learned about variadic functions, the sum() should be able to hold an indefinite amount of arguments.
-2. It's difficult to understand. 
+It would work, but it had a few issues on its readability. +
+1. It has no parameters even though what we learned about variadic functions, the sum() should be able to hold an indefinite amount of arguments. +
+2. It's difficult to understand what was going on. 
 
 Here's the sum function with the rest parameter.
 ----
@@ -786,4 +786,71 @@ function sum(...nums) {
 
 
 == 6.16: Quiz: Using the Rest Parameter(1-5)
+
+The rule is that we have to try and get the average when these numbers get entered
+----
+average(2, 6) should return 4
+average(2, 3, 3, 5, 7, 10) should return 5
+average(7, 1432, 12, 13, 100) should return 312.8
+average() should return 0
+----
+
+What's already there is an average function. Now we will have to put what we learned for it to output an average. 
+
+I had to go back to elementary school to figure out how to even get an average in the first place. +
+*Add the numbers together and then divide how many there are* ex: 6 + 11 + 7 = 24    24 / 3 = 8   so 8 is the average. +
+
+*Step 1*: 
+The first step is a way to turn it into an array with the rest parameter.
+----
+function average(...nums) {
+}
+----
+
+*Step 2*: create a variable as a starting point. Since it will be changed, might as well just use *let*. One for the total numbers and one for the average.
+----
+let total = 0;
+let avg = 0;
+----
+
+*Step 3*: We would need to use a for...of loop to iterate what's in the array.
+----
+for (const num of nums) {
+}
+----
+
+*Step 4*: Now we need to do something with that information. +
+I want to add each of the numbers and store it into total. With that total information, I want to divde the length of nums that the user will input.  It will look like the math: (x + y) / z and store that into the avg variable.
+
+----
+avg = (total += num) / nums.length;
+----
+
+*Step 5*: Now we can just return the information from avg. *return avg* outside of that for...of loop. 
+
+Here's how they all looked together: 
+
+----
+
+function average(...nums) {
+    let total = 0;
+    let avg = 0;
+    for (const num of nums) {
+        avg = (total += num) / nums.length;
+
+}
+
+    return avg;    
+}
+----
+
+
 == 6.17: Lesson Summary
+
+This part is just a very quick video to tell us what they've covered such as: 
+* let & const 
+* iterators 
+* spread operator
+* rest parameter 
+
+In lesson 2 we will work on all the updates that were added to functions.
