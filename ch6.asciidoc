@@ -334,6 +334,15 @@ Arrays destructuring went by position, but objects, you just use their property 
 
 NOTE: When you destructure an object and store a function into a variable, it no longer has access to *this* It will try and use the global.
 
+''''
+Now what if we wanted to give the destructured object a different variable and not what was in the object? +
+In that case, we can set it up using *:*. 
+
+----
+const {type: newNAME1, color: newNAME2, karat: newNAME3} = gemstone
+----
+
+
 === What about *this* ?
 
 ----
@@ -478,10 +487,303 @@ for (let i = 0; i < 10; i++) {
 }
 ----
 
+* In the for loop we give it an *i* variable. It can be any variable, but *i* is typical since it stands for iteration. +
+An iterator keeps track of your place in the loop. When it comes to looping an array, the iterator works like an index and lets you access each item in the array one after another. #The process of getting the next item one after the other is iteration#.
+
+=== What's new in ES6 with for loops?
+
+* Iterable protocol - allows javaScript objects to define or customize their *iteration behavior*. +
+Which is a new iterable interface that allows us to customize how objects are iterated. ie: changes how they're looped.
+
+More information on Iterable protocol will be discussed when they talk about symbols.
+
+* for...of loop - a loop that iterates over iterable objects - This loops exclusively over iterable objects. So what does an iterable object mean?
+
+They want us to replace the old for loop with the new for...of loop. More will be discussed in the lesson.
+
+
 == 6.11: Family of For Loops
+
+The *for...of loop* was added in ES6. It combines the strengths of its siblings: *for loop* and the *for...in loop* to loop over any type of data that is iterable. Which means it has to follow the rules of link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols[iteration protocols].
+The data types it can loop are strings, arrays, maps, and sets. By default, it doesn't iterate object data types.
+
+=== Here's the old for loop. 
+
+----
+const digits = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+for (let i = 0; i < digits.length; i++) {
+  console.log(digits[i]);
+}
+
+----
+Which prints out 0 - 9 one by one.
+
+The biggest downside of a for loop is having to keep track of the counter and exit condition. 
+the counter is the first part i = 0. the exit condition is digits.length. 
+This for loop is great for arrays, but other data types won't work that well.
+
+=== Here's the for...in loop
+
+the drawbacks of the for loop was improved with the for...in loop. It eliminates the counting logic and exit condition but outputs the same as the for loop.
+
+----
+const digits = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+for (const index in digits) {
+  console.log(digits[index]);
+}
+----
+
+You still have to use an index to access the values of the array. Also, the biggest issue with for...in loops is that you get in trouble when you need to add an extra method to an array or another object. +
+Since for...in loops loop over all enumerable properties, this means if you add any additional properties to the array's prototype, then those properties will also appear in the loop.
+
+----
+Array.prototype.decimalfy = function() {
+  for (let i = 0; i < this.length; i++) {
+    this[i] = this[i].toFixed(2);
+  }
+};
+
+const digits = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+for (const index in digits) {
+  console.log(digits[index]);
+}
+----
+
+will print out...
+----
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+function() {
+ for (let i = 0; i < this.length; i++) {
+  this[i] = this[i].toFixed(2);
+ }
+}
+----
+
 == 6.12: For...of Loop
+
+The for...of loop is used to loop over any type of data that is iterable.
+
+You would write a for...of loop almost exactly like you would write a for...in loop, except you swap out in with of and remove index.
+
+----
+const digits = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+for (let digit of digits) {
+  console.log(digit);
+}
+----
+
+NOTE: For good practice, when giving the name of the arrays, use plural, but when giving it a new name in the for...of loop, give it a singular name. When you do call it, you call the singular version.
+
+
+=== stop or break a for...of loop
+----
+const digits = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+for (const digit of digits) {
+  if (digit % 2 === 0) {
+    continue;
+  }
+  console.log(digit);
+}
+----
+will print out 
+
+----
+1
+3
+5
+7
+9
+----
+
+This way would make it far easier to read and understand.
+
 == 6.13: Quiz: Writing a For...of Loop(1-4)
+
+The quiz wants us to  write a for...of loop that:
+
+* loops through each day in the days array
+* capitalizes the first letter of the day 
+* and prints the day out to the console
+
+using this 
+
+----
+const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+----
+
+From what we've learned, here's how to write a for...of looop to print out each entry in the array.
+----
+for (let day of days) {
+console.log(day);
+}
+----
+Now how do we capitalize the first letter of the day?
+
+first we need to store the new information in the variable. Next we need to select that first letter using link:https://www.w3schools.com/jsref/jsref_charat.asp[charAt(index)]. Then we use that information for the link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/toUpperCase[toUpperCase].
+----
+day = day.charAt(0).toUpperCase()
+----
+Then we need to glue the rest with link:https://www.w3schools.com/jsref/jsref_substr.asp[substr(start, end)]. since second part is left out, it'll be just be the rest.
+----
+day = day.charAt(0).toUpperCase() + day.substr(1)
+----
+
+Here's how it all came togteher:
+----
+for (let day of days) {
+    day = day.charAt(0).toUpperCase() + day.substr(1);
+    
+    console.log(day);
+}
+
+----
+
 == 6.14: Spread... Operator
+
+A spread operator is (*...*).
+The spread operator gives us the ability to expand, or spread link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Iterators_and_Generators#Iterators[iterable object] into multiple elements.
+
+example 1: 
+
+----
+const books = ["Don Quixote", "The Hobbit", "Alice in Wonderland", "Tale of Two Cities"];
+console.log(...books);
+
+
+prints: Don Quixote The Hobbit Alice in Wonderland Tale of Two Cities
+----
+
+example 2:
+
+----
+const primes = new Set([2, 3, 5, 7, 11, 13, 17, 19, 23, 29]);
+console.log(...primes);
+
+Prints: 2 3 5 7 11 13 17 19 23 29
+----
+
+The first example would work regardless of the spread operator, but the example is where the spread operator is useful.
+In example 2 both of the array and set have been expanded into their individual elements. 
+
+Here's more information on link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set[sets]. Sets is a new built-in object and was recently added in ES6.
+
+=== Combining arrays using the spread operator
+
+Another example of the spread operator being useful is combining arrays.
+
+The old way of combining arrays, we had to use concat() method.
+----
+const fruits = ["apples", "bananas", "pears"];
+const vegetables = ["corn", "potatoes", "carrots"];
+const produce = fruits.concat(vegetables);
+console.log(produce);
+
+Prints: 
+["apples", "bananas", "pears", "corn", "potatoes", "carrots"]
+----
+
+Since ES6 is all about writing less, there's a better way to combine arrays.
+
+----
+const fruits = ["apples", "bananas", "pears"];
+const vegetables = ["corn", "potatoes", "carrots"];
+
+const produce = [fruits, vegetables];
+
+console.log(produce);
+
+prints out:
+ [ [ 'apples', 'bananas', 'pears' ],
+  [ 'corn', 'potatoes', 'carrots' ] ]
+----
+
+but if we use the spread operator for each of the arrays...
+
+----
+const produce = [...fruits, ...vegetables];
+
+console.log(produce);
+
+prints out: 
+[ 'apples', 'bananas', 'pears', 'corn', 'potatoes', 'carrots' ]
+----
+
+
 == 6.15: ...Rest Parameter
+
+So the spread operator spreads an array into multiple elements, so the opposite of that would be a way to bundle multiple elements into an array.
+
+Introducing the *rest parameter*. It's written the same way as the spread operator with the three consecutive dots (*...*). 
+
+The rest parameter allows us to represent an indefinite number of elements as an array.
+
+When we use the ...rest parameter in an array destructuring example below:
+----
+const order = [20.17, 18.67, 1.50, "cheese", "eggs", "milk", "bread"];
+const [total, subtotal, tax, ...items] = order;
+console.log(total, subtotal, tax, items);
+
+prints: 20.17 18.67 1.5 ["cheese", "eggs", "milk", "bread"]
+----
+
+Basically when you use (...) in this case, it created a new array with the rest of the items in the order array.
+
+''''
+Here's another example of the rest parameter. This one is with the for...of loop.
+----
+printPackageContents('cheese', 'eggs', 'milk', 'bread');
+function printPackageContents(...items) {
+    for (const item of items) {
+        console.log(item);
+    }
+}
+----
+
+''''
+The ...rest parameter is also great when it comes to variadic functions. +
+Variadic functions are functions that take an indefinite number of arguments. such as the *sum()* function. example: *sum(1, 3, 20, 30,);*
+
+The old way of handling a sum function, we had to write it like this:
+
+----
+function sum() {
+  let total = 0;  
+  for(const argument of arguments) {
+    total += argument;
+  }
+  return total;
+}
+----
+
+It would work, but it had a few issues on its readability.
+1. It has no parameters even though what we learned about variadic functions, the sum() should be able to hold an indefinite amount of arguments.
+2. It's difficult to understand. 
+
+Here's the sum function with the rest parameter.
+----
+function sum(...nums) {
+  let total = 0;  
+  for(const num of nums) {
+    total += num;
+  }
+  return total;
+}
+----
+
+
 == 6.16: Quiz: Using the Rest Parameter(1-5)
 == 6.17: Lesson Summary
