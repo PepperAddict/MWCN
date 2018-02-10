@@ -272,9 +272,20 @@ Unfortunately, it doesn't replace all functions. The arrow functions are only fo
 
 Now they're telling us that there's another drawback to arrow functions. The *this* keyword is different from the regular functions.
 
-...more on that in 7.6...
+More on that coming right up.
 
 == 7.6 Arrow Functions and the "this" Keyword 
+
+Before we start with this section, I want to further understand what *this* is and what *this* does.
+I tried to understand it with MDN web doc, but I just got severely lost. So I went elsewhere...
+
+* It cannot be set by assignment during execution.
+* May be different each time the function is called.
+** So if it's NOT in strict mode and the value of this is not set by the call, *this* will default to the global object.
+** In strict mode, the value of *this* remains at whatever it was set to when entering the execution context.
+* ES5 introduced link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind[bind()] to set the value of a function's this regardless of how it's called.
+* ES6 uses its own *this* binding to its relative.
+
 
 == 7.7 "this" and Regular Functions 
 
