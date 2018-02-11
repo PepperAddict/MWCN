@@ -1,0 +1,10 @@
+++++
+<style type="text/css">
+    .spoiler {
+    filter: blur(5px);
+    }
+
+    .spoiler:hover {
+    filter: none;}
+</style>
+++++

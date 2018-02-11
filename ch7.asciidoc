@@ -1,6 +1,7 @@
 :library: Asciidoctor
 :toc:
 :toc-placement!:
+include::style.adoc[]
 
 = Grow with Google Challenge Notes: Chapter 7
 
@@ -131,13 +132,12 @@ const greet = (name, age) => code
 ====
 
 The underscore was entirely new to me so I had to go look it up. 
-the underscore is very common in other languages. Having you omit parameters with () is bad practice? 
 
-Another user also mentions that () gives the impression that there will not be any arguments so it never bothered to declare any parameter.
+Another user mentions that () gives the impression that there will not be any arguments so it never bothered to declare any parameter.
 
 Though if you use the underscore, you're telling the function that there will be arguments, but maybe not so just leave the space open.
 
-I'm not entirely sure about all of this though, so I may have to do more research.
+I'm not entirely sure about all of this though, so I may have to do more research. For right now the underscore just replaces the empty paranthesis.
 
 ====
 ''''
@@ -158,9 +158,9 @@ const upperizedNames = ['Farrin', 'Kagure', 'Asser'].map(
 ----
 
 * block body function + 
-This is more if need more than a single line of code in the arrow function.
+This is needed for when you have more than a single line of code in the arrow function. Though, you can still use this method for a single line if you want to.
 ** it uses curly braces to wrap the function body 
-** and a *return* statement needs to be used to actually return something from the function.
+** A *return* statement needs to be used to actually return something from the function.
 
 example: 
 ----
@@ -176,33 +176,42 @@ The question is "Which of the following choices have correctly formatted arrow f
 
 NOTE: You can use an underscore to replace the empty paranthesis. They will both result in undefined and maybe an underscore would be better in a sea of paranthesis. I can't seem to find anymore information on this so maybe I'll update this post once I do.
 
-The way it was written confused me so I'm just going to lay it out here.
+The way it was written confused me so I'm just going to lay it out here. Also, quiz 1 was introduced before talking about concise and block body, so ignore the "must have a return with block" rule for this one.
 
 ----
 1   setTimeout( () => { console.log('starting the test');
     test.start();}, 2000);
-
-    empty parameter and uses block body > yes
+----
+++++
+    <p class="spoiler">empty parameter and uses block body > yes </p>
+++++
+----
 
 2   setTimeout( _ => { console.log('starting the test');
     test.start();}, 2000);
-
-    empty parameter and uses block body > yes
+----
+++++
+    <p class="spoiler">empty parameter and uses block body > yes</p>
+++++
+----
 
 3   const vowels = 'aeiou'.split('');
     const bigVowels = vowels.map((letter) => letter.toUpperCase());
-
-    single parameter and uses concise body > yes
-
+----
+++++
+    <p class="spoiler">single parameter and uses concise body > yes </p>
+++++
+----
 4   const vowels = 'aeiou'.split('');
     const bigVowels = vowels.map(letter => letter.toUpperCase());
-
-    single parameter and uses concise body > yes
 ----
+++++
+
+    <p class="spoiler">single parameter and uses concise body > yes </p>
+++++
+
 
 === arrow function quiz 2
-
-Let's ignore that the previous quiz didn't follow the same rules as this one... 
 
 Question: Which of these used the correctly formatted arrow functions?
 
@@ -214,8 +223,13 @@ Question: Which of these used the correctly formatted arrow functions?
         return jumble.join('') + '!';
 
     });
+----
 
-    block body needs a return which it does > yes
+++++
+<p class="spoiler">block body needs a return which it does > yes </p>
+++++
+
+----
 
 2   const color = ['red', 'blue', 'green', 'yellow', 'orange, 'black'];
 
@@ -223,23 +237,29 @@ Question: Which of these used the correctly formatted arrow functions?
         colors.split('').reverse().join('') + '!';
 
     });
-
-    block body does not have a return > no
+----
+++++
+    <p class="spoiler">block body does not have a return > no </p>
+++++
+----
 
 3   const color = ['red', 'blue', 'green', 'yellow', 'orange, 'black'];
 
     const crazyColors = colors.map( color => return color.split('').reverse().join('') + '!');
 
-
-    concise body automatically returns the expression so it doesn't need the return keyword. > no
-
+----
+++++
+    <p class="spoiler">concise body automatically returns the expression so it doesn't need the return keyword. > no </p>
+++++
+----
 
 4   const color = ['red', 'blue', 'green', 'yellow', 'orange, 'black'];
 
     const crazyColors = colors.map( color => color.split('').reverse().join('') + '!');
-
-    concise body with no return > yes
 ----
+++++
+    <p class="spoiler">concise body with no return > yes </p>
+++++
 
 
 == 7.4 Quiz: Convert Function into an Arrow Functions 
@@ -255,15 +275,18 @@ const squares = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(function(square) {
 });
 ----
 
-is now 
+is now:
+++++
+<div class="spoiler">
 
-----
-const squares = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(square => square * square);
-
-or 
+const squares = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(square => square * square); <p>
+<p>
+or <p>
 
 const squares = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(square => { return square * square};
-----
+
+</div>
+++++
 
 == 7.5 Arrow Functions Recap 
 
@@ -276,22 +299,170 @@ More on that coming right up.
 
 == 7.6 Arrow Functions and the "this" Keyword 
 
-Before we start with this section, I want to further understand what *this* is and what *this* does.
-I tried to understand it with MDN web doc, but I just got severely lost. So I went elsewhere...
+The instructors mention that *this* works differently in arrow functions. 
 
-* It cannot be set by assignment during execution.
-* May be different each time the function is called.
-** So if it's NOT in strict mode and the value of this is not set by the call, *this* will default to the global object.
-** In strict mode, the value of *this* remains at whatever it was set to when entering the execution context.
-* ES5 introduced link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind[bind()] to set the value of a function's this regardless of how it's called.
-* ES6 uses its own *this* binding to its relative.
-
+* The +++<u>Regular Functions</u>+++ way of *this* is *how the function is called*. 
+* The +++<u>Arrow Functions</u>+++ way of *this* is *where it's located in the code*.
 
 == 7.7 "this" and Regular Functions 
 
+In this section I'm going to try and relearn *this* by using this link:https://www.youtube.com/watch?v=zE9iro4r918[video] rather than the lesson. I just thought the short chapter on *this* was a bit confusing.
+
+=== Implicit Binding
+
+image:img/this1.png[] +
+This would print out his name *Tyler*.
+
+Implicit binding says when the function is being called, look to the left and that is where *this* keyword is going to reference.
+
+''''
+Here's a more complicated scenario: +
+image:img/this2.png[] +
+This would print out only his name: *Jim*.
+
+* *var Person* has the parameters: name and age. Inside were the objects: name, age, and sayName. sayName uses *this.name* which refers to *Person.name*.
+* *var jim* puts in the arguments: 'Jim', 42 for *Person*'s name and age parameter. *this* was stored with jim.
+* *jim.sayName();* will call sayName using jim's arguments.
+
+=== Explicit Binding with .call, .apply, .bind
+
+==== call()
+
+Now what if the function is separated from the object?
+We need to use .call for it to communicate with each other.
+
+image:img/this3.png[] +
+This would print: *My name is Stacey*. +
+In this example we want to use the function with the stacey object.
+
+SayName is the function. *this* needs to be connected or else it would be confused where to refer to.
+
+''''
+==== apply()
+
+Now what if there's an array? This is how .call() may not be the best. +
+image:img/this4.png[]
+
+This will print: *My name is Stacey and I know JavaScript, Ruby, and Python*.
+
+This will work, but there's an easier way to pass in what's in the array of languages and parse it for us into the parameters. That's where *.apply()* comes in.
+
+image:img/this5.png[] +
+So instead of *.call()* which we will have to manually call one by one, *.apply()* will pass an array of arguments and match it for us.
+
+==== bind()
+
+*.bind()* is a lot like .call as in they work one-by-one, but they're best for creating an entirely new function that can be called later. 
+
+So this is how .call() would have worked: 
+
+----
+ var sayName = function(lang1, lang2, lang3) {
+    console.log(`My name is ${this.name} and I know ${lang1}, ${lang2}, and ${lang3}`);
+};
+
+var stacey = {
+    name: 'Stacey',
+    age: 34
+};
+
+var languages = ['JavaScript', 'Ruby', 'Python']
+
+sayName.call(stacey, languages[0], languages[1], languages[2]);
+----
+
+With .bind we're binding it into a new function.
+
+----
+var newFn = sayName.bind(stacey, languages[0], languages[1], languages[2]);
+----
+
+so now we can just call the newF to get the same result.
+
+----
+newFn()
+----
+
+==== summary of call, apply, bind
+
+In short, *call()* and *apply()* behave the same way by instantly invoking the function. *.call()* will pass in arguments one by one, while *.apply()* will pass the arrays. +
+*.bind()* will behave the same way as .call() but instead of instantly invoking the function, it will instead give us a brand new function that we can call later.
+
+== window Binding 
+
+if we ran this:
+----
+var sayAge = function() {
+  console.log(this.age);
+}
+
+var me = {
+  age: 25
+}
+
+sayAge()
+----
+We would get *undefined* because there's nothing to the left of the *sayAge()*, not using the *new* Binding, and not using *call/apply/bind*, it will then default to the global *window binding*. 
+
+If we still wanted to call using *sayAge()* we would have to create *window.age = 25;* to give us the result we want.
++
+image:img/this6.png[]
+
+
+
+=== new Binding
+
+The new Binding is with the constructor function. Using the *new Binding* keyword with the variable *myFather* will create a new object and bound *this* with the new object.
+
+----
+
+function Person(first, last, age, eye) {
+
+    this.firstName = first;
+    this.lastName = last;
+    this.age = age;
+    this.eyeColor = eye
+}
+
+var myFather = new Person("John", "Doe", 50, "blue");
+
+console.log(`My father is  ${myFather.age}.`)
+
+----
+
+Okay that was long, but I think I understand how *this* works now.
+
 == 7.8 "this" and Arrow Functions 
 
+The convenience with the arrow function is that *this* inherits the value from the surrounding context.
+
+
+This is how the regular function would have worked with the constructor function.
+
+image:img/this8.png[]
+
+++++
+<p style="background:#ff0582; padding: 4px;">pink would print out: I currently have 3 scoops</p>
+<p style="background:#ff0000; padding: 5px;">"But now I have NaN scoops!"</p>
+++++
+
+Now here's the new arrow function.
+
+image:img/this7.png[] +
+++++
+<p style="background:#ff0582; padding: 4px;">pink would print out: I currently have 3 scoops</p>
+<p style="background:#ff0000; padding: 5px;">red would print out: But now I have 6 scoops</p>
+++++
+
+''''
+NOTE: if addScoop() used an arrow function along with setTimeOut(), *this* would refer to global instead.
+
+
+
 == 7.9 Default Function Parameters
+
+
+
 
 == 7.10 Defaults and Destructuring 
 

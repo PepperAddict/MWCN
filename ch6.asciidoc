@@ -1,6 +1,7 @@
 :library: Asciidoctor
 :toc:
 :toc-placement!:
+include::style.adoc[]
 
 = Grow with Google Challenge Notes: Chapter 6
 
