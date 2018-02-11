@@ -1,7 +1,6 @@
 :library: Asciidoctor
 :toc:
 :toc-placement!:
-include::style.adoc[]
 
 = Grow with Google Challenge Notes: Chapter 3
 
@@ -15,7 +14,7 @@ toc::[]
 == 3.1: An Overview of Service Worker
 All service worker really is is a single javascript file that sits between the website and the network.
 SW is a web worker which means it runs separately from the website. The user cannot see it. The SW cannot access the DOM. +
-It does control web pages and by control, it intercepts requests and sends it to wherever you tell it to.
+It does control web pages, and by control, it means it intercepts requests and sends it to wherever you tell it to.
 
 === Registering the SW
 

@@ -1,7 +1,6 @@
 :library: Asciidoctor
 :toc:
 :toc-placement!:
-include::style.adoc[]
 
 = Welcome to my notes on the Udacity course: Grow with Google Challenge Scholarship: Mobile Web
 toc::[]
