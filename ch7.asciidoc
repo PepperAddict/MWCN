@@ -461,14 +461,342 @@ NOTE: if addScoop() used an arrow function along with setTimeOut(), *this* would
 
 == 7.9 Default Function Parameters
 
+If there's no argument put in for the parameter, there's a way to give it a default value. 
 
+The old way you had to write a bit too much. Honestly, I never even knew it. Glad it was replaced. Here's the old way:
 
+----
+function greet(name, greeting) {
+  name = (typeof name !== 'undefined') ?  name : 'Student';
+  greeting = (typeof greeting !== 'undefined') ?  greeting : 'Welcome';
+
+  return `${greeting} ${name}!`;
+}
+
+greet(); // Welcome Student!
+greet('James'); // Welcome James!
+greet('Richard', 'Howdy'); // Howdy Richard!
+----
+
+Now there's a new way. All we now have to do is put the default values right inside the parameters.
+
+****
+function greet(*name = 'Student'*, *greeting = 'Welcome'*) { +
+  return `${greeting} ${name}!`; +
+} +
+
+greet(); // Welcome Student! +
+greet('James'); // Welcome James! +
+greet('Richard', 'Howdy'); // Howdy Richard! +
+****
+
+NOTE: Just in case it wasn't clear, the default values are right inside the parameters like this *(parameter1 = 'default string', parameter2 = default integer)*
 
 == 7.10 Defaults and Destructuring 
 
+
+Here's a little refresher on what destructuring is:
+
+____
+The destructuring assignment syntax is a JavaScript expression that makes it possible to unpack values from arrays, or properties from objects, into distinct variables.
+____
+
+=== Array Destructuring and defaults.
+
+Before we get into destructuring and defaults together, I suppose we need to understand why we would need the two together in the first place.
+
+When we work with array parameters and defaults, we would put in: 
+
+----
+function createGrid([width = 5, height = 5]) {
+  return `Generates a ${width} x ${height} grid`;
+}
+----
+
+* If we had called with *createGrid([])* it would give us the defaults: *Generates a 5 x 5 grid*.
+* If we had called with *createGrid([3, 2])* it would give us the new: *Generates a 3 x 2 grid*.
+* If we had called with *createGrid([undefined, 3]);* it would give us the default along with the new digit *Generates a 5 x 3 grid*.
+
+What if we called it with just the basic *createGrid()*? +
+We would get an error: *Uncaught TypeError: Cannot read property 'Symbol(Symbol.iterator)' of undefined*.
+
+We get this error because  *createGrid()* expects an array to be passed so it can destructure it. But since the function was called without an array, it will break. 
+To fix this default issue, we insert an empty bracket. 
+
+----
+function createGrid([width = 5, height = 5] = []) {
+  return `Generates a ${width} x ${height} grid`;
+}
+----
+
+In this case, if *createGrid()* is called without any argument, then it will use the default empty array. Since the array is empty, there's nothing to destructure so then it will default to the original: *width = 5, height = 5*. 
+''''
+
+[NOTE:]
+====
+REMINDER: link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment[Destructuring Arrays] in defaults also goes by position. +
+
+image:img/destArr2.png[] +
+So if you wanted to leave anything out, you would need to include an empty #, ,# for that position.
+
+====
+
+
+==== Quiz 1 of 2 - Array Destructuring in defaults
+
+
+
+With the following code, which of the options will not run without throwing an error:
+----
+function houseDescriptor([houseColor = 'green', shutterColors = ['red']]) {
+  return `I have a ${houseColor} house with ${shutterColors.join(' and ')} shutters`;
+}
+----
+
+With this function, I gave it a must have list:
+
+* [ ]  Everything must be encased in an array.
+* [ ]  First parameter is a string or undefined
+* [ ]  Second parameter must be an array or undefined.
+
+''''
+Option 1: 
+If we had put in:
+----
+houseDescriptor('red',['white', 'gray', 'pink'])
+----
+
+We get a *TypeError* +
+Because houseDescriptor is only expecting an *array argument*. This option doesn't work because it's calling the function with a string and an array.
+
+the rules result:
+
+* [ ]  Everything must be encased in an array.
+* [x]  *First parameter is a string* or undefined
+* [x]  *Second parameter must be an array* or undefined.
+
+[NOTE]
+====
+Now of course if we had written the function as: 
+
+----
+function houseDescriptor(houseColor = 'green', shutterColor = ['red']) {}
+----
+
+then calling it as: 
+----
+houseDescriptor('red',['white', 'gray', 'pink']);
+----
+would have worked.
+====
+''''
+
+Option 2: 
+
+----
+houseDescriptor(['green', ['white', 'gray', 'pink']]);
+----
+
+This would work because everything is encased into an array like the function was written. Which was: +
+
+<array> +
+<string>default</string> , +
+<array> default </array>  +
+</array> +
+
+So according to the rules that the function wrote, it passed all of them.
+
+* [x]  *Everything must be encased in an array*.
+* [x]  *First parameter is a string* or undefined
+* [x]  *Second parameter must be an array* or undefined.
+
+''''
+Option 3:
+
+----
+houseDescriptor(['blue', 'purple']);
+----
+
+It passed a bunch of the rules except that the second parameter needed to be an array or left out.
+
+* [x]  *Everything must be encased in an array*.
+* [x]  *First parameter is a string* or undefined.
+* [ ]  Second parameter must be an array or undefined. 
+ 
+Though if you had ran the code, an error wouldn't pop up. The second parameter would just ignore it and default on its own. We wanted to use use *'purple'* so this option would be wrong.
+
+
+''''
+
+Option 4:
+
+----
+houseDescriptor(['green']);
+----
+
+Well this is an obvious one. It's in an array like what is required. It's just missing the second argument, but since there's a default option, I guess we don't need it. Like what was mentioned earlier, it could even be:
+*houseDescriptor([])"* and it'll give the default: green and red.
+
+
+* [x]  *Everything must be encased in an array*.
+* [x]  *First parameter is a string* or undefined.
+* [x]  Second parameter must be an array or *undefined*. 
+
+=== Object destructuring in defaults. 
+
+Fortunately *object destructuring in defaults* works the same way as array destructuring in defaults. I'm relieved how easy this part is and I can give my brain a break.
+
+A function can have an object be a default parameter and use object destructuring. It is basically the same as the array but of course, instead of an array, it would be an object.
+
+for example:
+----
+function createSundae({scoops = 1, toppings = ['Hot Fudge']}) {
+  const scoopText = scoops === 1 ? 'scoop' : 'scoops';
+  return `Your sundae has ${scoops} ${scoopText} with ${toppings.join(' and ')} toppings.`;
+}
+
+createSundae({}); // Your sundae has 1 scoop with Hot Fudge toppings.
+createSundae({scoops: 2}); // Your sundae has 2 scoops with Hot Fudge toppings.
+createSundae({scoops: 2, toppings: ['Sprinkles']}); // Your sundae has 2 scoops with Sprinkles toppings.
+createSundae({toppings: ['Cookie Dough']}); // Your sundae has 1 scoop with Cookie Dough toppings.
+----
+
+Now if we tried to call it without any arguments
+
+----
+createSundae();
+----
+This would throw an error
+
+The same reason as the array. So to work around this issue, we would have to edit the function to include an empty object.
+
+----
+function createSundae({scoops = 1, toppings = ['Hot Fudge']} = {})
+----
+
+So in case an empty argument is called, it will call the empty object which will then call the defaulted object.
+
+''''
+Code Reminder about object destructuring.
+
+The difference with arrays and object is that objects are referenced by their position. Object on the other hand, is referenced by their given name. +
+image:img/destOBJ2.png[] +
+If we had left out their name, it would default. 
+
+
+==== Quiz 2-2 Object Destructuring in Defaults
+
+Using the code below, which call wouldn't throw an error?
+
+----
+function houseDescriptor({houseColor = 'green', shutterColors = ['red']} = {}) {
+  return `I have a ${houseColor} house with ${shutterColors.join(' and ')} shutters`;
+}
+----
+
+With that, I had to make a new checklist
+
+* [ ] Would have to be encased in a set of curly brackets or an empty call.
+* [ ] first parameter has to be a string or undefined.
+* [ ] second parameter has to be an array or undefined.
+
+''''
+Option 1:
+----
+houseDescriptor({houseColor:'red', shutterColors:['white', 'gray', 'pink']});
+----
+* [x] Would have to be *encased in a set of curly brackets* or an empty call.
+* [x] *first parameter has to be a string* or undefined.
+* [x] *second parameter has to be an array* or undefined.
+
+''''
+Option 2
+
+----
+houseDescriptor({houseColor:'red'});
+----
+
+* [x] Would have to be *encased in a set of curly brackets* or an empty call.
+* [x] first parameter has to be a string or undefined.
+* [x] second parameter has to be an array or *undefined*.
+
+''''
+Option 3
+----
+houseDescriptor();
+----
+* [x] Would have to be encased in a set of curly brackets or an *empty call*.
+* [x] first parameter has to be a string or *undefined*.
+* [x] second parameter has to be an array or *undefined*.
+
+''''
+Option 4:
+----
+
+houseDescriptor({shutterColors:['orange', 'blue']});
+----
+
+* [x] Would have to be *encased in a set of curly brackets* or an empty call.
+* [x] first parameter has to be a string or *undefined*.
+* [x] *second parameter has to be an array* or undefined.
+
+''''
+Option 5:
+----
+houseDescriptor({})
+----
+
+* [x] Would have to be *encased in a set of curley brackets or an empty call*.
+* [x] first parameter has to be a string or *undefined*.
+* [x] second parameter has to be an array or *undefined*.
+
+
+
+''''
+There's this little section mentioning the difference between having to leave out an argument with Objects and Arrays.
+Objects we could just mention the name or don't mention it at all.
+Arrays, on the otherhand, in place of the one we want to skip, we have to put *undefined*. However, when I tested it with just an empty #, ,#, that works too.
+
 == 7.11 Quiz: Using Default Function Paramters (2 - 2)
 
+Quiz time! +
+This is a quiz we have to create our own function with the name: *buildHouse()* with 3 default parameters.
+
+Here are the default values they want inserted
+
+----
+floors = 1
+color = 'red'
+walls = 'brick'
+----
+
+Here is what the function is going to be tested with:
+
+----
+console.log(buildHouse()); // Your house has 1 floor(s) with red brick walls.
+console.log(buildHouse({})); // Your house has 1 floor(s) with red brick walls.
+console.log(buildHouse({floors: 3, color: 'yellow'})); // Your house has 3 floor(s) with yellow brick walls.
+----
+
+According to those calls, there's a checklist we have to make.
+
+* [ ] There has to be a fallback. Either it would be *([array] =[])* or *({object} = {})*
+* [ ] It has to be an object.
+* [ ] It has to take 3 parameters.
+
+''''
+answer: 
+
+''''
+function buildHouse({floors = 1, color = 'red', walls = 'brick'} = {}) {
+  return `Your house has ${floors} floor(s) with ${color} ${walls} walls.`
+}
+
+''''
 == 7.12 Class Preview
+
+
+
 
 == 7.13 Javascript's Illusion of Classes 
 
