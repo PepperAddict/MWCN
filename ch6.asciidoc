@@ -360,13 +360,14 @@ return 2 * Math.PI * this.radius;
 let {radius, getArea, getCircumference} = circle;
 ----
 
-If we tried to do a *console.log(getArea)*, we would get a *NaN* because when we destructured circle, it no longer has access to what *this* and would try and retrieve from global instead. +
+If we tried to do a *console.log(getArea)*, we would get a *NaN* because when we destructured the object *circle*, it no longer has access to what *this* was and would try and retrieve from global instead. +
 so inside the function, _this.radius_, the call was trying to look for a _radius_ variable from global and not inside the circle object.
 
 The best way to regain access with the getArea function using *this* to listen to its mommy circle object, we can use *bind*, *apply*, and *call*. +
 To use *call* we put in *getArea.call()*. Inside the *()* we should refer to the original object with the function. So together it would look: +
 *console.log(getArea.call(circle))*
 
+NOTE: I actually made a very in depth section on *bind*, *apply*, and *call*. Click to see it on link:ch7.asciidoc#explicit-binding-with-call-apply-bind[Chapter 7: binding with call, apply, and bind.]
 
 
 

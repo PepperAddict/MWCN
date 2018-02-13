@@ -1,22 +1,49 @@
 :library: Asciidoctor
-:toc:
-:toc-placement!:
+
 
 = Welcome to my notes on the Udacity course: Grow with Google Challenge Scholarship: Mobile Web
-toc::[]
+
+
+
 == Chapters
-Here I have my formatted notes on the following chapters: 
+Here are my notes on the following chapters: 
+
+NOTE: The 2nd half is completely unrelated to the 1st half. I suggest you begin with the 2nd half before starting the 1st half to give you a better understanding of JavaScript and Promises.
+
+''''
+
+=== 1st half
 
 link:ch2.asciidoc[Chapter 2] : The Benefits of Offline First +
 link:ch3.asciidoc[Chapter 3] : Introducing the Service Worker +
 Chapter 4 : IndexedDb and Caching +
 Chapter 5 : Next Up +
-link:ch6.asciidoc[Chapter 6] : Syntax +
-link:ch7.asciidoc[Chapter 7] : Functions + 
-Chapter 8 : Built-Ins + 
+
+=== 2nd half
+
+link:ch6.asciidoc[Chapter 6] aka Lesson 1: Syntax +
+link:ch7.asciidoc[Chapter 7] aka Lesson 2: Functions + 
+Chapter 8 aka Lesson 3 : Built-Ins + 
 Chapter 9 : Professional Developer-fu +
 Chapter 10 : Challenge Course Wrap Up
 
-== Useful Links
+''''
+== Extra Courses for better understanding
 
-* link:https://repl.it/repls/SimplisticInfatuatedRoutine[Javascript Testing] - I found this website very helpful for playing with JavaScript
+link:https://www.udacity.com/course/object-oriented-javascript--ud015[Object Oriented JavaScript]
+
+== Useful Links and Tips
+
+
+* For Javascript testing, I recommend using link:https://developers.google.com/web/tools/chrome-devtools/snippets[snippet]. It offers the authentic devtools feel and can be accessed from any page.
+
+Here's how to use snippet in devtools:
+
+image:img/devtoolsSNIP.png[] +
+
+* A: Here's how to find it. Chrome devtools > Sources > Snippet +
+* B: Here is where you create a *New* snippet. You can right click and click *New* and you can also just click on *+ New snippet* +
+* C: When you right click the file, you can run, rename, remove, and save it on your disk.+
+* D: Here is where the JavaScript code will be in. +
+* E: To run the code, right click the file at *C* and select *run*, select *Evaluate in console*. Be sure to save the file first. *ctrl s*. +
+* F: Here is where snippet shines over the rest. You can see the detail of the code in devtool's console.

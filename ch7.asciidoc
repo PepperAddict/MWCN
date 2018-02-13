@@ -3,7 +3,7 @@
 :toc-placement!:
 
 
-= Grow with Google Challenge Notes: Chapter 7
+= Grow with Google Challenge Notes: Chapter 7 aka Lesson 2
 
 Function notes +
 To go back to the README where all the chapters are: click link:README.asciidoc[here].
@@ -172,12 +172,12 @@ const upperizedNames = ['Farrin', 'Kagure', 'Asser'].map( name => {
 
 === arrow function quiz 1
 
-The question is "Which of the following choices have correctly formatted arrow functions?"
+The question is "Which of the following choices have the correctly formatted arrow functions?"
 
 NOTE: You can use an underscore to replace the empty paranthesis. They will both result in undefined and maybe an underscore would be better in a sea of paranthesis. I can't seem to find anymore information on this so maybe I'll update this post once I do.
 
 The way it was written confused me so I'm just going to lay it out here. Also, quiz 1 was introduced before talking about concise and block body, so ignore the "must have a return with block" rule for this one.
-
+ 
 ----
 1   setTimeout( () => { console.log('starting the test');
     test.start();}, 2000);
@@ -185,6 +185,8 @@ The way it was written confused me so I'm just going to lay it out here. Also, q
 ++++
     <p class="spoiler">empty parameter and uses block body > yes </p>
 ++++
+
+''''
 ----
 
 2   setTimeout( _ => { console.log('starting the test');
@@ -193,6 +195,8 @@ The way it was written confused me so I'm just going to lay it out here. Also, q
 ++++
     <p class="spoiler">empty parameter and uses block body > yes</p>
 ++++
+
+''''
 ----
 
 3   const vowels = 'aeiou'.split('');
@@ -201,6 +205,8 @@ The way it was written confused me so I'm just going to lay it out here. Also, q
 ++++
     <p class="spoiler">single parameter and uses concise body > yes </p>
 ++++
+
+''''
 ----
 4   const vowels = 'aeiou'.split('');
     const bigVowels = vowels.map(letter => letter.toUpperCase());
@@ -210,6 +216,7 @@ The way it was written confused me so I'm just going to lay it out here. Also, q
     <p class="spoiler">single parameter and uses concise body > yes </p>
 ++++
 
+''''
 
 === arrow function quiz 2
 
@@ -225,10 +232,9 @@ Question: Which of these used the correctly formatted arrow functions?
     });
 ----
 
-++++
-<p class="spoiler">block body needs a return which it does > yes </p>
-++++
+* [x] block body function must have a *return*
 
+''''
 ----
 
 2   const color = ['red', 'blue', 'green', 'yellow', 'orange, 'black'];
@@ -238,9 +244,9 @@ Question: Which of these used the correctly formatted arrow functions?
 
     });
 ----
-++++
-    <p class="spoiler">block body does not have a return > no </p>
-++++
+* [ ] block body function must have a *return*
+
+''''
 ----
 
 3   const color = ['red', 'blue', 'green', 'yellow', 'orange, 'black'];
@@ -248,19 +254,21 @@ Question: Which of these used the correctly formatted arrow functions?
     const crazyColors = colors.map( color => return color.split('').reverse().join('') + '!');
 
 ----
-++++
-    <p class="spoiler">concise body automatically returns the expression so it doesn't need the return keyword. > no </p>
-++++
+
+* [ ] concise body should not have a *return*.
+
+''''
+
 ----
 
 4   const color = ['red', 'blue', 'green', 'yellow', 'orange, 'black'];
 
     const crazyColors = colors.map( color => color.split('').reverse().join('') + '!');
 ----
-++++
-    <p class="spoiler">concise body with no return > yes </p>
-++++
 
+* [x] concise body should not have a *return*.
+
+''''
 
 == 7.4 Quiz: Convert Function into an Arrow Functions 
 
@@ -529,7 +537,18 @@ function createGrid([width = 5, height = 5] = []) {
 }
 ----
 
-In this case, if *createGrid()* is called without any argument, then it will use the default empty array. Since the array is empty, there's nothing to destructure so then it will default to the original: *width = 5, height = 5*. 
+In this case, if *createGrid()* is called without any argument, it will call its other default since it was expecting an array.
+
+----
+function createGrid([width, height] = [5, 5])
+----
+
+
+Since the array is empty, there's nothing to destructure so then it will default to the original: *width = 5, height = 5*. 
+
+Giving the function the extra *= []* is like giving the call createGrid(*[]*). 
+
+
 ''''
 
 [NOTE:]
@@ -679,9 +698,9 @@ So in case an empty argument is called, it will call the empty object which will
 ''''
 Code Reminder about object destructuring.
 
-The difference with arrays and object is that objects are referenced by their position. Object on the other hand, is referenced by their given name. +
+The difference with arrays and object is that arrays are referenced by their position. Object on the other hand, is referenced by their given name. +
 image:img/destOBJ2.png[] +
-If we had left out their name, it would default. 
+Deconstructed object's order does not matter and if we had left out an item, it would be ignored. 
 
 
 ==== Quiz 2-2 Object Destructuring in Defaults
@@ -717,7 +736,7 @@ houseDescriptor({houseColor:'red'});
 ----
 
 * [x] Would have to be *encased in a set of curly brackets* or an empty call.
-* [x] first parameter has to be a string or undefined.
+* [x] *first parameter has to be a string* or undefined.
 * [x] second parameter has to be an array or *undefined*.
 
 ''''
@@ -755,7 +774,11 @@ houseDescriptor({})
 ''''
 There's this little section mentioning the difference between having to leave out an argument with Objects and Arrays.
 Objects we could just mention the name or don't mention it at all.
-Arrays, on the otherhand, in place of the one we want to skip, we have to put *undefined*. However, when I tested it with just an empty #, ,#, that works too.
+Arrays, on the otherhand, in place of the one we want to skip, we have to put *undefined*. However, when I tested it with just an empty 
+
+  , ,
+
+that works too.
 
 == 7.11 Quiz: Using Default Function Paramters (2 - 2)
 
@@ -785,26 +808,212 @@ According to those calls, there's a checklist we have to make.
 * [ ] It has to take 3 parameters.
 
 ''''
-answer: 
+Answer: 
 
-''''
+----
 function buildHouse({floors = 1, color = 'red', walls = 'brick'} = {}) {
   return `Your house has ${floors} floor(s) with ${color} ${walls} walls.`
 }
-
-''''
+----
 == 7.12 Class Preview
 
+The instructors want to show us classes. Here's a little preview. 
 
+----
+class Dessert {
+  constructor(calories = 250) {
+    this.calories = calories;
+  }
+}
 
+class IceCream extends Dessert {
+  constructor(flavor, calories, toppings = []) {
+    super(calories);
+    this.flavor = flavor;
+    this.toppings = toppings;
+  }
+  addTopping(topping) {
+    this.toppings.push(topping);
+  }
+}
+----
+
+They gave us some questions.
+
+. What's this class keyword?
+. What's this extends keyword inside Icecream *extends* Dessert?
+. What's that *Super()* call inside IceCream's constructor?
+
+I believe there will be more of that coming up....
 
 == 7.13 Javascript's Illusion of Classes 
 
+To avoid confusion, let's ignore what the instructors say about what other languages do with classes and just focus on what JavaScript does with it.
+
+Javascript is not a class based language, but uses functions to create objects, and links objects together with link:https://www.w3schools.com/js/js_object_prototypes.asp[prototype inheritance].
+The new keywords: *class*, *super*, and *extends* doesn't change anything in the language. It's just a new and cleaner way to write in JavaScript.
+
 == 7.14 Javascript Classes 
+
+Before we get started with *classes*, I figured I needed to understand *prototype inheritance* first.
+
+With the code they provided let's try to understand prototype...
+
+----
+function Plane(numEngines) {
+  this.numEngines = numEngines;
+  this.enginesActive = false;
+}
+
+// methods "inherited" by all instances
+Plane.prototype.startEngines = function () {
+  console.log('starting engines...');
+  this.enginesActive = true;
+};
+
+const rich = new Plane(1);
+
+const james = new Plane(4);
+
+----
+
+const rich = new Plane(1) +
+and +
+const james = new Plane(4) +
+
+when rich and james used *new Plane(1)*, they created their own constructor function with their own number of engines in the parameter. What's happening here is that now we have two copies of *Plane*.
+
+*Plane.prototype.startEngines = function() {...}* is the function that james and rich will use. +
+The way I see it, prototype is like the shared folder that the two computers in the network can all access. Prototype boils down to being easier to keep track of and also it stores less data. 
+
+''''
+
+If we had skipped prototype and just stored our startEngine right inside the Plane constructor like this:
+----
+function Plane(numEngines) {
+  this.numEngines = numEngines;
+  this.enginesActive = false;
+  this.startEngines = function() {
+      console.log('starting engines...');
+      this.enginesActive = true;
+  }
+}
+----
+
+this would happen inside the hood: 
+
+image:img/proto1.png[] +
+rich and james has 3 properties of their own. *enginesActive*, *numEngines*, and *startEngines*.
+
+''''
+
+Now if we stored the startEngines prototype for Plane constructor like this:
+
+----
+function Plane(numEngines) {
+  this.numEngines = numEngines;
+  this.enginesActive = false;
+}
+
+Plane.prototype.startEngines = function() {
+      console.log('starting engines...');
+      this.enginesActive = true;
+}
+
+----
+
+rich and james would look like this under the hood:
+
+image:img/proto2.png[] +
+
+startEngine function is stored in the shared _proto_ area. 
+
+=== Introducing classes 
+
+In ES6, this does the same thing as the Plane constructor and startEngine *prototype*
+
+----
+class Plane {
+  constructor(numEngines) {
+    this.numEngines = numEngines;
+    this.enginesActive = false;
+  }
+
+  startEngines() {
+    console.log('starting engines…');
+    this.enginesActive = true;
+  }
+}
+----
+
+We'll find out more coming right up.
+
+
 
 == 7.15 Convert a Function to a Class 
 
+The changes are actually a lot more straightforward than I thought and I'm actually loving it.
+
+image:img/proto3.png[]
+
+What's new: 
+
+* There's now a class function that you can store these methods in. Instead of of the constructor function with the name, class now has the name.
+* There's a new method name called *constructor* which has all the information for objects to create with.
+* You can now create your prototype inside the class function. No need to type in Name.Prototype.propertyName to link the two together.
+
+
 == 7.16 Working with JavaScript Class
+
+Class is just a function. To test it out, put this in:
+----
+class Plane {
+  constructor(numEngines) {
+    this.numEngines = numEngines;
+    this.enginesActive = false;
+  }
+
+  startEngines() {
+    console.log('starting engines…');
+    this.enginesActive = true;
+  }
+}
+
+typeof Plane; // function
+----
+
+=== Quiz
+
+This is a reminder quiz to check if you've been paying attention.
+
+When it comes to this code, which of the options are true?
+----
+class Animal {
+  constructor(name = 'Sprinkles', energy = 100) {
+    this.name = name;
+    this.energy = energy;
+  }
+
+  eat(food) {
+    this.energy += food / 3;
+  }
+}
+----
+
+Option 1: +
+The *eat()* method ends up on *Animal.prototype* 
+
+Option 2: +
+----
+typeof Animal === 'class'
+----
+
+Option 3: + 
+----
+typeofAnimal === 'function'
+----
+
+The answers are Option 1 and 3 being correct. eat() will be Animal's prototype because it's separate from the constructor. Option 3 because all class is is a function and not its own entity.
 
 == 7.17 Super and Extends 
 
