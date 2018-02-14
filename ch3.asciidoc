@@ -313,7 +313,7 @@ image:img/webconsole2.png[]
 === Dev Tools Sources
 
 - To find the debugging menu that Jake was playing around with go to sources tab. The UI is actually the same, but the navigator is hidden by default. Just press the arrow and the navigator will pop up. +
- Navigate to sw.js>localhost:8888>public/js/sw>index.js
+- Navigate to sw.js>localhost:8888>public/js/sw>index.js
 - While in index.js, Jake put in a breakpoint in our fetch event by pressing 2 on the side.
 - Refresh the page and notice that the script gets paused. 
 - To unpause, just unclick the number and press the play button.
@@ -324,7 +324,9 @@ Service Worker has its very own panel. It's not in the Resources like Jake has i
 image:img/SW1.png[] +
 
 - There you will see the link *Unregister* that will refetch the Service Worker from scratch.
-- Instead of tabs, we just get a status information. Right now the status should be green. It should have the message *"activated and is running"* If you have a service worker waiting underneath it, it probably just means you made some changes. More on that on the quiz. 
+- Instead of tabs, we just get status information. Right now the status should be green. It should have the message *"activated and is running"* +
+
+NOTE: If you have a service worker waiting underneath it, it probably just means you made some changes. More on that on the quiz. 
 
 === The Quiz to give you the waiting status 
 
@@ -353,10 +355,15 @@ This lesson, Mike wants us to get that new service worker active.
 
 Jake explains that having to reopen the page during development can be annoying. +
 
-NOTE: You can do a hard refresh by *Shift + refresh*. It will reload the page but bypasses the Service Worker. It will set the waiting as the active.
+You can do a hard refresh with *Shift + refresh*. +
+It will reload the page but bypasses the Service Worker. It will set the waiting as the active, but there's actually an easier way.
 
-TIP: Instead of doing *Shift + refresh*, you can just check the *update on reload* option. +
-image:img/SW3.png[] +
+Instead of doing *Shift + refresh*, you can just check the *update on reload* option in devtools. +
+
+
+image:img/SW3.png[] 
+
+
 The option will change the Service Worker life cycle to be developer friendly. Now that when you hit refresh, rather than just refreshing the page, it fetches a service worker and treats it as a new version whether it was changed or not and it will become active straight away. After that, the page refreshes. +
 
 WARNING: This is only for developers. The user will be stuck with the old way of having to close the page and reopening it to get the new service worker.

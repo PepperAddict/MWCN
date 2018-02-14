@@ -1,0 +1,77 @@
+:library: Asciidoctor
+:toc:
+:toc-placement!:
+
+
+= Grow with Google Challenge Notes: Chapter 8 aka Lesson 3
+
+Built-Ins notes +
+To go back to the README where all the chapters are: click link:README.asciidoc[here].
+
+
+toc::[]
+
+== 8.1 : New Built-Ins 
+
+These are the new Built-Ins that were put in with ES6
+
+* Sets
+* Maps 
+* Promises
+* and more...
+
+These built-ins will make it much easier to execute tasks that were more difficult before. In this lesson we are going to:
+
+* See how the new built-ins are structured
+* See how the new built-ins work.
+* and when to use these new built-ins.
+
+== 8.2 : Symbols Intro
+
+Symbols is a new addition to the primitive data type in JavaScript.
+
+Here are the current primitive data types:
+====
+
+* numbers 
+* String 
+* booleans
+* null
+* undefined
+* symbols
+====
+
+So what is Symbol?
+
+Symbol is a unique idenitfier, most used to uniquely identify properties within an object.
+
+Example:
+Bowl has 2 bananas, 1 orange, and 1 apple.
+
+Symbol will help identify each of those bananas as banana1 and banana2, but it'll be easier. We'll see!
+
+== 8.3 : Symbols
+== 8.4 : Iteration & Iterable Protocols
+== 8.5 : Sets
+== 8.6 : Modifying Sets
+== 8.7 : Working with Sets
+== 8.8 : Sets & Iterators
+== 8.9 : Quiz: Using Sets
+== 8.10 : WeakSets
+== 8.11 : Quiz: Working With WeakSets 
+== 8.12 : Maps
+== 8.13 : Creating & Modifying Maps
+== 8.14 : Working with Maps
+== 8.15 : Looping Through Maps
+== 8.16 : WeakMaps
+== 8.17 : Promises Intro
+== 8.18 : Promises
+== 8.19 : More Promises
+== 8.20 : Proxies Intro
+== 8.21 : Proxies
+== 8.22 : Proxies vs ES5 Getter/Setter
+== 8.23 : Proxies Recap
+== 8.24 : Generators
+== 8.25 : Generators & Iterators
+== 8.26 : Sending Data into/out of a Generator
+== 8.27 : Lesson 3 Summary

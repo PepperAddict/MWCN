@@ -8,7 +8,7 @@
 == Chapters
 Here are my notes on the following chapters: 
 
-NOTE: The 2nd half is completely unrelated to the 1st half. I suggest you begin with the 2nd half before starting the 1st half to give you a better understanding of JavaScript and Promises.
+NOTE: The 2nd half is completely unrelated to the 1st half. I suggest you begin with the 2nd half just so that it will give you a better understanding of JavaScript and Promises.
 
 ''''
 
@@ -34,8 +34,8 @@ link:https://www.udacity.com/course/object-oriented-javascript--ud015[Object Ori
 
 == Useful Links and Tips
 
-
-* For Javascript testing, I recommend using link:https://developers.google.com/web/tools/chrome-devtools/snippets[snippet]. It offers the authentic devtools feel and can be accessed from any page.
+* A quick and easy place for JavaScript sandboxing: link:https://repl.it/[Repl]
+* Also For Javascript testing, I recommend using link:https://developers.google.com/web/tools/chrome-devtools/snippets[snippet]. It offers the authentic devtools feel and can be accessed from any page.
 
 Here's how to use snippet in devtools:
 

@@ -999,28 +999,254 @@ class Animal {
   }
 }
 ----
-
+====
 Option 1: +
-The *eat()* method ends up on *Animal.prototype* 
 
+  The eat() method ends up on Animal.prototype
+====
+====
 Option 2: +
 ----
 typeof Animal === 'class'
 ----
-
+====
+====
 Option 3: + 
 ----
 typeofAnimal === 'function'
 ----
+====
+Option 1 and 3 being correct. +
+Option 1 because eat() will be Animal's prototype since it's separate from the constructor. +
+Option 3 because class is a function and not its own entity.
 
-The answers are Option 1 and 3 being correct. eat() will be Animal's prototype because it's separate from the constructor. Option 3 because all class is is a function and not its own entity.
+
+=== static methods 
+
+The topic is very confusing unless we know more about *Object Oriented JavaScript* +
+There's an entire class on it: link:https://www.udacity.com/course/object-oriented-javascript--ud015[Udacity Object Oriented Javascript].
+
+It's quite long... I might take it if I have time. In the meantime I'll just be confused about static methods and hope it's never referenced again.
+
+In the meantime... to create a static method, all we have to do is add *static* in front of the name like this example with *badweather()*
+
+----
+class Plane {
+  constructor(numEngines) {
+    this.numEngines = numEngines;
+    this.enginesActive = false;
+  }
+
+  static badWeather(planes) {
+    for (plane of planes) {
+      plane.enginesActive = false;
+    }
+  }
+
+  startEngines() {
+    console.log('starting engines…');
+    this.enginesActive = true;
+  }
+}
+----
+
+From this short sentence on what static methods mean when it comes to classes is that
+badweather() is a method that's accessed directly on the *Plane* class.
+
+
+=== class rules
+
+* Class doesn't get hoisted. Which means if you were going to do a call for that class, make sure its under it's declaration.
+* You can only create new instances of the JavaScript class with the *new* keyword.
 
 == 7.17 Super and Extends 
 
+Here we're introduced to Super and Extends with this code
+
+----
+class Tree {
+  constructor(size = '10', leaves = {spring: 'green', summer: 'green', fall: 'orange', winter: null}) {
+    this.size = size;
+    this.leaves = leaves;
+    this.leafColor = null;
+  }
+
+  changeSeason(season) {
+    this.leafColor = this.leaves[season];
+    if (season === 'spring') {
+      this.size += 1;
+    }
+  }
+}
+
+class Maple extends Tree {
+  constructor(syrupQty = 15, size, leaves) {
+    super(size, leaves);
+    this.syrupQty = syrupQty;
+  }
+
+  changeSeason(season) {
+    super.changeSeason(season);
+    if (season === 'spring') {
+      this.syrupQty += 1;
+    }
+  }
+
+  gatherSyrup() {
+    this.syrupQty -= 3;
+  }
+}
+----
+
+* *extend* in [underline]#class Maple extends Tree# is a subclass for [underline]#Tree#.
+* the keyword *super* is used to get from the subclass to the parent class.
+* *super* is used two different ways when it comes to the classes. [underline]#Maple's constructor# *super* was a function, but in [underline]#Maple's changeSeason() method# *super* was an object.
+
 == 7.18 Extending Classes from ES5 to ES6 
+
+This section is just explaining the difference between ES5 and ES6 when it comes to constructors and their prototypes.
+
+image:img/proto4.png[] +
+
+
+[cols="2,2,5a"]
+|===
+| letter | Left: ES5 | Right: ES6
+| a
+| Tree custructor function all alone
+| Tree is now a class and the constructor is *inside* the Tree class
+
+| b 
+| prototype [underline]#changeSeason# is linked with [underline]#Tree# by having the name *Tree.prototype.changeSeason*
+| prototype [underline]#changeSeason# is inside the class [underline]#Tree# which is how they will be linked.
+
+| c 
+| A constructor function all alone. However you would have to link it somehow... see c.1 and c.2
+| To link the subclass to the parent class, We have to give it the name: *class [underline]#Maple# #extends# [underline]#Tree#*
+
+| c.1 
+| We have to set Maple's prototype to the parent's prototype with: +
+
+*Maple.prototype = Object.create(Tree.prototype);*
+
+| 
+
+| c.2
+| Since we overwrote the original prototype object, we need to remake the connection from the constructor property to the original constructor function by typing in: 
+
+*Maple.prototype.constructor = Maple*
+|
+
+| c.3
+| For subclass [underline]#Maple# to call parent class [underline]#Tree# you need to use *.call*. +
+
+ *Tree.call this, size, barkColor, leaves);*
+| For subclass [underline]#Maple# to call parent class [underline]#Tree# we need to use the keyword *super* +
+
+*super(size, barkColor, leaves)*
+
+| d
+| To call a prototype method from [underline]#changeSeason# to its parent you also use *.call* +
+
+*Tree.prototype.changeSeason.call this, season);*
+| To call a prototype method from [underline]#changeSeason# to its parent you also use *super*. +
+
+*super.changeSeason(season);*
+
+|===
+
 
 == 7.19 Working with JavaScript Subclasses
 
+A reminder about classes and subclasses: They do not gets hoisted up. +
+So when it comes to subclasses and you're going to refer to its parent with *this* keyword, you need to call it with *super* and then under it you can use *this*.
+
+=== Quiz 1 of 2 
+
+in this code 
+
+----
+class Toy {}
+class Dragon extends Toy {}
+const dragon1 = new Dragon();
+----
+
+With the code above, is the following statement true or false?
+
+----
+dragon1 instanceof Toy;
+----
+
+Answer: True because Dragon is a subclass of Toy.
+
+''''
+
+=== Quiz 2 of 2
+
+These are all just checking to see if you've been paying attention.
+
+*Question*
+====
+
+Let's say that a Toy class exists and that a Dragon class extends the Toy class.
+
+What is the correct way to create a Toy object from inside the Dragon class's constructor method?
+====
+
+*Answer*
+
+====
+We learned the new way to call from subclass to parent class is to use *super()*
+====
+
 == 7.20 Quiz: Building Classes and Subclasses (2 - 3)
 
+1. Here we have to create our own subclass *Bicycle* for the *Vehicle* class.
+
+2. Bicycle has to change the defaults to *wheels = 4* and *horn = 'honk honk'*
+
+NOTE: You have to put in all of the parameters into the new subclass and just not the ones you want to change. 
+
+Here's the main class:
+----
+class Vehicle {
+	constructor(color = 'blue', wheels = 4, horn = 'beep beep') {
+		this.color = color;
+		this.wheels = wheels;
+		this.horn = horn;
+	}
+
+	honkHorn() {
+		console.log(this.horn);
+	}
+}
+----
+
+and here is what they'll test with:
+----
+const myVehicle = new Vehicle();
+myVehicle.honkHorn(); // beep beep
+const myBike = new Bicycle();
+myBike.honkHorn(); // honk honk
+
+----
+
+*Answer* 
+====
+----
+class Bicycle extends Vehicle {
+    constructor(color, wheels = 2, horn = 'honk honk') {
+        super(color, wheels, horn);
+    }
+    
+}
+----
+====
+
 == 7.21 Lesson 2 Summary
+
+Here is a recap of what we've learned in Lesson 2:
+
+* The new way to write functions with *=> (Arrow Functions)*
+* The new and much easier way to write *default* values for functions.
+* Javascript *classes* and *subClasses* that is simulated through functions.
