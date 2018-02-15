@@ -1148,7 +1148,7 @@ image:img/proto4.png[] +
 | d
 | To call a prototype method from [underline]#changeSeason# to its parent you also use *.call* +
 
-*Tree.prototype.changeSeason.call this, season);*
+*Tree.prototype.changeSeason.call(this, season);*
 | To call a prototype method from [underline]#changeSeason# to its parent you also use *super*. +
 
 *super.changeSeason(season);*
@@ -1248,5 +1248,5 @@ class Bicycle extends Vehicle {
 Here is a recap of what we've learned in Lesson 2:
 
 * The new way to write functions with *=> (Arrow Functions)*
-* The new and much easier way to write *default* values for functions.
+* The new and much easier way to write *default values* for functions.
 * Javascript *classes* and *subClasses* that is simulated through functions.

@@ -51,14 +51,573 @@ Bowl has 2 bananas, 1 orange, and 1 apple.
 Symbol will help identify each of those bananas as banana1 and banana2, but it'll be easier. We'll see!
 
 == 8.3 : Symbols
+
+
+
+To create a symbol, we write *Symbol()* with an optional string as its description.
+
+----
+const sym1 = Symbol('apple');
+----
+
+Adding a description *'apple'* is just a way to describe the symbol, but it can't be used to access the symbol itself.
+
+To show how it works, we'll compare the two symbols with the same description.
+
+----
+const sym2 = Symbol('banana');
+const sym3 = Symbol('banana');
+console.log(sym2 === sym3);
+----
+
+The result will be *false* because the description has no effect on the symbol itself but for description only.
+
+''''
+
+Here's to show how a symbol can be useful.
+
+----
+const bowl = {
+  'apple': { color: 'red', weight: 136.078 },
+  'banana': { color: 'yellow', weight: 183.151 },
+  'orange': { color: 'orange', weight: 170.097 },
+  'banana': { color: 'yellow', weight: 176.845 }
+};
+
+console.log(bowl);
+----
+
+When we run this, the second banana will overwrite the first banana.
+
+This is the output for *console.log(bowl)*:
+====
+----
+{ apple: { color: 'red', weight: 136.078 },
+  banana: { color: 'yellow', weight: 176.845 },
+  orange: { color: 'orange', weight: 170.097 } }
+----
+====
+
+''''
+To fix this problem, we have to use Symbols.
+
+Here is how we'd write it:
+----
+const bowl = {
+  [Symbol('apple')]: { color: 'red', weight: 136.078 },
+  [Symbol('banana')]: { color: 'yellow', weight: 183.15 },
+  [Symbol('orange')]: { color: 'orange', weight: 170.097 },
+  [Symbol('banana')]: { color: 'yellow', weight: 176.845 }
+};
+console.log(bowl);
+----
+
+will print out: 
+====
+----
+{ [Symbol(apple)]: { color: 'red', weight: 136.078 },
+  [Symbol(banana)]: { color: 'yellow', weight: 183.15 },
+  [Symbol(orange)]: { color: 'orange', weight: 170.097 },
+  [Symbol(banana)]: { color: 'yellow', weight: 176.845 } }
+----
+====
+
+because when the properties use symbols, each property is a unique Symbol and the first banana doesn't get overwritten by the second banana anymore.
+
+
 == 8.4 : Iteration & Iterable Protocols
+
+Before we continue on, the instructors want us to understand these new protocols in ES6. 
+
+* the *iterable* protocol
+* the *iterator* protocol
+
+=== The Iterable Protocol 
+
+Let's start with Iterable.
+
+What the iterable protocol does is define and customize the iteration behavior of objects. +
+Which means we now have the flexibility in ES6 to specify a way for iterating through values in an object.
+
+Before, strings and arrays had built-in iterables. +
+
+Code refresher: Array built-in iterable
+----
+const digits = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+for (const digit of digits) {
+  console.log(digit);
+}
+----
+
+will print:
+----
+0 
+1 
+2 
+3 
+4 
+5 
+6 
+7 
+8 
+9 
+----
+
+Later in this lesson, they'll cover more on that and also more built-in iterables like *Sets* and *Maps*.
+
+''''
+When we were learning *for...of* loops, they said that objects can be iterated _only_ if they're *iterable*. +
+To make an object iterable, we have to implement the *iterable interface*. +
+The *iterable interface* means it must contain a *default iterator method*. This method will define how the object should be iterated.
+
+So now we have to understand what the *iterator method* is...
+
+=== The Iterator Protocol 
+
+The iterator method is available through constant: *[Symbol.iterator]* is a zero arguments function 
+that returns an iterator object. +
+An iterator object is an object that follows the rules of the iterator protocol.
+
+The iterator protocol has a process for defining how an object will iterate. This is done through using the *.next()* method.
+
+The object becomes an iterator when it implements the *.next()* method. The *.next()* method is a zero arguments function that returns an object with [underline]#two properties#.
+
+The two properties: 
+
+. *value* : the data representing the value that was used for the *.next()* method.
+. *done* : a [underline]#boolean# representing if the iterator is _done_ going through the sequence of values.
+  * If done is *true*, then the iterator has reached the end of its sequence of values.
+  * If done is *false*, then the iterator is able to produce another value in its sequence of values.
+
+Here is how to write an iterator using an array. I made it shorter than the example that way we can see done as *true* and *false*
+
+----
+const digits = ['can1', 'can2', 'can3'];
+const arrayIterator = digits[Symbol.iterator]();
+
+console.log(arrayIterator.next());
+console.log(arrayIterator.next());
+console.log(arrayIterator.next());
+console.log(arrayIterator.next());
+----
+
+This will print out: 
+
+====
+----
+{ value: 0, done: false }
+{ value: 1, done: false }
+{ value: 2, done: false }
+{ value: undefined, done: true }
+----
+====
+
+
 == 8.5 : Sets
+
+A set in mathematics is something like this: {2, 4, 5, 6} +
+because each of the numbers in the collection are unique. + 
+
+However...
+{1, 1, 2, 3} is not a set because it contains *duplicate* entries. [underline]#1# appears more than once.
+
+JavaScript on the other hand, doesn't care and will let you have duplicated entries.
+However, doing so will break the [underline]#mathematical# set rule.
+
+Now if you want JavaScript to follow the mathematical set rule, you need to use *new Set()*. +
+Sets lets you add or remove items, and loop, but each of the items have to be unique.
+
+''''
+
+Here's how to create a set: 
+----
+const games = new Set();
+console.log(games);
+----
+
+will print out an empty Set games with no items.
+====
+set {}
+====
+
+''''
+
+If you want to create a Set from a list of values, you can use an array:
+
+----
+const games = new Set(['Super Mario Bros.', 'Banjo-Kazooie', 'Mario Kart', 'Super Mario Bros.']);
+console.log(games);
+----
+
+prints out: 
+====
+----
+Set { 'Super Mario Bros.', 'Banjo-Kazooie', 'Mario Kart' }
+----
+====
+
+In this example, the duplicate object was automatically removed. In this case, it removed "*Super Mario Bros"*.
+
+
+=== Sets quiz 
+
+This quiz wants to check if you've been paying attention.
+
+Reminder: Sets is a collection of values that has to be unique.
+
+====
+Option 1: {1, 'Basketball', true, false, '1'}
+
+Option 2: {}
+
+Option 3: {1, 1, 1, 1}
+
+Option 4: {false, '0', 0, 'Soccer', 3.14, 25, 0}
+
+Option 5: {'Gymnastics', 'Swimming', 2}
+====
+
+Answer:  They put in different data types to try and trick you. So a number 1 and a string 1 are considered unique from each other. So the answers are Options 1, 2, and 5.
+
 == 8.6 : Modifying Sets
+
+now that we know how to create sets, now we can learn how to use them.
+
+Using this set:
+----
+const games = new Set(['Super Mario Bros.', 'Banjo-Kazooie', 'Mario Kart', 'Super Mario Bros.']);
+----
+
+Here's how to *add* to the set:
+
+----
+games.add('Banjo-Tooie');
+----
+
+If we print it out with console.log(games); we would get: 
+----
+Set {
+  'Super Mario Bros.',
+  'Banjo-Kazooie',
+  'Mario Kart',
+  'Banjo-Tooie' }
+----
+with our new *Banjo-Tootie* at the very bottom.
+
+
+
+''''
+If we wanted to *delete*, we type in:
+
+----
+games.delete('Super Mario Bros.');
+----
+
+our new result would be:
+----
+Set { 'Banjo-Kazooie', 'Mario Kart', 'Banjo-Tooie' }
+----
+
+
+
+''''
+
+If we want to delete all of the items from the Set, we can simply use the *.clear()* method.
+
+----
+games.clear()
+----
+
+prints the familiar empty Set.
+----
+Set {}
+----
+''''
+[NOTE]
+====
+* If you try to *.add()* an item that is already in the set, you will not receive an error, instead the item will just be ignored. +
+    . The .add() will return the *Set* if an item was successfully added.
+* If you try to *.delete()* an item that is not in the set, you will not receive an error, instead the command will just be ignored.
+    . The .delete() returns a Boolean depending on successful deletion.
+====
+
 == 8.7 : Working with Sets
+There are a number of different properties and methods we can use to work with sets.
+
+=== Checking the Length
+
+Now that we've made a Set, we want to see how many items are in it. +
+here, we use: *.size* property.
+
+Here's how to use it 
+----
+const months = new Set(['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']);
+console.log(months.size);
+----
+This will print out: *12*.
+
+NOTE: Sets can't be accessed by their index like an array, so you use the .size property instead of .length property to get the size of the Set.
+
+=== Check if an Item Exists.
+
+To check if an item exists in the Set, we use *.has()* method.
+
+* If the item is in the set, then .has() will return *true*.
+* If the item is NOT in the set, then .has() will return *false*.
+
+To use:
+----
+console.log(months.has('September'));
+----
+
+will print: *true*
+
+=== Retrieving all Values
+
+If we want to return all the values in a Set, we use the *.values()* method. The returned values from *.values()* method is a *SetIterator* object.
+
+Here's how to use:
+----
+console.log(months.values());
+----
+
+You get a *SetIterator* with a lists of the months in {}. 
+
+NOTE: SetIterator is shown empty on sites like JSBin and Repl.it. however, if you use it in devtools, you can really see the details and what's inside.
+Here's a screen shot of using just *months* vs *months.values()* +
+image:img/sets1.png[] +
+
+''''
+
+Another note is that .keys() method behaves the same way as .values() method by returning the values of a Set within a new iterator Object.
+The .keys() method is an alias for the .values() method for similarity with maps. We will get more into .keys() when when we cover maps.
+
 == 8.8 : Sets & Iterators
+
+Because the *.values()* method returns a new iterator object called *SetIterator*, you can store that iterator object in a variable and loop through each item in the Set using .next().
+
+----
+const iterator = months.values();
+iterator.next();
+----
+
+will print: *Object {value: 'January', done: false}* +
+If you type *iterator.next()* again, you will get *{'February', done: false}*. This will keep going until *done: true*.
+
+''''
+
+There's an easier way to loop through the items in a Set, and that is to use the *for...of loop*.
+
+----
+const colors = new Set(['red', 'orange', 'yellow', 'green', 'blue', 'violet', 'brown', 'black']);
+for (const color of colors) {
+  console.log(color);
+}
+----
+
+Which will print: 
+----
+red
+orange
+yellow
+green
+blue
+violet
+brown
+black
+----
 == 8.9 : Quiz: Using Sets
+
+=== Refresher for the quiz
+This was a long subject so maybe a refresher is needed.
+
+Code Refresher: 
+====
+*Here's how to create a set:*
+----
+const name = new Set();
+----
+====
+
+====
+*Here's how to add an item into the set*
+
+----
+name.add('item1')
+----
+====
+
+====
+*Here's how to delete an item from the set*
+
+----
+name.delete('item2')
+----
+====
+
+''''
+=== Using Sets Quiz 
+
+* They want you to create a set with the name: *myFavoriteFlavors*
+
+* They want you to add in these strings: 
+    . "chocolate chip"
+    . "cookies and cream"
+    . "strawberry"
+    . "vanilla"
+* They want you to delete this item from the set:
+    . "strawberry"
+
+''''
+
+Answer 
+====
+----
+const myFavoriteFlavors = new Set();
+
+myFavoriteFlavors.add('chocolate chip');
+myFavoriteFlavors.add('cookies and cream');
+myFavoriteFlavors.add('strawberry');
+myFavoriteFlavors.add('vanilla');
+myFavoriteFlavors.delete('strawberry')
+
+console.log(myFavoriteFlavors)
+----
+====
+
+
 == 8.10 : WeakSets
+
+WeakSet is like a normal Set but it's different in these ways:
+
+* WeakSet can only contain *objects*.
+* WeakSet is *not iterable* which means it cannot be looped over.
+* WeakSet does not have a *.clear()* method.
+
+
+To create a Weakset, you do the same thing as a normal Set.
+
+----
+const roster = new WeakSet();
+----
+
+However, like what was mentioned earlier, it only accepts objects.
+
+Objects:
+----
+const student1 = { name: 'James', age: 26, gender: 'male' };
+const student2 = { name: 'Julia', age: 27, gender: 'female' };
+const student3 = { name: 'Richard', age: 31, gender: 'male' };
+----
+
+New Weaksets:
+----
+const roster = new WeakSet([student1, student2, student3]);
+console.log(roster);
+----
+
+If you try to add a string inside the weakset like this:
+
+----
+roster.add('Amanda');
+----
+
+You get the error:
+
+----
+Uncaught TypeError: Invalid value used in weak set(…)
+----
+
+=== WeakSet's purpose
+
+If Sets can have many datatypes and WeakSets can only have Objects, then why do we need WeakSets?
+
+The reason is because of the *.clear()* method.
+
+=== Garbage Collection
+
+In JavaScript, memory is allocated when new values are created and is "automatically" freed up when
+those values are no longer needed. This process of freeing up memory after it is no longer needed is what is known 
+as *garbage collection*.
+
+WeakSets take advantage of this by exclusively working with objects. If you set an object to *null*, then
+you're essentially deleting the object. And when JavaScript's *garbage collector* runs, the
+memory that object previously occupied will be freed up to be used later in your program.
+
+
+For example:
+
+====
+----
+student3 = null 
+console.log(roster);
+----
+
+Will print out: *WeakSet {Object {name: 'Julia', age: 27, gender: 'female'}, Object {name: 'James', age: 26, gender: 'male'}}*
+
+Jasmine was completely removed.
+====
+
+What makes WeakSet suseful is that you don't have to worry about deleting references to deleted objects in your
+weakSets, because JavaScript does it for us. When an object is deleted, the object will also 
+be deleted from the WeakSet when garbage collection runs. *This makes WeakSet useful in 
+situations where you want an efficient, lightweight solution for creating groups of objects*.
+
+
 == 8.11 : Quiz: Working With WeakSets 
+
+Quiz Time!
+=== Refresher
+Just in case you need a refresher!
+
+====
+*To add a WeakSet*
+----
+const name = new WeakSet()
+----
+====
+
+====
+*to add an object into a WeakSet*
+----
+One Object: 
+
+name.add(object1);
+
+More than one Object: 
+
+name.add([object1, object2, object3])
+
+----
+====
+
+=== Quiz: Working With WeakSets 
+
+NOTE: Keep in mind that they want you to add the objects one by one. So there should be 3 .add().
+
+* Create a WeakSet with the name *uniqueFlavors*
+* create an object with the name *flavor1* with the properties: *{flavor: 'chocolate'}*
+* create an object with the name *flavor2* with the properties: *{flavor:}* Give the value of flavor whatever you want.
+* use the *.add()* method to add the objects *flavor1* and *flavor2* to *uniqueFlavors*.
+* use the *.add()* method to add *flavor1* to *uniqueFlavors* WeakSet, again.
+
+Answer
+====
+----
+const uniqueFlavors = new WeakSet();
+
+const flavor1 = {flavor: 'chocolate'};
+const flavor2 = {flavor: 'chocolate chip'};
+
+
+uniqueFlavors.add(flavor1);
+uniqueFlavors.add(flavor2);
+uniqueFlavors.add(flavor1);
+
+console.log(uniqueFlavors)
+----
+====
+
 == 8.12 : Maps
 == 8.13 : Creating & Modifying Maps
 == 8.14 : Working with Maps
