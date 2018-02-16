@@ -553,9 +553,9 @@ student3 = null
 console.log(roster);
 ----
 
-Will print out: *WeakSet {Object {name: 'Julia', age: 27, gender: 'female'}, Object {name: 'James', age: 26, gender: 'male'}}*
+Will print out: +
+*WeakSet {Object {name: 'Julia', age: 27, gender: 'female'}, Object {name: 'James', age: 26, gender: 'male'}}*
 
-Jasmine was completely removed.
 ====
 
 What makes WeakSet suseful is that you don't have to worry about deleting references to deleted objects in your
@@ -619,7 +619,48 @@ console.log(uniqueFlavors)
 ====
 
 == 8.12 : Maps
+
+Introducing Maps and WeakMaps. 
+
+Maps and WeakMaps are actually similar. 
+
+====
+Here is what they have in common:
+
+* They have similar properties. 
+* Maps and Sets are both iterable. Which means we can loop over them.
+* WeakMaps and WeakSets don't prevent garbage collection.
+====
+
+====
+Here is what Maps and WeakMaps has that's different.
+
+* Maps are collections of key-value pairs while Sets are collections of unique values.
+
+example:
+----
+Maps 
+
+        {
+            key1: value1
+            richard: 'is awesome'
+            james: 'wants to be cool like richard'
+        }
+
+Sets are collections of unique values
+
+        [val1, val2, val3]
+----
+A nice way to see them is *Sets::Arrays* and *Maps::Objects*
+====
+
+
+
 == 8.13 : Creating & Modifying Maps
+
+Essentially, a Map is an object that lets you store key-value pairs when both the keys and the values can be
+objects, primitive values, or a combination of the two.
+
 == 8.14 : Working with Maps
 == 8.15 : Looping Through Maps
 == 8.16 : WeakMaps
