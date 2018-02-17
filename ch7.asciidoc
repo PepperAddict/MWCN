@@ -1111,7 +1111,7 @@ image:img/proto4.png[] +
 
 [cols="2,2,5a"]
 |===
-| letter | Left: ES5 | Right: ES6
+|  | Left: ES5 | Right: ES6
 | a
 | Tree custructor function all alone
 | Tree is now a class and the constructor is *inside* the Tree class

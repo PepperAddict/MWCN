@@ -30,8 +30,8 @@ Chapter 10 : Challenge Course Wrap Up
 ''''
 == Extra Courses for better understanding
 
-link:https://www.udacity.com/course/object-oriented-javascript--ud015[Object Oriented JavaScript]
-
+link:https://www.udacity.com/course/object-oriented-javascript--ud015[Object Oriented JavaScript] +
+link:https://www.udacity.com/course/javascript-promises--ud898[JavaScript Promises]
 == Useful Links and Tips
 
 * A quick and easy place for JavaScript sandboxing: link:https://repl.it/[Repl]

@@ -661,14 +661,552 @@ A nice way to see them is *Sets::Arrays* and *Maps::Objects*
 Essentially, a Map is an object that lets you store key-value pairs when both the keys and the values can be
 objects, primitive values, or a combination of the two.
 
+=== Here's how to create a Map 
+
+To create a Map, type:
+
+----
+const employees = new Map();
+----
+
+If we console.log this, it would print out: *Map {}* Employee will be created with no key-value pairs.
+
+=== Modifying Maps 
+
+==== Adding to a Map
+
+====
+
+
+Unlike Sets, you can't create Maps from a list of values; instead, you add key-values
+by using the Map's *.set()* method.
+
+----
+const employees = new Map();
+
+employees.set('james.parkes@udacity.com', { 
+    firstName: 'James',
+    lastName: 'Parkes',
+    role: 'Content Developer' 
+});
+employees.set('julia@udacity.com', {
+    firstName: 'Julia',
+    lastName: 'Van Cleve',
+    role: 'Content Developer'
+});
+employees.set('richard@udacity.com', {
+    firstName: 'Richard',
+    lastName: 'Kalehoff',
+    role: 'Content Developer'
+});
+
+console.log(employees);
+----
+
+It will print out: +
+image:img/map1.png[] +
+The *.set()* method takes two arguments. The first argument is the [underline]#key#, which is used to reference the second argument, which is [underline]#value#.
+
+NOTE: When you use the *.set()* on a key-value pair to a Map that already uses the same key, you
+won't receive an error, but the key-value pair will overwrite what currently exists in the Map. +
+The return value of *.set()* is the Map object itself if the operation was successful.
+
+====
+
+==== Deleting from a map. 
+
+====
+If you want to remove [underline]#key-value# pair(s), simply use the *.delete()* method.
+
+----
+employees.delete('julia@udacity.com');
+employees.delete('richard@udacity.com');
+----
+
+now it will only print out:
+
+----
+Map {
+  'james.parkes@udacity.com' => { firstName: 'James',
+  lastName: 'Parkes',
+  role: 'Content Developer' } }
+----
+
+NOTE: If you try to *.delete()* a key-value pair that is not in a Map, you won't receive an error, and the
+Map will remain unchanged. +
+Just like in [underline]#Sets#, .delete() method returns true if a key value pair is succesfully deleted
+from the Map object, and false if unsuccessful.
+====
+
+=== Remove all 
+
+====
+Similar to Sets, you can use the *.clear()* method to remove all key-value pairs from the Map.
+
+----
+employees.clear()
+----
+
+will print out an empty Map:
+
+----
+Map {}
+----
+====
+
+
 == 8.14 : Working with Maps
+
+=== Checking your Map 
+====
+To check to see if a [underline]#key-value# pair exists inside the Map, use *.has()*.
+
+----
+const members = new Map();
+
+members.set('Evelyn', 75.68);
+members.set('Liam', 20.16);
+members.set('Sophia', 0);
+members.set('Marcus', 10.25);
+
+console.log(members.has('Xavier'));
+console.log(members.has('Marcus'));
+----
+
+You would get the results:
+
+* *false* for [underline]#Xavier#
+* *true* for [underline]#Marcus#
+====
+
+=== Retrieving values 
+
+====
+If you need to retrieve a Value from a Map, you need to pass in its *key* using the *get()* method.
+
+----
+console.log(members.get('Evelyn'));
+----
+
+Should get this result:
+
+----
+75.68
+----
+====
+
+
 == 8.15 : Looping Through Maps
+
+We have 3 different ways to loop through Maps.
+
+* Step through each key or value using the *Map's default iterator*
+* Loop through each key-value pair using the new *for...of* loop 
+* Loop through each key-value pair using the Map's *.forEach()* method.
+
+Let's check them out one by one.
+
+=== MapIterator
+
+Using both the *.keys()* and *.values()* methods on a Map will return a new iterator object
+called *MapIterator*. +
+You can store that iterator object in a new variable and use *.next()* to 
+loop through each key or value. +
+Depending on which method you use, it will determine if your iterator 
+has access to the Map's keys or the Map's values.
+
+----
+let iteratorObjForKeys = members.keys();
+iteratorObjForKeys.next();
+----
+
+will return 
+----
+Object {value: 'Evelyn', done: false}
+----
+
+You can keep using *.next()* until [underline]#done# is *true*
+
+----
+let iteratorObjForKeys = members.keys();
+iteratorObjForKeys.next();
+{value: "Evelyn", done: false}
+iteratorObjForKeys.next();
+{value: "Liam", done: false}
+iteratorObjForKeys.next();
+{value: "Sophia", done: false}
+iteratorObjForKeys.next();
+{value: "Marcus", done: false}
+iteratorObjForKeys.next();
+{value: undefined, done: true}
+----
+
+=== Using for...of Loop
+
+This is the familiar *for...of* loop to be used with *Maps*.
+
+----
+for (const member of members) {
+  console.log(member);
+}
+----
+
+will print out: 
++
+image:img/map2.png[] +
+
+Though, when using *for...of* loop with a Map, you don't exactly get back a *key* or a *value*.
+Instead, the key-value pair is split up into an array where the first element is the *key* and 
+the second element is the value.  
+
+What you need to do is use the *array deconstructuring inside the for...of loop*.
+
+=== Quiz: 
+
+====
+
+Code Refresher:
+
+
+Array Destructuring 
+----
+var x = [1, 2, 3, 4, 5];
+var [y, z] = x;
+----
+====
+
+====
+Using array destructuring to fix the following code to print the keys and values of the 'members' Map
+to the console.
+----
+for (const member of members) {
+    console.log(member)
+}
+----
+====
+
+Answer 
+====
+----
+for (const [key, value] of members) {
+    console.log(key, value)
+}
+
+----
+
+which will print out + 
+image:img/map3.png[]
+====
+
+Did you know that *for...of* loops support destructuring? I didn't. Here's a tiny bit of information
+on it (and I really mean *tiny*): link:http://2ality.com/2015/01/es6-destructuring.html#examples-of-destructuring[destructuring with for...of loop]
+
+----
+for (const [key, value] of members) {
+    console.log(`${key} has ${value}`)
+}
+----
+
+=== Using the forEach Loop
+Just when I learned about deconstructing for...of loops, turns out there's an easier method.
+
+Introducing the *forEach* loop. 
+
+Here's how to use it: 
+
+----
+members.forEach((key, value) => console.log(key, value));
+----
+
+will print out: 
+
+image:img/map4.png[]
+
+Okay, something funky is going on here.... I'll check back later on this.... +
+AND I'm back. Apparently, values show first when it comes to iterating maps.
+
+[NOTE]
+====
+When we wrote in *.forEach(key, value)*  [underline]#key, value# wasn't a deconstructoring thing, it was just an argument for the map in this order:
+
+. the element value
+. the element key
+. the Map object being traversed
+
+So if we wanted the argument to be accurate, it should have been written like this: +
+ *.forEach(value, key)*
+
+More on that here: link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map/forEach[MDN]
+====
+
+Okay, I think we can move on now!
+
 == 8.16 : WeakMaps
+
+A WeakMap is just like a normal Map with a few differences such as:
+
+* a WeakMap can only contain objects as keys
+* a WeakMap is *not* iterable which means it can't be looped and 
+* a WeakMap does not have a .clear() method.
+
+=== Creating WeakMaps 
+
+You create it the same as you would Set, WeakSet, and Map. 
+
+----
+const library = new WeakMap()
+----
+
+You also add in the same way as *Map* by using *.set()*. 
+
+----
+const book1 = { title: 'Pride and Prejudice', author: 'Jane Austen' };
+const book2 = { title: 'The Catcher in the Rye', author: 'J.D. Salinger' };
+const book3 = { title: 'Gulliver’s Travels', author: 'Jonathan Swift' };
+----
+
+Test it out with this: 
+
+----
+library.set(book1, true);
+library.set(book2, false);
+library.set(book3, true);
+
+console.log(library);
+----
+
+Should get this result: +
+image:img/map5.png[]
+
+''''
+However, if you try to add something other than an *object* as key, you'll get an error.
+
+----
+library.set('The Grapes of Wrath', false);
+----
+
+You will get this error: +
+image:img/map6.png[] +
+
+We get this error because *WeakMap* can only contain objects as keys. Again, similar to 
+WeakSets, weakMaps leverage garbage collection for easier use and maintainability. 
+
+
+NOTE: WeakMap's Garbage collection is very identical to *WeakSet's Garbage Collection*. If you need a refresher,
+scroll up: link:ch8.asciidoc#garbage-collection[garbage collection].
+
 == 8.17 : Promises Intro
+
+James and Richard show a real life scenario of what *Promises* are.
+
+JavaScript is a new way of handling *asynchronous* requests.
+
+
+*In Summary:* +
+Making a request for something and the downtime waiting for that request to be fulfilled and being able to do
+other work while we wait and then later be notified when the request is finished is what *promises* does for us in 
+JavaScript.
+
 == 8.18 : Promises
+
+=== Creating Promises 
+
+Promises are created with the Promise constructor function *new Promise()*. A promise
+will let you start some work that will be done *asynchronously* and let you get back to 
+your regular work. When you create the promise, you must give it the code that will be 
+run asynchronously. You provide this code as the argument of the constructor function: 
+
+
+----
+new Promise(function () {
+    window.setTimeout(function createSundae(flavor = 'chocolate') {
+        const sundae = {};
+        // request ice cream
+        // get cone
+        // warm up ice cream scoop
+        // scoop generous portion into cone!
+    }, Math.random() * 2000);
+});
+----
+
+This code creates a promise that will start in a few seconds after I make a request. Then there are 
+a number of steps that need to be made in the *createSundae* function. The way I see it, it's 
+similar to when James was waiting for Richard to place an order. 
+
+=== Indicated a successful request or a Failed Request 
+
+But once that's all done, we need a way for JavaScript to tell us that the request is complete.
+That is when we use *resolve*. Resolve is used to indicate that this function should be 
+called when the request completes successfully. Here we added *resolve* after all the requests.
+
+----
+new Promise(function (resolve, reject) {
+    window.setTimeout(function createSundae(flavor = 'chocolate') {
+        const sundae = {};
+        // request ice cream
+        // get cone
+        // warm up ice cream scoop
+        // scoop generous portion into cone!
+        resolve(sundae);
+    }, Math.random() * 2000);
+});
+----
+
+Once the sundae is successfully created, it calls the *resolve* method and passed the data 
+we want to return. Such as this completed sundae. The *resolve* method is used to indicate that the request 
+is complete and that it completed _successfully_.
+
+''''
+
+If there is a problem with the request and it couldn't be completed, then we could use the second 
+function that's passed to the function. Typically, this function is stored in an identifier called 
+*"reject"* to indicate that this function should be used if the request fails for some reason. This code we added 
+*reject*.
+
+----
+new Promise(function (resolve, reject) {
+    window.setTimeout(function createSundae(flavor = 'chocolate') {
+        const sundae = {};
+        // request ice cream
+        // get cone
+        // warm up ice cream scoop
+        // scoop generous portion into cone!
+        if ( /* iceCreamConeIsEmpty(flavor) */ ) {
+            reject(`Sorry, we're out of that flavor :-(`);
+        }
+        resolve(sundae);
+    }, Math.random() * 2000);
+});
+----
+
+So the reject method is used when the request could not be completed. Notice that even 
+though the request failed, we can still return data, so in this case we're just returning an error message: [underline]#Sorry, we're out of that flavor#.
+
+A promise constructor takes a function that will run and then, after some amount of time, will either complete 
+successfully (using the *resolve* method) or unsuccessfully ( using the *reject* method). When the outcome has been finalized whether it was successful or not, the promise 
+is now _fulfilled_ and will notify us so we can decide what to do with the response. 
+
+''''
+
+*Promises Return Immediately*
+
+The first thing to understand is that a Promise will immediately return an object.
+
+----
+const myPromiseObj = new Promise(function (resolve, reject) {
+    // sundae creation code
+});
+----
+
+The object that the Promise created is the *.then()* method. It is a way we can use to have it notify us if 
+the request we made in the promise was either successful or failed.  +
+
+[underline]#The *.then()* method takes two functions:#
+
+* The function to run if the request completed successfully.
+
+----
+mySundae.then(function(sundae) {
+  console.log("Time to eat my delicious ${sundae};
+},
+----
+
+* the function to run if the request failed to complete. 
+
+----
+ function(msg) {
+     console.log(msg);
+    }
+ );
+----
+
+together would look like this: 
+----
+new Promise(function (resolve, reject) {
+    window.setTimeout(function createSundae(flavor = 'chocolate') {
+        const sundae = {};
+        // request ice cream
+        // get cone
+        // warm up ice cream scoop
+        // scoop generous portion into cone!
+        if ( /* iceCreamConeIsEmpty(flavor) */ ) {
+            reject(`Sorry, we're out of that flavor :-(`);
+        }
+        resolve(sundae);
+    }, Math.random() * 2000);
+});
+
+
+mySundae.then(function(sundae) {
+    console.log(`Time to eat my delicious ${sundae}`);
+}, function(msg) {
+    console.log(msg);
+});
+----
+
 == 8.19 : More Promises
+
+This video is dedicated to tell you that you can learn more about *Promises* through their 
+extra course: link:https://www.udacity.com/course/javascript-promises--ud898[Udacity JavaScript Promises]
+
+There are benefits to Promises.. such as: 
+
+* They make it easier to do *asynchronous* code. 
+* The code will be easier to read and write.
+* Easier to debug.
+
+The class will also help us build an app called "Exoplanet explored"(sp). 
+
+
 == 8.20 : Proxies Intro
+
+In the dictionary, A proxie is something that represents someone else. +
+But in ES6 A Proxie is letting an object stand in for another object to handle all the interactions for that other object. 
+
+* The proxie can handle requests directly 
+* pass data back and forth to the target object
+* and more. 
+
 == 8.21 : Proxies
+
+To create a *proxy object*, we use the Proxy constructor *new Proxy();*. The proxy constructor 
+takes two items: 
+
+* the object that it will be the proxy for. 
+* the object containing the list of methods it will handle for the proxied object. 
+
+The second object is called the handler. 
+
+''''
+=== A Pass Through Proxy 
+
+The simplest way to create a proxy is to provide an object and then an empty handler object. 
+
+----
+var richard = {status: 'looking for work'};
+var agent = new Proxy(richard, {});
+----
+
+When you check the status of agent by typing in 
+
+----
+agent.status;
+----
+
+You should get the message: 
+
+----
+"looking for work"
+----
+
+So far the code doesn't do anything special with the proxy, but it does pass the request 
+directly to the source object. If we want the proxy object to actually intercept the request, 
+that's what the handler object is for.
+
+The key to making Proxies useful is the handler object that's passed as the second object to the Proxy 
+constructor. The handler object is made up of a method's that will be used for 
+property access. Let's look at th *get*:
+
 == 8.22 : Proxies vs ES5 Getter/Setter
 == 8.23 : Proxies Recap
 == 8.24 : Generators
