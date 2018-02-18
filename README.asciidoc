@@ -13,6 +13,7 @@ NOTE: The 2nd half is completely unrelated to the 1st half. I suggest you begin 
 ''''
 
 === 1st half
+link:https://www.udacity.com/course/offline-web-applications--ud899[Udacity's Offline Web Applications]
 
 link:ch2.asciidoc[Chapter 2] : The Benefits of Offline First +
 link:ch3.asciidoc[Chapter 3] : Introducing the Service Worker +
@@ -20,11 +21,12 @@ Chapter 4 : IndexedDb and Caching +
 Chapter 5 : Next Up +
 
 === 2nd half
+link:https://www.udacity.com/course/es6-javascript-improved--ud356[Udacity's ES6 - JavaScript Improved]
 
-link:ch6.asciidoc[Chapter 6] aka Lesson 1: Syntax +
-link:ch7.asciidoc[Chapter 7] aka Lesson 2: Functions + 
+link:ch6.asciidoc[Chapter 6] aka Lesson 1 : Syntax +
+link:ch7.asciidoc[Chapter 7] aka Lesson 2 : Functions + 
 link:ch8.asciidoc[Chapter 8] aka Lesson 3 : Built-Ins + 
-Chapter 9 : Professional Developer-fu +
+link:ch9.asciidoc[Chapter 9] : Professional Developer-fu +
 Chapter 10 : Challenge Course Wrap Up
 
 ''''
@@ -32,6 +34,7 @@ Chapter 10 : Challenge Course Wrap Up
 
 link:https://www.udacity.com/course/object-oriented-javascript--ud015[Object Oriented JavaScript] +
 link:https://www.udacity.com/course/javascript-promises--ud898[JavaScript Promises]
+
 == Useful Links and Tips
 
 * A quick and easy place for JavaScript sandboxing: link:https://repl.it/[Repl]

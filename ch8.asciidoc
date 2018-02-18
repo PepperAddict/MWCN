@@ -1200,16 +1200,729 @@ You should get the message:
 ----
 
 So far the code doesn't do anything special with the proxy, but it does pass the request 
-directly to the source object. If we want the proxy object to actually intercept the request, 
-that's what the handler object is for.
+directly to the source object.
 
-The key to making Proxies useful is the handler object that's passed as the second object to the Proxy 
-constructor. The handler object is made up of a method's that will be used for 
-property access. Let's look at th *get*:
+If we want the proxy object to actually intercept the request, that's what the handler object is for.
+
+The handler object is made up of a method's that will be used for 
+property access. Let's look at one of these properties: *get*:
+
+=== Get Trap 
+
+The *get* trap is used to *intercept* calls to properties: 
+
+example: 
+----
+const richard = {status: 'looking for work'};
+const handler = {
+    get(target, propName) {
+        console.log(target); // the `richard` object, not `handler` and not `agent`
+        console.log(propName); // the name of the property the proxy (`agent` in this case) is checking
+    }
+};
+const agent = new Proxy(richard, handler);
+agent.status; // logs out the richard object (not the agent object!) and the name of the property being accessed (`status`)
+----
+
+In the code above...
+
+*  *handler* object has a *get* method (called a *trap* since it's being used in a Proxy). 
+* When the code *agent.status;* is run on the last line, because the *get* trap 
+exists, it "intercepts" the call to get the status property and runs the *get* trap function. 
+
+* This will log out the target object of the proxy  (richard object) and then logs out the 
+name of the property being requested (the status property).
+
+* It doesn't actually log out the property. This is important - If a trap is used, you need to make sure you 
+provide all the functionality for that specific trap. 
+
+
+=== Accessing the Target object from inside the proxy 
+
+To provide the real result, we would need to return the property on the target object: 
+
+----
+const richard = {status: 'looking for work'};
+const handler = {
+    get(target, propName) {
+        console.log(target);
+        console.log(propName);
+        return target[propName];
+    }
+};
+const agent = new Proxy(richard, handler);
+agent.status; // (1)logs the richard object, (2)logs the property being accessed, (3)returns the text in richard.status
+----
+
+Here they added *return target[propName];* as the last line of the *get* trap. This will access the 
+property on the *target object* and will return it.
+
+=== Have the proxy return info directly
+
+Alternatively, we could use the proxy to provide direct feedback: 
+
+----
+const richard = {status: 'looking for work'};
+const handler = {
+    get(target, propName) {
+        return `He's following many leads, so you should offer a contract as soon as possible!`;
+    }
+};
+const agent = new Proxy(richard, handler);
+agent.status; // returns the text `He's following many leads, so you should offer a contract as soon as possible!`
+----
+
+With this code, the Proxy doesn't even check the target object, it just directly 
+responds to the calling code. 
+
+So the *get* trap will take over whenever any property on the proxy is accessed.
+
+
+=== Intercept calls to change properties
+
+If we want to intercept calls to _change_ properties, then the *set* trap needs to be used! 
+
+The *set* trap is used for intercepting code that will change a property. The *set* trap receives the object 
+it proxies the property that is being set the new value for the proxy. 
+
+----
+const richard = {status: 'looking for work'};
+const handler = {
+    set(target, propName, value) {
+        if (propName === 'payRate') { // if the pay is being set, take 15% as commission
+            value = value * 0.85;
+        }
+        target[propName] = value;
+    }
+};
+const agent = new Proxy(richard, handler);
+agent.payRate = 1000; // set the actor's pay to $1,000
+agent.payRate; // $850 the actor's actual pay
+----
+
+In the code above notice that the *set* trap checks to see if the *payRate* property is being set. 
+If it is, then the proxy (the agent) takes 15 percent off the top of her own commission. Then, when the actor's pay is 
+set to one thousand dollars, since the payRate property was used, the code took 15% off the top and set 
+the actual *payRate* property to *850*.
+
+
+=== Other Traps
+All we've looked at was *get* and *set* traps. There are 13 traps that can be used inside the handler.
+
+The two that we covered: 
+
+====
+* link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy/handler/get[get] trap - lets the proxy handle calls to property access.
+
+Syntax 
+----
+var p = new Proxy(target, {
+  get: function(target, property, receiver) {
+  }
+});
+----
+
+Takes 3 Parameters 
+
+* target - the target object 
+* property - The name of the property to get 
+* receiver - Either the proxy or an object that inherits from the proxy.
+
+''''
+Return Value - The *get* method can return any value.
+====
+
+====
+* link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy/handler/set[set] trap - lets the proxy handle setting the property to a new value.
+
+Syntax 
+
+----
+var p = new Proxy(target, {
+  set: function(target, property, value, receiver) {
+  }
+});
+----
+
+Takes 4 Parameters 
+
+* target - The target object 
+* property - The name of the property to set 
+* value - The new value of the property to set. 
+* receiver - The object to which the assignments was originally directed. This is usually the proxy itself.
+
+''''
+Return Value - The *set* method should return a boolean value. Return *true* to indicate that assignment succeeded. If the *set* method returns *false*, and the assignment 
+happened in _strict-mode code_, a *TypeError* will be shown.
+====
+The others that weren't covered. 
+====
+
+* link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy/handler/apply[apply] trap - lets the proxy handle being invoked (the object being proxied is the function).
+
+syntax: 
+----
+var p = new Proxy(target, {
+  apply: function(target, thisArg, argumentsList) {
+  }
+});
+----
+
+Takes 3 parameters
+
+. target - the target object 
+. thisArg - the this argument for the call.
+. argumentsList - the list of arguments for the call.
+
+''''
+Return Value - the *apply* method can return any value.
+====
+====
+* link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy/handler/has[has] trap - The handler.has method is a trap for the *in* operator.
+
+syntax: 
+----
+var p = new Proxy({}, {
+  has: function(target, prop) {
+    console.log('called: ' + prop);
+    return true;
+  }
+});
+
+console.log('a' in p); // "called: a"
+                       // true
+----
+
+Takes 2 parameters
+
+. target - the target object
+. prop - the name of the property to check for existence.
+
+''''
+Return Value - the *has* method must return a boolean value.
+
+====
+
+
+====
+* link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy/handler/deleteProperty[deleteProperty] trap - lets the proxy handle if a property is deleted.
+
+syntax
+----
+var p = new Proxy(target, {
+  deleteProperty: function(target, property) {
+  }
+});
+----
+
+Takes 2 parameters.
+
+. target - the target object. 
+. property - the name of the property to delete
+
+''''
+Return Value - of *deleteProperty* method must return a *Boolean* indicating whether or not the property has been successfully deleted.
+
+====
+
+====
+* link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy/handler/ownKeys[ownKeys] trap - lets the proxy handle when all keys are requested.
+
+syntax
+----
+var p = new Proxy(target, {
+  ownKeys: function(target) {
+  }
+});
+----
+
+Takes 1 parameter.
+
+* target - the target object
+
+''''
+the *ownKeys* method must return an enumerable object. +
+
+====
+
+====
+* link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy/handler/construct[construct] trap - lets the proxy handle when the proxy is used with the *new* keyword as a constructor.
+
+syntax
+----
+var p = new Proxy(target, {
+  construct: function(target, argumentsList, newTarget) {
+  }
+});
+----
+
+Takes in 3 parameters 
+
+* target - the target object 
+* argumentsList - the list of arguments for the constructor.
+* newTarget - the constructor that was originally called like *p* above.
+
+''''
+Return Value - The construct method must return an object.
+
+====
+
+====
+* link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy/handler/defineProperty[defineProperty] trap - let the proxy handle when defineProperty is used to create a new property on the object. 
+
+syntax 
+----
+var p = new Proxy(target, {
+  defineProperty: function(target, property, descriptor) {
+  }
+});
+----
+
+Takes 3 parameters 
+
+* target - the target object.
+* property - the name of the property whose description is to be retrieved.
+* descriptor - the descriptor for the property being defined or modified.
+
+''''
+Return Value - the *defineProperty* method must return a *Boolean* indicating whether or not the property has been successfully defined.
+
+====
+
+====
+
+* link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy/handler/getOwnPropertyDescriptor[getOwnPropertyDescriptor] - lets the proxy handle when defineProperty is used to create a new property on the object.
+
+Syntax
+----
+var p = new Proxy(target, {
+  getOwnPropertyDescriptor: function(target, prop) {
+  }
+});
+----
+
+Takes 2 Parameters 
+
+* target - the target object 
+* prop - The name of the property whose description should be retrieved. 
+
+''''
+Return Value - The *getOwnPropertyDescriptor* method must return an object or undefined.
+
+====
+====
+* link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy/handler/preventExtensions[preventExtensions] trap - lets the proxy handle calls to *Object.preventExtensions()* on the proxy object. 
+
+Syntax 
+----
+var p = new Proxy(target, {
+  preventExtensions: function(target) {
+  }
+});
+----
+
+takes in 1 parameter 
+
+* target - the target object 
+
+''''
+Return Value - the *preventExtensions* method must return a boolean value.
+
+====
+
+====
+* link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy/handler/isExtensible[isExtensible] trap - lets the proxy handle calls to *Object.isExtensible* on the proxy object.
+
+Syntax 
+----
+var p = new Proxy(target, {
+  isExtensible: function(target) {
+  }
+});
+----
+
+Takes 1 Parameter 
+
+* target - the target object 
+
+''''
+Return Value - The *isExtensible* method must return a boolean value.
+
+====
+
+====
+
+* link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy/handler/getPrototypeOf[getPrototypeOf] trap - lets the proxy handle calls to *Object.getPrototypeOf* on the proxy object.
+
+Syntax
+
+----
+var p = new Proxy(obj, {
+  getPrototypeOf(target) {
+  ...
+  }
+});
+----
+
+Takes 1 parameter 
+
+* target - the target object
+
+''''
+Return Value - The *getPrototypeOf* method must return an object or null.
+
+====
+
+====
+* link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy/handler/setPrototypeOf[setPrototypeOf] trap - lets the proxy handle calls to *Object.setPrototypeOf* on the proxy object.
+
+Syntax 
+----
+var p = new Proxy(target, {
+  setPrototypeOf: function(target, prototype) {
+  }
+});
+----
+
+Takes 2 Parameters 
+
+* target - the target object 
+* prototype - the object's new prototype or null
+
+''''
+Return Value - The *setPrototypeOf* method returns *true* if the \[[Prototype]] was successfully changed, otherwise *false*.
+
+====
 
 == 8.22 : Proxies vs ES5 Getter/Setter
+
+Here's an example of getter/setter that will do the same thing as proxies. 
+
+----
+var obj = {
+    _age: 5,
+    _height: 4,
+    get age() {
+        console.log(`getting the "age" property`);
+        console.log(this._age);
+    },
+    get height() {
+        console.log(`getting the "height" property`);
+        console.log(this._height);
+    }
+};
+----
+
+With Get/Set we have to set *get age()* and *get height()* when initializing the object. 
+So when we call the code below, we'll get the following results: 
+
+----
+obj.age; // logs 'getting the "age" property' & 5
+obj.height; // logs 'getting the "height" property' & 4
+----
+
+But when we add a new property to the object... 
+----
+obj.weight = 120; // set a new property on the object
+obj.weight; // logs just 120
+----
+
+Notice that a *getting the "weight" property* message wasn't displayed like the age and height properties produced.
+
+With ES6 Proxies, we do not need to know the properties beforehand:
+
+----
+const proxyObj = new Proxy({age: 5, height: 4}, {
+    get(targetObj, property) {
+        console.log(`getting the ${property} property`);
+        console.log(targetObj[property]);
+    }
+});
+
+proxyObj.age; // logs 'getting the age property' & 5
+proxyObj.height; // logs 'getting the height property' & 4
+----
+
+Now if we do the same thing like with ES5 and add a new property 
+
+----
+proxyObj.weight = 120; // set a new property on the object
+proxyObj.weight; // logs 'getting the weight property' & 120
+----
+
+Here A *weight* property was added to the proxy object, and when it was later retrieved, 
+it displayed a log message. 
+
+So some functionality of proxy objects may seem similar to existing ES5 getter/setter methods. But with 
+proxies, you do not need to initialize the object with getters/setters for each property when the object is initalized.
+
+
+
 == 8.23 : Proxies Recap
+
+A proxy object sits between a real object and the calling code. The calling code 
+interacts with the proxy instead of the real object. To create a proxy: 
+
+* use the *new Proxy()* constructor.
+    . pass the object being proxied as the first item. 
+    . the second object is a handler object. 
+* the handler object is made up of 1 of 13 different "traps"
+* a trap is a function that will intercept calls to properties let you run code
+* if a trap is not defined, the default behavior is sent to the target object. 
+
+Proxies are a powerful new way to create and manage the interactions between objects.
+
 == 8.24 : Generators
+
+Whenever a *function* is invoked, the javaScript engine starts at the top of 
+the function and runs every line of the code until it gets to the bottom. 
+
+There's no way to stop the execution of the function in the middle and pick up again at some later point. 
+
+This *run to completion* is the way it's always been: 
+
+----
+function getEmployee() {
+    console.log('the function has started');
+
+    const names = ['Amanda', 'Diego', 'Farrin', 'James', 'Kagure', 'Kavita', 'Orit', 'Richard'];
+
+    for (const name of names) {
+        console.log(name);
+    }
+
+    console.log('the function has ended');
+}
+
+getEmployee();
+----
+prints: 
+
+image:img/gen.png[] +
+
+'''
+But what if you want to print out the first 3 employee names then stop for a bit, then, at some later point, 
+you want to continue where you left off and print out more employee names. With a regular function, 
+you can't do this since there's no way to *pause* a function in the middle of its execution. 
+
+=== Pausable Functions 
+
+If we do want to be able to pause a function mid-execution, then we'll need a new type of function available 
+to us in ES6 - *generator functions!* Let's look at one: 
+
+----
+function* getEmployee() {
+    console.log('the function has started');
+
+    const names = ['Amanda', 'Diego', 'Farrin', 'James', 'Kagure', 'Kavita', 'Orit', 'Richard'];
+
+    for (const name of names) {
+        console.log( name );
+    }
+
+    console.log('the function has ended');
+}
+----
+
+The asterisk after function ( function* ) indicates that this function is actually a *generator*!
+
+Now when we run that code with this
+
+----
+getEmployee();
+----
+
+It prints: 
+
+image:img/gen2.png[]
+
+Now the question is where are all the text from the top of the function and how come we didn't 
+get any names printed to the console? 
+
+
+=== Function Generator Quiz 
+
+NOTE: You can place the asterisk anywhere in between function and name 
+
+Question: +
+Which of the following are valid generators? Pay attention to the placement of the asterisk.
+
+====
+----
+Option 1: function* names() {...}
+Option 2: function * names() {...}
+Option 3: function *names() {...}
+----
+====
+
+Answer: All of them
+
 == 8.25 : Generators & Iterators
+
+Continuing from the previous section and its problem...
+
+When a generator is invoked, it doesn't actually run any of the code inside the function. 
+Instead, it creates and returns an iterator. This iterator can then be used to execute the actual generator's inner code. 
+
+image:img/gen3.png[]
+
+''''
+When we used .next(), it printed out everything and the code never paused. We're kind of back to square one...
+
+=== The Yield Keyword 
+
+The yield keyword is new and was introduced with ES6. it can only be used inside generator 
+functions. *yield* is what causes the generator to pause. Let's put it in the code. 
+
+----
+function* getEmployee() {
+    console.log('the function has started');
+
+    const names = ['Amanda', 'Diego', 'Farrin', 'James', 'Kagure', 'Kavita', 'Orit', 'Richard'];
+
+    for (const name of names) {
+        console.log(name);
+        yield;
+    }
+
+    console.log('the function has ended');
+}
+----
+
+When we put in
+
+----
+const generatorIterator = getEmployee();
+generatorIterator.next();
+----
+
+We get: 
+
+----
+the function has started
+Amanda
+----
+
+It's paused there. If we put in another *generatorIterator.next()* we get: 
+----
+Diego
+----
+
+It remembered where we left off. If we keep doing .next(), it will keep going till it's finished. 
+
+=== Yielding Data to the "Outside" World
+
+Instead of logging the names to the console and then pausing, let's have the code *return* the name and then pause.
+
+----
+function* getEmployee() {
+    console.log('the function has started');
+
+    const names = ['Amanda', 'Diego', 'Farrin', 'James', 'Kagure', 'Kavita', 'Orit', 'Richard'];
+
+    for (const name of names) {
+        yield name;
+    }
+
+    console.log('the function has ended');
+}
+----
+
+The difference here is that the for...of loop's no longer has console.log(name) but has *yield name* instead.
+
+=== Yield Quiz 
+
+Question: 
+
+How many times will the iterator's .next() method need to be called to fully complete/"use up" the 
+udacity's generator function below:
+
+----
+function* udacity() {
+    yield 'Richard';
+    yield 'James'
+}
+----
+
+Answer: 3 times
+
+NOTE: It will be called one more time than there are *yield* expressions in the generator function. 
+The first call to *.next()* will start the function and run to the first *yield*. The second call to *.next()* will pick up where things left off 
+and run to the second *yield*. The third and final call to *.next()* will pick up where things left off again and run to the end of the function. 
+
 == 8.26 : Sending Data into/out of a Generator
+
+Previous lessons on generators [underline]#was sending data out#. This will be about *sending data back into the generator*! We do this 
+with the *.next()* method: 
+
+----
+function* displayResponse() {
+    const response = yield;
+    console.log(`Your response is "${response}"!`);
+}
+
+const iterator = displayResponse();
+----
+
+When you put in this *.next()* method with it 
+
+----
+iternator.next(); // This starts running the generator function
+iterator.next('Hello Udacity Student');  // This sends data into the generator. 
+----
+
+you get: +
+image:img/gen4.png[] +
+
+Calling *.next()* with data (ie *.next('Richard')*) will send data into the generator function where it last left off. It will *replace* the yield keyword with the data that you provided.
+
+So the *yield* keyword is used to pause a generator and used to send data outside of the generator, and 
+then the *.next()* method is used to pass data into the generator.
+
+=== Quiz 
+
+What will happen if you run this code: 
+
+----
+function* createSundae() {
+    const toppings = [];
+
+    toppings.push(yield);
+    toppings.push(yield);
+    toppings.push(yield);
+
+    return toppings;
+}
+
+var it = createSundae();
+it.next('hot fudge');
+it.next('sprinkles');
+it.next('whipped cream');
+it.next();
+----
+
+* Option 1:  The *toppings* array will have undefined as its last item. 
+* An error will occur 
+* The generator will be paused, waiting for it's last call to *.next()*
+
+Answer 
+====
+The toppings array will have *undefined* as its last item.
+
+image:img/gen5.png[]
+
+Because the first call to .next() passes in some data, but that data doesn't get stored anywhere. 
+The last call to .next() should have some data since it's being yielded into the last call to *toppings.push()*
+====
+
+generators are a powerful new kind of function that is able to pause its execution while also 
+maintaining its own state. 
+Generators are great for iterating over a list of items one at a time so you can handle each item on its own before moving on to 
+the next one. 
+
+Generators will also be used heavily in upcoming additions to the JavaScript language. One upcoming feature that will make sure to use them is link:https://github.com/tc39/ecmascript-asyncawait[async functions].
+
 == 8.27 : Lesson 3 Summary
+
+As great as ES6 is, some browsers can't read it. 
+The next chapter there's a way to write ES6 code for the browsers that work with it, and will also work with browsers that are behind.

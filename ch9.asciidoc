@@ -1,0 +1,64 @@
+:library: Asciidoctor
+:toc:
+:toc-placement!:
+
+
+= Grow with Google Challenge Notes: Chapter 9
+
+Professional Developer-fu notes +
+To go back to the README where all the chapters are: click link:README.asciidoc[here].
+
+
+toc::[]
+
+== 9.1 : The Web is Growing Up
+
+The problem with using ES6 is that some old browsers won't work too well with it. Though 
+there is a way to write ES6 anyway... We'll find out how.
+
+== 9.2 : Old and New Browsers 
+
+At the time of making the lesson, browsers that don't support ES6 supported ES5.1. 
+If we ran an arrow function and tried to run it on Safari 9, we would receive a *Syntax Error*. 
+
+*But how do they know about these changes* 
+
+Just like the W3C is the standards body for things like HTML, CSS, and SVG, link:https://www.ecma-international.org/[Ecma international] 
+is an industry association that develops and oversees standards like Javascript and JSON. You can find the specification for 
+ES6 link:http://www.ecma-international.org/ecma-262/6.0/index.html[here]
+
+
+== 9.3 : ES6 Specification
+
+Here they want you to check out the specification for ES6: link:http://www.ecma-international.org/ecma-262/6.0/index.html[]
+
+To figure out what ES6's code does. The rules and guidelines on how the language is supposed to function.
+
+== 9.4 : Supported Features
+
+To find out if a certain browser supports the latest ES6 you can visit their website:
+
+* link:https://www.chromestatus.com/features#ES6[google chrome]
+* link:https://developer.microsoft.com/en-us/microsoft-edge/platform/status/?q=ES6[microsoft edge]
+* link:https://platform-status.mozilla.org/[Mozilla Firefox]
+
+NOTE: Safari doesn't have its own platform status webpage, but under the hood, Sfari is powered by the open source browser 
+engine, *Webkit*. The status for Webkit features can be found link:https://webkit.org/status/[here]
+
+Someone created a chart with most of the browsers and their platform status. 
+
+can find that link:http://kangax.github.io/compat-table/es6/[here]. Pretty neat!
+
+== 9.5 : The Web is Eternal
+
+Here talks 
+
+== 9.6 : Polyfills
+== 9.7 : Using Polyfills 
+== 9.8 : Polyfill Walkthrough 
+== 9.9 : Other Uses for Polyfills
+== 9.10 : Transpiling 
+== 9.11 : Using Babel
+== 9.12 : Transpiling Walkthrough 
+== 9.13 : Transpiling Recap 
+== 9.14 : Course Summary
