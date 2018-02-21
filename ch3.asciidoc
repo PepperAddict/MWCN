@@ -1277,8 +1277,8 @@ git checkout task-update-reload
 *Step 4*: In the same \_updateReady method we have to control what pressing the *'refresh'* button will do. +
 There we will have to send a message to the new service worker and tell it to take control of pages immediately. +
 *Step 5*: back in public>main>js>sw>index.js  there's a different TODO at the very bottom. There we can listen for the message to take over page control. +
-*Step 6*: now we head back to indexController.js there's a different TODO near the top. There we need to listen for the pages controlling service worker changing and using that as a signal to reload the page.
-*Step 7*: Head over to wittr app's Dev Tools and unregister the SW. 
+*Step 6*: now we head back to indexController.js there's a different TODO near the top. There we need to listen for the pages controlling service worker changing and using that as a signal to reload the page. +
+*Step 7*: Head over to wittr app's Dev Tools and unregister the SW. +
 *Step 8*: Make a change in index.js. maybe a comment. anything. +
 
 *The following is a bit tricky so you need to do these carefully*

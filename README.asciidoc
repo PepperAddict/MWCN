@@ -17,7 +17,7 @@ link:https://www.udacity.com/course/offline-web-applications--ud899[Udacity's Of
 
 link:ch2.asciidoc[Chapter 2] : The Benefits of Offline First +
 link:ch3.asciidoc[Chapter 3] : Introducing the Service Worker +
-Chapter 4 : IndexedDb and Caching +
+link:ch4.asciidoc[Chapter 4] : IndexedDb and Caching +
 Chapter 5 : Next Up +
 
 === 2nd half

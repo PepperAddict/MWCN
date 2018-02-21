@@ -1,0 +1,299 @@
+:library: Asciidoctor
+:toc:
+:toc-placement!:
+
+
+= Grow with Google Challenge Notes: Chapter 4
+
+IndexedDB and Caching notes +
+To go back to the README where all the chapters are: click link:README.asciidoc[here].
+
+
+toc::[]
+
+== 4.1 : Introducing the IDB Promised Library 
+
+* When a user opens wittr, we want to start by showing the latest posts the device received, *before* going to the network.
+* We make a *web socket* connection and we start receiving new posts one by one. 
+* When we receive these posts, we want to display them, but we also want to add them to the set of posts we already have stored. 
+* We also want to remove entries that are too old to be worth keeping. 
+
+=== Introducing Databases
+Databases are great for adding and removing individual posts, iterate over them, and query the data.
+
+The web platform has a database called *IndexedDB*. We will be learning with that for the offline database approach. 
+If we've used *noSQL* before, indexeddb will be familiar. If we've used relational databases before, then this will be a little weird. 
+
+IDB can have many different databases with any name we give them, but we'll only be creating one for this lesson. 
+
+* It's best to only have *one database per app*.
+* The one data will have multiple objects stores, generally one for each kind of thing you want to store. 
+* The object store contains multiple values. 
+* The values can be JavaScript objects, strings, numbers, dates, or arrays.
+* The items in the object's store can have a separate primary key or you can assign a property of the values to be the key.
+
+Example: 
+
+|===
+| Out-of-line Keys | | In-line Keys
+| *Key* | *Value* | *Entries* 
+| Jane | 41 | {name: 'Jane', age: 41}
+| Natalie | 24 | {name: 'Natalie', age: 24}
+| Pete | 32 | {name: 'Pete', age: 32} 
+|===
+
+* The key must be unique within an object store because it is the way to identify a particular object.
+* Later we can get, set, add, remove, iterate over items in object stores as part of a transaction.
+* All read or write operations in indexDB must be part of a transaction.
+
+Transaction: 
+
+Here's an example of a series of steps:
+* [ ] Add "hello:world" to *"keyval'* store.
+* [ ] Get the first value from the *"people"* store 
+* [ ] Change the person's name to "james"
+* [ ] Wwrite it back to the *"people"* store.
+
+If one of these steps fail, none of them will be applied. The state of the database would be 
+as if none of the steps happened. 
+
+''''
+
+We can also create indexes *within* an object store, which provides a different view of the same 
+data ordered by particular properties. 
+
+
+|===
+| People Store | ...indexed by age
+| Entries | Entries 
+| {name: 'Jane', age 41} | {age: 24, name: 'Natalie'}
+| {name: 'Natalie', age: 24} | {age: 32, name: 'Pete'}
+| {name: 'Pete', age: 32} | {age: 41, name: 'Jane'} 
+|===
+
+Example here is similar to a lot of databases which makes a lot of sense. The browser support 
+is good as well with every major browser supporting it. 
+
+=== IndexedDB's bad reputation
+
+The API for IDB is horrid, and creates spaghetti code. 
+Though it is *asynchronous* which is fine, but it predates promises. It created its own *event-based promise* system which creates really 
+confusing code.  
+
+The instructor says he's going to chicken out of teaching us the IDB's API. So instead 
+we're going to use *IndexDB Promised*. link:https://github.com/jakearchibald/idb/blob/master/README.md[]
+
+It's a small library that mirrors the *IndexDB API*, but uses *promises* rather than events. Other than that 
+it's the same as IndexedDB.
+
+== 4.2 : Getting STarted with IDB 
+
+First you head over to link:http://localhost:8888/idb-test/[] +
+It should be a blank page. The script for *idb-test* is in *public > js > idb-test > index.js*
+
+All that is in there is an import for the idb library that we saw before. 
+----
+import idb from 'idb';
+----
+
+=== Creating our database 
+
+To create a database, we use 
+
+----
+idb.open(name, version, upgradeCallback)
+----
+
+idb.open() takes in 3 parameters: 
+
+* name 
+* version
+* upgradeCallback - a callback to set the database up. 
+
+=== Creating our Database START 
+
+under the import, we create our database 
+
+----
+idb.open('test-db', 1, function(upgradeDb) {})
+
+
+----
+
+* The function will be called if the browser hasn't heard about this database before or if the version 
+it knows about is less than this numbe here.
+
+* The function uses the parameter *upgradeDb* which we use to define the database.
+
+* To ensure the DB integrity, this is the *only* place we can create and remove object stores and indexes.
+
+=== Creating an object store 
+
+The original syntax for creating goes something like this:
+
+----
+var objectStore = db.createObjectStore("toDoList", { keyPath: "taskTitle" });
+----
+
+The original syntax for adding an item inside.
+
+----
+var request = objectStore.put(myItem, optionalKey);
+----
+NOTE: It is value, key instead of the usual key, value.
+
+''''
+
+For our project, we will create an object store called keyVal. This store has a key that's separate to the data and does this 
+by default, which is what we want for a keyValStore.
+
+----
+var keyVal = upgradeDb.createObjectStore('keyval');
+----
+
+We want to add some content. 
+
+In the library docs that an object store has methods which behave the same as IDB, except they return a promise. 
+The library is way more usable than plain IDB.
+
+----
+keyValStore.put('world', 'hello')
+----
+
+* We finished setting up our database. *.open* returns a promise that resolves with a database object.
+* Jake stored the database in the variable *dbPromise*. Now we can use that database object to get and set items in the database.
+
+Here's how it would look like alltogether so far:
+----
+const dbPromise = idb.open('test-db', 1, (upgradeDb) => {
+  const keyValStore = upgradeDb.createObjectStore('keyval');
+  keyValStore.put("world", "hello");
+  return;
+}); 
+----
+and in dev tools the result should look like this: 
+
+image:img/idb1.png[]
+
+''''
+=== Reading the Database
+So now for *reading* the database! +
+
+* we need to create a transaction. The function to do this 
+is *db.transaction()* with the *keyval* object store. 
+----
+const tx = db.transaction('keyval');
+----
+
+* Then we call the object store (*keyValStore*), passing in the name of the object store I want, *keyval*.
+----
+const keyValStore = tx.objectStore('keyval')
+----
+
+NOTE: It may be repetitive, but there's a possibility that you'll have a transaction that uses multiple objects stores.
+
+* we call .get() on the object store and pass the key I'm interested in such as "*hello*". 
+
+----
+return keyValStore.get('hello');
+----
+
+It will return a promise, which resolves to the value I'm looking for.
+
+----
+.then( val => console.log(`The value of "hello" is: ${val}`))
+
+or 
+
+.then(function(val) {
+    console.log('The value of "hello" is:', val);
+}
+----
+
+Here's how they look all together for reading the object store 
+
+----
+dbPromise.then(db => {
+  const tx = db.transaction('keyval');
+  const keyValStore = tx.objectStore('keyval');
+  return keyValStore.get('hello');
+}).then(val => console.log(`The value of "hello" is: ${val}`))
+----
+
+When you refresh in console in devtools, you should get: 
+
+*The value of "hello" is: world*
+
+''''
+=== Adding another value to the object store 
+
+Now if we want to add another value to the object store. To do that, we need to create 
+a transaction just as we did before, but this time we specify that we want to *read and write* this time.
+
+----
+dbPromise.then(function(db) {
+    var tx = db.transaction('keyval', 'readwrite' );
+    var keyValStore = tx.objectStore('keyval');
+    keyValStore.put('bar', 'foo');
+}
+----
+
+when using *.put*, it returns a promise. This promise doesn't mean it will work. As a reminder, 
+if any part of the operation fails, the whole operation will fail. Which is kind of a good thing because none of the 
+operation will be in a half finished state. So either all happens or none of it happens. 
+
+----
+return tx.complete;
+----
+
+transaction.complete is a promise that filfills if and when the transaction completes, and it rejects if it fails.
+
+Once the transaction completes, I'm going to log a success message: 
+
+----
+.then(function() {
+    console.log('Added foo:bar to keyval')
+})
+----
+
+Here's how they look like all together in an ES6 practice version. 
+
+----
+dbPromise.then(db => {
+  const tx = db.transaction('keyval', 'readwrite');
+  var keyValStore = tx.objectStore('keyval');
+  keyValStore.put('bar', 'foo');
+  return tx.complete;
+}).then(_ => console.log(`Added foo:bar to keyval`));
+----
+
+and get this result in console: *Added foo:bar to keyval* and this in the idb database +
+image:img/idb2.png[]
+
+
+== 4.3 : Quiz: Getting Started with IDB 
+
+You don't have to, but if you want to ready the template for the quiz, you can type in: +
+----
+git reset --hard 
+git checkout page-skeleton
+----
+
+* Just in case you forget where the IDB index is for editing, it's in: + 
+public > js > idb-test > index.js
+
+* TODO: in the keyval store, set "favoriteAnimal" as the key and an animal as your value. eg: cat or dog. 
+
+The test ID: *idb-animal*
+
+== 4.4 : Quiz: More IDB 
+== 4.5 : Using the IDB Cache and Display Entries 
+== 4.6 : Quiz: Using IDB Cache 
+== 4.7 : Quiz: Using IDB 2
+== 4.8 : Quiz: Cleaning IDB 
+== 4.9 : Cache Photos 
+== 4.10 : Quiz: Cache Photos Quiz 
+== 4.11 : Cleaning Photo Cache 
+== 4.12 : Quiz: Cleaning Photo Cache Quiz 
+== 4.13 : Quiz: Caching Avatars
+== 4.14 : Outro

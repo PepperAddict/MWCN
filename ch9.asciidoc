@@ -51,14 +51,197 @@ can find that link:http://kangax.github.io/compat-table/es6/[here]. Pretty neat!
 
 == 9.5 : The Web is Eternal
 
-Here talks 
+Here the instructors try to get you to exercise your ES6 skills.
 
 == 9.6 : Polyfills
+
+Polyfill - a JavaScript file that patches a hole by replicating some native feature that's missing.
+
+Basically patching the holes that browsers have.
+
 == 9.7 : Using Polyfills 
+
+Polyfill, or polyfiller, is a piece of code (or plugin) that provides the technology that you, the developer, expect the browser to provide natively.
+
+
+An example of polyfill with the ES6 string method, *startsWith()*
+
+----
+if (!String.prototype.startsWith) {
+  String.prototype.startsWith = function (searchString, position) {
+    position = position || 0;
+    return this.substr(position, searchString.length) === searchString;
+  };
+}
+----
+
+Quiz 
+
+Why does the *startsWith()* polyfill begin with the following line?
+
+----
+if (!String.prototype.startsWith)
+----
+
+* Option 1: Without it, the script would throw an error.
+* Option 2: It checks to make sure the *string.prototype* exists.
+* It avoids overwriting the native startswith method.
+
+Answer + 
+It avoids overwriting the native *startsWith* method.
+
 == 9.8 : Polyfill Walkthrough 
+
+With this code: 
+
+----
+if (!String.prototype.startsWith) {
+    String.prototype.startsWith = function (searchString, position) {
+        position = position || 0;
+        return this.substr(position, searchString.length) === searchString;
+    }
+}
+----
+
+This code will just help with browsers that doesn't yet support the native feature. 
+
+----
+if (!String.prototype.startsWith)
+----
+
+This if statement is the check to see if the native *startsWith* exists and if it does 
+exist, we don't want to overwride the native version with the new *startsWith* that was 
+written underneath it.
+
+
 == 9.9 : Other Uses for Polyfills
+
+JavaScript is the language used to create a polyfill, but polyfill doesn't just 
+patch up missing JavaScript features. There are polyfills for all sorts of browser 
+features: 
+
+* SVG
+* Canvas 
+* Web Storage (local storage /session storage) 
+* Video 
+* HTML5 elements 
+* Accessibility 
+* Web Sockets 
+* and many more! 
+
+Here's more on link:https://github.com/Modernizr/Modernizr/wiki/HTML5-Cross-Browser-Polyfills[polyfills].
+
+
 == 9.10 : Transpiling 
+
+
+* Compiler - is when it takes a source code language such as C++  and then converts it to a target language such as Machine code. 
+    . Running a code through a compiler changes its level of abstraction. It changes from a machine runnable code to a lower level language.
+* Transpiler -  It takes source code and converts it to target code. Just like compiler but the source code and target code are at the same 
+level of extraction. 
+    . Such as if it starts as human readable, the output will also be human readable.
+
+We want this because of older browsers maybe not supporting ES6. We can write our code in ES6 and use a transpiler to convert it to the supported ES6. 
+
+We can even use a different computer language and compile it into a different computer language such as Java to JavaScript.
+
 == 9.11 : Using Babel
+
+Here they want to introduce us to the most popular transpiler: link:https://babeljs.io/[Babel]
+
+To see how Babel works, C & P the code below into their engine and see how it translated it to ES5 JavaScript. 
+
+----
+class Student {
+  constructor (name, major) {
+    this.name = name;
+    this.major = major;
+  }
+
+  displayInfo() {
+    console.log(`${this.name} is a ${this.major} student.`);
+  }
+}
+
+const richard = new Student('Richard', 'Music');
+const james = new Student('James', 'Electrical Engineering');
+----
+
+This is what happens 
+
+image:img/babel.png[] +
+
+=== Transpiling project in repo 
+
+In this link:https://github.com/udacity/course-es6/tree/master/lesson-4/walk-through-transpiling[repo project], inside the lesson 4 directory 
+there's an ES6 folder with babel that will convert the code into ES6. 
+
+Babel has plugins that will do different transpilings. Such as the ES2015 arrow function plugin, string concatenation, etc. For a list click link:http://babeljs.io/docs/plugins/[here].
+
+Now if you're busy (or lazy like me) and don't want to go through a whole long list of plugins to see which 
+ones we need to convert from ES6 to ES5. Instead of having a bunch of plugins, Babel has *presets* which 
+are groups of plugins handled together. So instead of worrying about which plugins you need 
+to install, we'll just use the link:http://babeljs.io/docs/plugins/preset-es2015/[ES2015 preset] that is a 
+collection of all the plugins we'll need to convert all of our ES6 code to ES5.
+
+In the repo folder there is a *.babelrc* file. This is where you'd put all of the plugins and/or presets that 
+the project will use. Since we want to convert all eS6 code, we've set it up so that it has the ES2015 preset.
+
 == 9.12 : Transpiling Walkthrough 
+
+* File *package.json* - lists all the *NPM* packages that the project depends on. It lists what *should* be installed.
+
+----
+{
+  "name": "es6",
+  "version": "1.0.0",
+  "description": "Simple app that demos transpiling ES6 code to ES5 code with Babel.",
+  "main": "",
+  "scripts": {
+    "build": "babel ES6 -d ES5"
+  },
+  "author": "Richard Kalehoff",
+  "license": "MIT",
+  "devDependencies": {
+    "babel-cli": "^6.16.0",
+    "babel-preset-es2015": "^6.16.0"
+  }
+}
+
+----
+
+So the project depends on:
+
+* "babel-cli": "^6.16.0"  <- Babel CLI will check the .babelrc file for which plugin and preset to use.
+* "babel-preset-es2015": "^6.16.0"  <- This is the collection of all ES6 plugins. Then it will talk to *Babel CLI* for which plugin to install for transpiling.
+
+
+The building script 
+
+* "build": "babel ES6 -d ES5"  <- The build script will tell "Babel" to take what's in the "ES6" directory and transpile it 
+using the *.babelrc*'s preset and put the transformed code into the *ES5* directory.
+
+
+
+''''
+
+* File *.babelrc* tells babel which plugin to use when it does its transpiling. 
+
+
 == 9.13 : Transpiling Recap 
+
+It's important to stay on top of all the changes in JavaScript is going through. The 
+best way to do that is to start making use of the new features that are added. The problem is that 
+not all browsers support these new features. So to have your cake and eat it too, you can write 
+in ES6 and then use a transpiler to convert it to ES5 code. 
+
 == 9.14 : Course Summary
+
+We finished! 
+
+Here is what we covered: 
+
+* [x] - Syntax - We learned the latest syntax addition with ES6.
+* [x] - Functions - Discovered a new way to write functions and javaScript classes.
+* [x] - Built-Ins - we explored the new built-ins that came with ES6.
+* [x] - Developer-Fu - how to incorporate ES6 for our new projects.
