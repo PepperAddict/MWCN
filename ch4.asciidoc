@@ -284,10 +284,350 @@ public > js > idb-test > index.js
 
 * TODO: in the keyval store, set "favoriteAnimal" as the key and an animal as your value. eg: cat or dog. 
 
-The test ID: *idb-animal*
+''''
+Code Refresher: +
+====
+* Create a function for *dbPromise* with a *read and write* transaction. 
+----
+dbPromise.then(db => {
+  const tx = db.transaction('keyval', 'readwrite');
+})
+----
+
+* Then we have to have a place to store the information to.
+----
+const keyValStore = tx.objectStore('keyval');
+----
+
+* The process of actually adding the key and value. Don't forget to return the information.
+----
+keyValStore.put('animalOfChoice', 'favoriteAnimal');
+return tx.complete;
+----
+====
+
+* Once you've completed the task, check to see if the entry was submitted into the devtool's database. If you don't see it right away, try refreshing it.
+
+NOTE: Make sure you're in localhost:8888/idb-test.
+
+* Once you see the entry, head on over to the setting's page and type in test ID: *idb-animal* and you should see the message: *Yay! Your favorite animal is "animalYouPicked*
+
+
+''''
+The answer should have been: 
+
+----
+dbPromise.then(function(db) {
+    const tx = db.transaction('keyval', 'readwrite');
+    const keyvalStore = tx.objectStore('keyval');
+    keyvalStore.put('manatee', 'favoriteAnimal');
+    return tx.complete;
+}).then(_ => console.log("added an animal"));
+----
+
+''''
+==== Adding People objects to objectStore 
+
+So far we've created a *key/value* objects store, but now we want to create a different 
+store with objects all of the same kind. Such as *people*. To do that, we need to create another ObjectStore. 
+To create a different objectstore, we need to do that in indexes within the upgrade function.
+
+NOTE: You need to bump the version of the .open() for the upgradeDb function to run again for the new addition we're going to put in.
+
+* We create a new objectStore called *People*. It's not going to have separate keys, instead the name property of 
+the objects inside will be the key.
+
+----
+keyValStore.put('people', { keyPath: 'name'});
+----
+
+Here Jake mentions that in the real world, people will have the same name, but in this case, we're just going to assume people have different names.
+
+WARNING: If we try to run the code now, it will fail because *createObjectStore* has already been created.
+
+IDB has a workaround to that problem. +
+Introducing: *oldVersion* in conjuction with link:https://www.w3schools.com/js/js_switch.asp[switch()] statement to let you know which to run if a certain version. +
+We use the switch and oldversion to surround each of the createObjectStore to control which ones to run when.
+
+----
+switch(upgradeDb.oldVersion) {
+  case 0;
+    var keyValStore = upgradeDb.createObjectStore('keyval');
+    keyValStore.put("world", "hello");
+  case 1;
+    upgradeDb.createObjectStore('people', { keyPath: 'name'})
+}
+----
+
+So if the version is 0, it sets up the 'keyval' store, if the version is 1, we set up the 'people' store.
+
+NOTE: Usually with switch statements, there's a *break* after each case, but we don't want to do that here because if the browser hasn't 
+set up this database at all before, it'll start with case 0. It will create the key object store, but it will continue and create the object store.
+
+''''
+=== Adding people to the People store.
+
+* *Step 1* : Create the transaction for people and make it read/write.
+----
+dbPromise.then(function(db) {
+  var tx = db.transaction('people', 'readwrite');
+  var peopleStore = tx.objectStore('people');
+})
+----
+
+* *Step 2* : Adding a person. Putting in their name, age, and their favorite animal.
+
+----
+peopleStore.put({
+  name: 'Sam Munoz',
+  age: 25,
+  favoriteAnimal: 'dog'
+}); 
+return tx.complete
+----
+
+NOTE: we just put in *.put()* without a key this time. Because when we created the objectStore, we specified the key was { keyPath: 'name'}. So the *name* of the object is the key.
+
+* *Step 3*: Now we can add a success console message. 
+
+----
+.then(function() {
+  console.log('People added')
+})
+----
+
+Here, Jake added a lot more people objects into the list...
+
+=== Reading people in object store. 
+
+We have to create a transaction for people again. 
+
+* *Step 1* : We get ahold of the people object store with transaction again.
+----
+db.Promise.then(function(db) {
+  var tx = db.transaction('people');
+  var peopleStore = tx.objectStore('people')
+})
+----
+
+* *Step 2* : We use *.getAll()* Which returns a promise for all the object in the store.
+
+----
+return peopleStore.getAll();
+----
+
+* *Step 3*: Then we log the information.
+
+----
+.then(function(people) {
+  console.log('People:', people);
+})
+----
+
+By default it will be sorted alphabetically by their name since that is the key.
+
+=== Changing the sorting to their favorite animal.
+
+This is where indexes come in. 
+Indexes can only be created as part of a version upgrade and put inside the .open() function.
+
+* *Step 1* : Bump the version number. 
+* *Step 2* : Add an index to our switch case. 
+* *Step 3* : First we need to get ahold of the *person* object store using transaction again.
+
+----
+case 2: 
+  var peopleStore = upgradeDb.transaction.objectStore('people')
+----
+
+* *Step 4* : Now that we have the store, we have to create the index called *animal* which will sort by 'favoriteAnimal' property.
+
+----
+peopleStore.createIndex('animal', 'favoriteAnimal')
+----
+
+* *Step 5* : Now for actually using it. We go back to where we were reading *people* +
+here's the original that we wrote: 
+----
+db.Promise.then(function(db) {
+  var tx = db.transaction('people');
+  var peopleStore = tx.objectStore('people');
+
+  return peopleStore.getAll();
+}).then(function(people) {
+  console.log('People:', people);
+})
+----
+
+* *Step 6* : first we create a new index from the object store by *animal*
+----
+var animalIndex = peopleStore.index('animal')
+----
+
+* *Step 7* : Then we modify *.get()*. Instead of returning peopleStore, we're returning *animalIndex*.
+
+Now when we refresh the browser to see the changes, they're sorted by their favoriteAnimals.
+
+=== How to execute queries on the index.
+
+Using *.getAll()* you can put a specific key to search for. Such as *.getAll('cat')*.
+
 
 == 4.4 : Quiz: More IDB 
+
+This we need to get the same template as Jake's 
+
+----
+git reset --hard 
+git checkout task-idb-people
+----
+
+* We need to create an index for *people* ordered by *age* inside the upgrade function.
+* At the bottom of the code we need to log out all the people in that order. 
+
+Code Refresher: 
+====
+This is kind of a spoiler, but I figured it was copying what you last did anyway.
+
+
+* Add an index to the createObject function and use switch.
+----
+  case 3:
+  var peopleStore = upgradeDb.transaction.objectStore('people'); // first access the people database.
+  peopleStore.createIndex('age', 'age');  //Then create a new index (create the new name, the key that we'll sort with)
+----
+
+To read and console.log our result.
+----
+dbPromise.then(function(db) {
+    var tx = db.transaction('people');
+    var peopleStore = tx.objectStore('people'); // first access the people objectstore.
+
+    var ageIndex = peopleStore.index('age'); // We also access the index we created earlier and we store it in ageIndex.
+  
+    return ageIndex.getAll();  // return what we stored in ageIndex.
+  }).then(function(age) {
+    console.log('age:', age);    // the logged info and sorted by age.
+  });
+----
+====
+
+NOTE: Be sure to change the version # and also, the *TODO:* in the createObject function was after the curly bracket. Your new created Index should be inside with the others.
+
+* once done, we should see the changes in the browser's console and there will be *age* section in people's database.
+
+* To confirm the changes, go to the setting's page and type in the test ID: *idb-age*. You should see the message *Yay! The age index is working*.
+
+=== Introducing cursors
+We've been getting items out of the store, but now we can go through them one at a time using cursors.
+
+
+Using the age property that we created, instead of calling getAll(), we're going to *open a cursor*.
+----
+return ageIndex.openCursor();
+----
+
+That will return a promise for a cursor object representing the first item in the index or undefined if there isn't one. But if it 
+is undefined, we're going to do a usual return. 
+
+----
+.then(function(cursor) {
+  if {!cursor) return;
+})
+----
+
+otherwise we'll just log it 
+
+----
+console.log('Cursored at:', cursor.value.name);
+----
+
+The first person in the index is in *cursor.value*.
+
+Next we insert this code to move on to the next item.
+----
+return cursor.continue();
+----
+This returns a promise for a cursor representing the next item or undefined if there isn't one.
+
+''''
+=== Using cursor to keep going until undefined
+Now if we want this to keep going until it becomes undefined, this is where it gets trickly.
+
+*Step 1* : you can name the function we're in. 
+
+-----
+.then(function logPerson(cursor) {...})
+-----
+
+*Step 2* Then we can call it once cursor.continue resolves.
+
+----
+return cursor.continue().neth(logPerson);
+---- 
+
+What this does is that it creates an asynchronous loop until cursor is undefined which is the end of the list.
+
+----
+.then(function() {
+  console.log('Done cursoring');
+})
+----
+
+
+=== Skipping items with cursor. 
+
+Let's say you want to skip the first two items, here is what you'd put. 
+-----
+.then(function(cursor) {
+  if (!cursor) return;
+  return cursor.advance(2);
+})
+-----
+
+=== Cursor Summary
+''''
+So far it just shows a complicated way of using .getAll(), but cursors become really useful 
+when you want to modify items as you're looping through. You can use your cursor to: +
+
+* cursor.update(newValue) to change the value.
+* cursor.delete() to remove it.
+
+''''
+
+This is the basics for what we'll be covering in the lesson. It's the basic API. 
+
+If you want to play with the code that Jake was writing...
+
+----
+git reset --hard 
+git checkout idb-cursoring
+----
+
 == 4.5 : Using the IDB Cache and Display Entries 
+
+The objective is to create a database that stores the posts.
+
+When wittr loads via a service worker, it does so without going to the network. It fetches the page skeleton and assets straight from the cache.
+
+At the moment we have to go to the network for posts. We're going to change that. We want to get the posts from the offline stored database and display them. Then we want to connect the web socket to get updated posts once we're online. Web sockets bypass both the service worker and the http cache. As the new posts
+arrive, we'll add them to our database for next time. 
+
+* *Step 1* : We need to populate the database. First we need to inspect our websocket code. Head to public>js>main>inddexController.js
+  . There is a method that is called to open the web socket. 
+  ----
+    this._openSocket();
+  ----
+
+  ----
+  // open a connection to the server for live updates
+IndexController.prototype._openSocket = function() {
+  var indexController = this;
+  var latestPostDate = this._postsView.getLatestPostDate();
+  ----
+  
+In this methodd, we can see a listener for the message event.
+
 == 4.6 : Quiz: Using IDB Cache 
 == 4.7 : Quiz: Using IDB 2
 == 4.8 : Quiz: Cleaning IDB 
