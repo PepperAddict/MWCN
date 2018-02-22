@@ -613,23 +613,217 @@ When wittr loads via a service worker, it does so without going to the network. 
 At the moment we have to go to the network for posts. We're going to change that. We want to get the posts from the offline stored database and display them. Then we want to connect the web socket to get updated posts once we're online. Web sockets bypass both the service worker and the http cache. As the new posts
 arrive, we'll add them to our database for next time. 
 
-* *Step 1* : We need to populate the database. First we need to inspect our websocket code. Head to public>js>main>inddexController.js
-  . There is a method that is called to open the web socket. 
-  ----
-    this._openSocket();
-  ----
+* *Step 1* : We need to populate the database, but deal with displaying the contents later. First we need to inspect our websocket code. Head to public>js>main>inddexController.js
+  . There is a method that is called to open the web socket.
 
-  ----
-  // open a connection to the server for live updates
-IndexController.prototype._openSocket = function() {
-  var indexController = this;
-  var latestPostDate = this._postsView.getLatestPostDate();
-  ----
+
+    this._openSocket();
+
+
+
+open a connection to the server for live updates
+
+  IndexController.prototype._openSocket = function() {
+    var indexController = this;
+    var latestPostDate = this._postsView.getLatestPostDate();
+
   
 In this methodd, we can see a listener for the message event.
+var ws = new WebSocket(socketUrl.href);
+
+
+And that hands off to *onSocketMessage*, passing in the data it receives. 
+
+----
+ws.addEventListener('message', function(event) {
+  requestAnimationFrame(function() {
+    indexController._onSocketMessage(event.data)
+  })
+})
+----
+
+Then *._onSocketMessage* parses the data with JSON, then passes it to *addPost*.
+
+----
+IndexController.prototype._onSocketMessage = function(data) {
+  var messages = JSON.parse(data);
+  this._postsView.addPosts(messages);
+}
+----
+
+* *Step 2* : We are going to look at the data that was received by adding in a console.log.
+
+----
+IndexController.prototype._onSocketMessage = function(data) {
+  var messages = JSON.parse(data);
+  console.log(messages);
+  this._postsView.addPost(message);
+}
+----
+
+Once you select *update on reload* for service worker and refresh the page, you'll receive this 
+into console: + 
+image:img/idb3.png[] + 
+
+And more keeps getting added into console when wittr adds a new post. What we want to do is pass this information 
+to IndexedDB.
+
+There's an obvious primary key here, *id* 
+
+image:img/idb4.png[] +
+
+And we want to display this information in the order of their *date* so we'll need to create an *index* based on their *time*.
+
 
 == 4.6 : Quiz: Using IDB Cache 
+
+We're going to create a database for wittr! Yay! The moment I've been waiting for. +
+Okay, so first we need to ready the template. 
+
+----
+git reset --hard 
+git checkout task-idb-store 
+----
+
+We're going to be editing wittr right in index Controller. Which is in: +
+public > js> main > IndexController.js
+
+Inside a constructor function IndexController(container) {....}, they've created 
+a promise for our database by calling *openDatabase*
+----
+this._dbPromise = openDatabase();
+----
+
+The *openDatabase() function* is incomplete and it's our job to complete it.
+
+* *Step 1* : First we create our database
+  . Inside *openDatabase()*
+  . Create a database called *wittr*. 
+  . It has an *objectStore called wittrs*
+  . *id* as its key
+  . index is called *by-date* which will sort by the *time property*.
+
+In  *_onSocketMessage* the database has been fetched. +
+
+* *Step 2* : We need to add each of the messages to the wittr store.  
+* *Step 3* : Confirm that the changes were made by searching for the database that was added by *date*. 
+
+Should look something like this: +
+image:img/idb5.png[] +
+
+* *Step 4* : Confirm again in the setting's page(localhost:8889) in the test ID enter: *idb-store* and you should see the message *The database is set up and populated!*
+
+Code Refresher 
+
+====
+To actually create the database
+----
+idb.open('name_of_database', version_#, The function that gets run when starting the database for the first time or if the version number is more than the last time this was run.)
+----
+
+Adding the database
+
+----
+var name = upgradeDb.createObjectStore('aSubName', { keyPath:'id'});  // The *ID* will be the primary key.
+----
+
+Adding an index from original
+----
+name.createIndex('by-date', 'time');
+----
+
+''''
+Now what to put in it.
+
+We always have to do the usual retrieving the database. 
+----
+var tx = db.transaction('aSubName', 'readwrite');
+var keyValStore = tx.objectStore('aSubName')
+----
+
+This lesson they want you to store *messages* into the database. +
+We need to *iterate* the messages array and put it in *keyValStore*. There are a number of ways to do this.
+
+----
+ForEach
+
+messages.forEach(function(message) {
+  keyValStore.put(message);
+})
+
+For...of loop
+
+for (const message of messages) {
+  keyValStore.put(message);
+}
+----
+====
+
+[NOTE]
+====
+When creating the database. You don't need to store it into a variable with a name since we're not going to be calling it by its name. Since it's in a 
+function, you just need to return it. So it'll look like this: + 
+-----
+return idb.open(){...}
+-----
+====
+
+=== How Jake completed the quiz 
+
+Creating the database 
+
+----
+return idb.open('wittr', 1, function(upgradeDb) {
+  var store = upgradeDb.createObjectStore('wittrs', {keyPath: 'id'});
+  store.createIndex('by-date', 'time');
+})
+----
+
+Everything works. The database is open and working, but now we just need to put *messages* in it.
+
+Inside *_dbPromise.then*'s function
+
+----
+var tx = db.transaction('wittrs', 'readwrite');
+var store = tx.objectStore('wittrs');
+messages.forEach(function(message) {
+  store.put(message);
+})
+
+----
+
 == 4.7 : Quiz: Using IDB 2
+
+Now that we've put messages into the database, we want to show them. Now we want to get posts that are in 
+the database and display them before connecting to the web socket that gets us newer posts. 
+
+Let's ready the template! 
+----
+git reset --hard 
+git checkout task-show-stored
+----
+
+We are still working with wittr, so we'll be editing in *indexController.js*. On the previous lesson we were calling _opensocket in the constructor. Now
+we're calling *_showcachedMessages* [underline]#then# we will open the socket. 
+
+----
+this._showCachedMessages().then(function() {
+  indexController._openSocket();
+})
+----
+
+Currently our *showCachedMessages* is rather empty. This is where we come in. 
+
+* *Step 1* : We have to get the messages out of the database and pass them to this method: +
+----
+indexController._postsView.addPosts(messages)
+---- 
+* *Step 2* : Make sure they're in date descending order. 
+* *Step 3* : Once you're done making changes to the code, make sure you bump the version inside the service worker script.
+* *Step 4* : Once done with that, you can test it out by going to setting's page and set *offline* mode and should still see the posts on wittr. 
+* *Step 5* : To confirm again, in the settings page go back to *online mode* and in the test ID enter: *idb-show* 
+
+
 == 4.8 : Quiz: Cleaning IDB 
 == 4.9 : Cache Photos 
 == 4.10 : Quiz: Cache Photos Quiz 
