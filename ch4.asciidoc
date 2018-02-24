@@ -818,14 +818,218 @@ Currently our *showCachedMessages* is rather empty. This is where we come in.
 ----
 indexController._postsView.addPosts(messages)
 ---- 
-* *Step 2* : Make sure they're in date descending order. 
+
+code refresher 
+====
+The usual grab
+----
+var tx = db.transaction('wittrs');
+var store = tx.objectStore('wittrs');
+----
+
+Now for the index that we want to use
+----
+var dateIndex = store.index('by-date');
+----
+
+Now we want to get all of the data from our index
+----
+return dateIndex.getAll()
+----
+
+getAll returns a promise so we want to pass them to the indexController and we want it starting with latest.
+----
+.then(function(messages) {
+  indexController._postsView.addPosts(messages.reverse());
+})
+----
+
+====
+
 * *Step 3* : Once you're done making changes to the code, make sure you bump the version inside the service worker script.
 * *Step 4* : Once done with that, you can test it out by going to setting's page and set *offline* mode and should still see the posts on wittr. 
-* *Step 5* : To confirm again, in the settings page go back to *online mode* and in the test ID enter: *idb-show* 
+* *Step 5* : To confirm again, in the settings page go back to *online mode* and in the test ID enter: *idb-show* and should see the message *Page populated from IDB!*
 
+=== How Jake did it
+
+
+----
+var index = db.transaction('wittrs').objectStore('wittrs').index('by-index');
+return index.getAll().then(function() {
+  indexController._postsView.addPosts(messages.reverse());
+})
+----
+
+It looks like you can cram transaction, objectstore, and index into one variable. good to know!
 
 == 4.8 : Quiz: Cleaning IDB 
+The thing with databases is that there will be a limit. So to work with that, we only want *30* wittr items in it at any single time. 
+
+To ready the template, you type in: 
+----
+git reset --hard 
+git checkout task-clean-db
+----
+
+* *Step 1* : We will edit our code inside indexController.js again. +
+public>js>main>indexcontroller.js
+* *Step 2* : We are editing in 
+----
+IndexController.prototype._onSocketMessage = function(data) {...}
+----
+We already added items to the database, we just need to make it limit to only 30. We 
+will have to use *cursors* for this. 
+
+code refresher. 
+====
+First we need to open the cursor for *store*.
+----
+return store.openCursor(null, 'prev');
+----
+
+It will return a promise so we're going to use it to only display 30.
+----
+.then(function(cursor) {
+    return cursor.advance(30);
+----
+
+advance is also a promise so we can use that to use the other cursor method *delete()*.
+----
+.then(function deleteRest(cursor) {
+    cursor.delete();
+
+----
+
+    return cursor.continue().then(deleteRest);
+====
+
+* *Step 3* : See the changes in the database. 
+* *Step 4* : Confirm the change by going to the setting's page and type in the test ID: *idb-clean* and you should get this message: *Looks like the database is being cleaned!*
+
+
+=== Here's how Jake did it. 
+----
+
+store.index('by-date').openCursor(null, 'prev').then(function(cursor) {
+  return cursor.advance(30);
+}).then(function deleteRest(cursor) {
+  if (!cursor) return;
+  cursor.delete();
+  return cursor.continue().then(deleteRest);
+})
+----
+
+He's going to go *by-date* because he wants to remove the oldest posts.
+
+* *null, 'prev'* makes it so it goes *backwards* in the index starting with the newest posts.
+* Starting with the newest post, he wants to keep the top 30 posts.
+* if cursor is undefined, we're done. 
+* With the rest of the information, he wants it deleted with .delete().
+* After it's done deleting, continue the cursor from start, and then run the same deleteRest function again to loop through the remaining entries.
+
+''''
+
+Now we can check off another todo list that I completely forgot about! 
+
+* [x] Unobtrusive app updates.
+* [x] Get the user onto the latest version. 
+* [x] Continually update cache of posts.
+* [ ] cache photos.
+* [ ] cache avatars.
+
+
 == 4.9 : Cache Photos 
+At the moment we're only caching resources at install time. We want to cache photos too. 
+we want to cache photos as they appear.
+We could put these photos in IDB along with the rest of the phost data, but that would mean we need to read the pixel 
+data and convert it into a blob. That's a little too complicated and it loses streaming, which has a performance impact.
+
+At the moment, when we get an item from a database, we have to take the whole thing out in one lump, then convert 
+it into image data, then add it to the page. 
+
+Though if we get the image from a cache, it will stream the data. So we don't need to wait for the whole thing before we display anything.
+Which makes it more energy efficient and leads to faster render time. 
+
+Here's the code for the image which is responsive image. Which means it can appear at a veriety of different widths. 
+
+----
+<img src="/photos/65152-800px.jpg"
+srcset="/photos/65152-1024px.jpg 1024w,
+        /photos/65152-800px.jpg 800w,
+        /photos/65152-600px.jpg 640w,
+        /photos/65152-320px.jpg 320w"
+  sizes="(min-width: 800px) 765px,
+         (min-width: 600px) calc(100vw - 32px),
+        calc(100vw - 16px)">
+----
+Because images can appear at a variety of different widths, the responsive image lets the browser decide which image to load
+based on the width of the window and also the network conditions.
+
+''''
+So when the posts arrives through the web socket, which version do we cache? 
+
+* First we wait until the browser makes the request. 
+* Then we hear about it in the serviceWorker.
+* We go to the network for the image. 
+* once we get a response, we put it in the cache.
+* At the same time, we send it on to the page.
+* At the moment we put the image into a separate cache to the rest of the other static content.
+* We reset the content of our static cache whenever we update our javaScript or css, but we want these photos to live between versions of our app.
+
+next time we get a request for an image that we already have cached, we simply return it.
+
+The trick here is that we'll return image from the *cache* even if the browser requests a different size of the same image.
+
+Posts on wittr are short lived, so if the browser requests a bigger version of the same image, returning a smaller one from the cache isn't really a problem.
+
+You can only use the body of a response, *once*.
+
+Meaning if we read the responses json, you cannot then read it as a blob.
+
+* response.json();
+* [line-through]#response.blob()#;
+
+That's because the original data has gone, keeping it in memory would be a waste. Also keep in mind that respondWith uses the body of 
+the response as well so which means we cannot later read it again.
+
+* [line-through]#event.respondWith(response)# 
+
+This can be a good thing. If the responses was like a free gigabyte video going to a video element on the page, 
+the browser doesn't need to keep the whole free gigabytes in memory. It only needs to keep the bit that it's currently playing. Plus a little bit extra for buffering. 
+
+However this is a problem for our photos. 
+
+We want to open a cache, +
+fetch from the network, +
+and send the response to both the cache and back to the browser.
+
+----
+event.respondWith(
+  caches.open('wittr-content-imgs').then(function(cache) {
+    return fetch(request).then(function(response) {
+      cache.put(request, response);
+      return response;
+    })
+  })
+)
+----
+
+Using the body twice like this doesn't work, but there is a workaround by using *clone()*.
+Now the clone goes to the cache and the original gets sent back to the page. 
+
+----
+event.respondWith(
+  caches.open('wittr-content-imgs').then(function(cache) {
+    return fetch(request).then(function(response) {
+      cache.put(request, response.clone());
+      return response;
+    })
+  })
+)
+----
+
+The browser keeps enough of the original request around to satisfy all of the clones.
+
 == 4.10 : Quiz: Cache Photos Quiz 
 == 4.11 : Cleaning Photo Cache 
 == 4.12 : Quiz: Cleaning Photo Cache Quiz 
