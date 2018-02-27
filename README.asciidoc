@@ -33,13 +33,16 @@ Chapter 10 : Challenge Course Wrap Up
 == Extra Courses for better understanding
 
 link:https://www.udacity.com/course/object-oriented-javascript--ud015[Object Oriented JavaScript] +
-link:https://www.udacity.com/course/javascript-promises--ud898[JavaScript Promises]
+link:https://www.udacity.com/course/javascript-promises--ud898[JavaScript Promises] +
+link:https://www.udacity.com/course/responsive-images--ud882[Responsive Images]
 
 == Useful Links and Tips
 
 * A quick and easy place for JavaScript sandboxing: link:https://repl.it/[Repl]
 * Also For Javascript testing, I recommend using link:https://developers.google.com/web/tools/chrome-devtools/snippets[snippet]. It offers the authentic devtools feel and can be accessed from any page.
+* If only there's a cheat for regular expressions. OH WAIT THERE IS! link:https://regexr.com/[regexr] !!
 
+''''
 Here's how to use snippet in devtools:
 
 image:img/devtoolsSNIP.png[] +

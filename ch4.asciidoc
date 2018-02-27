@@ -994,8 +994,8 @@ the response as well so which means we cannot later read it again.
 
 * [line-through]#event.respondWith(response)# 
 
-This can be a good thing. If the responses was like a free gigabyte video going to a video element on the page, 
-the browser doesn't need to keep the whole free gigabytes in memory. It only needs to keep the bit that it's currently playing. Plus a little bit extra for buffering. 
+This can be a good thing. If the responses was like a 3 gigabyte video going to a video element on the page, 
+the browser doesn't need to keep the whole 3 gigabytes in memory. It only needs to keep the bit that it's currently playing. Plus a little bit extra for buffering. 
 
 However this is a problem for our photos. 
 
@@ -1031,7 +1031,376 @@ event.respondWith(
 The browser keeps enough of the original request around to satisfy all of the clones.
 
 == 4.10 : Quiz: Cache Photos Quiz 
+
+=== Jake starts us off.
+
+We're actually taking a break from IDB and going back to caches for storing images.
+
+* *Step 1* : We go back to service worker in: +
+public>js>sw>index.js 
+* *Step 2* : We need to set up our image cache in our service worker. We start that off by
+creating a variable *contentImgsCache* and setting it to *'wittr-content-imgs';*
+* *Step 3* : Next we're going to create another variable *allCaches* that contains an array of 
+the cache names we've already created. *staticCacheName* and *contentImgsCache*
+
+----
+var allCaches = [
+  staticCacheName,
+  contentImgsCache
+]
+----
+
+* *Step 4* : Back in Chapter 3, our *activate* event that we wrote, we deleted 
+any cache that isn't *staticCacheName*. 
+----
+cacheName != staticCacheName;
+----
+
+Now that we created *contentImgsCache*, we want that to be included as well somehow. So instead of just 
+checking *staticCacheName* alone, we are going to make it check our array that we made which was called *allCache*.
+
+----
+!allCaches.includes(cacheName);
+----
+
+* *Step 5* : Now we are going to handle our photo requests. Go over to our *fetch* handler. We are 
+going to handle URLs that have the same origin and have a path that starts with *'/photos/'*. And when 
+it does see one of those, it will respond with whatever returns from *serve photo*.
+
+----
+if (requestUrl.pathname.startsWith('/photos/')) {
+  event.respondWith(servePhoto(event.request));
+  return;
+}
+----
+
+* *Step 6* : Now that we created a fetch listener for photos, it called *servePhoto*. Now we just need to implement *servePhoto*.
+We only want to store 1 copy of each photo, and the responsive photos that was stored look like this: 
+
+----
+/photos/9-8028-75277734776-e1d2bda28e-800px.jpg 
+----
+
+They have their width information at the end. 
+
+What we're going to do is create a storage URL that doesn't have the size info. 
+We are going to do that using the link:https://regexr.com/[regular expressions] and link:https://www.w3schools.com/jsref/jsref_replace.asp[.replace()] .
+----
+var storageUrl = request.url.replace(/-\d+px\.jpg$/, '');
+----
+
+We're matching on *-* | *any digit* | *px.jpg* and then we replace it with nothing.
+We have the URL, but missing the size-specific stuff. That is the URL we will use on the cache.
+
+for example 
+----
+original: /photos/9-8028-75277734776-e1d2bda28e-800px.jpg
+
+the changed : /photos/9-8028-75277734776-e1d2bda28e
+----
+
+''''
+=== Here is where we take over inside servePhoto
+
+* *Step 1* : To ready the template 
+
+----
+git reset --hard 
+git checkout task-cache-photos
+----
+
+* *Step 2* : We will still be working in the serviceworker script. +
+public> js> sw > index.js 
+
+* *Step 3* : What we need to do is to serve the photos from the cache if they're there, 
+otherwise we get the photos from the network and also put them in the cache for next time. Also 
+be sure to use the variable we created *storageUrl* when matching and putting stuff into the image cache so you only 
+end up with one photo in cache no matter how many different sizes are requested.
+
+Code Refresher +
+(This is a major spoiler. It has been a while since I worked on SW so I had to get Jake!)
+====
+First we need to open up the cache that we created.
+----
+return cache.open(contentImgsCache)
+----
+
+Then we need to serve the photos from the cache if they're there
+----
+return cache.match(newVarWeMade).then(function(response) {
+  if (response) return response;
+})
+----
+
+otherwise we get it from the network
+----
+return fetch(request)
+----
+
+store it into the cache
+
+----
+.then(function(networkResponse) {
+  cache.put(newVarWeMade, networkResponse.clone());
+})
+----
+
+and send the original to the browser.
+----
+return networkResponse;
+----
+
+NOTE: As a reminder. You can only read the messages once, so that is why we used *clone()* to send to the cache 
+and send it to the browser...
+
+====
+
+* *Step 4* : You can confirm that it's working when you go to your cache in devtools 
+and see a *wittr-content-cache* and all the images that are saved are missing the width and their .jpg.
+
+image:img/swphotos.png[]
+
+* *Step 5* : Confirm a second time by going to the settings page and set it to offline mode to check to see if images 
+are still loaded when you refresh the wittr page. 
+
+* *Step 6* : To finalize your confirmation, go to the setting's page and set it back to *online* and type in the Test ID: *cache-photos*. You should get the message: *Photos are being cached and served correctly!*
+
+=== Here's how Jake did it 
+----
+  return caches.open(contentImgsCache).then(function(cache) {
+    return cache.match(storageUrl).then(function(response) {
+      if (response) return response;
+      return fetch(request).then(function(networkResponse) {
+        cache.put(storageUrl, networkResponse.clone());
+        return networkResponse;
+      })
+    })
+  })
+
+----
+
+Jake tests the images by resizing the window to see if the images would still load. And it does 
+because it will still send the image that is in the cache no matter the size that it requests. 
+
+Okay, that part is a bit confusing since I don't know about *responsive images*. 
+
 == 4.11 : Cleaning Photo Cache 
+
+Okay now that we've added a cache for images, we need to delete the old ones we don't need anymore. +
+It won't be the same way we did with databases. It's going to be different and specific for caches. 
+
+* If we want to remove specific entries from the cache, we can use *cache.delete* +
+----
+cache.delete(request);
+----
+
+* There is *.keys()* that returns a promise that gives us all the requests for entries in the cache.
+----
+cache.keys().then(function(requests) { // }
+----
+
+All of this is available from pages as well as service workers. In the next chapter we will use these methods 
+to clean the image cache.
+
+
 == 4.12 : Quiz: Cleaning Photo Cache Quiz 
+
+=== Jake helps setup our _cleanImageCache
+
+* *Step 1* : We are going to be working in our *indexController* for this one. +
+public >js > main>indexController.js 
+
+* *Step 2* : We are going to create a new method called *_cleanImageCache*.
+
+----
+IndexController.prototype._cleanImageCache = function() {//}
+----
+
+* *Step 3* : When the page loads, it starts *IndexController* so inside there, we're going to add a call 
+for our new *_cleanImageCache* method. 
+
+* *Step 4* : The cache can still go out of control if the user keeps the page open for ages. We can make it so it'll 
+call for the clean every five minutes.
+
+----
+setInterval(function() {
+  indexController._cleanImageCache();
+}, 1000 * 60 * 5)
+----
+
+* *Step 4* : Now we just need to implement our *_cleanImageCache*.
+
+=== Now we have to complete our _cleanImageCache
+
+Our new _cleanImageCache is going to bring together IDB and cache API.
+
+* *Step 1* : Ready the template +
+----
+git reset --hard
+git checkout task-clean-photos
+----
+
+* *Step 2* : We will be working in indexController.js + 
+public>js>main>indexController.js
+
+* *Step 3* : We have to implement *_CleanImageCache*. +
+
+Our TODO: We have to get all the messages from the database. Looking at what photos they need, then going through 
+the images cache and getting rid of ones you don't need anymore. Important note: The photo's property may not match the URL in the cache.
+
+TIP: When you're done editing in the code, make sure you clear everything. Clear your cache and delete your database! There's a special way 
+to delete your cache on the page here: +
+image:img/cleardata.png[] +
+After you've cleared the cache, make sure you actually have some images in the cache for the test ID to check if some changes have been made when 
+you refresh the wittr page. So which means you may have to stay idle for a bit to collect some images. +
+If you're still getting a fail, you may need to *clear site data* on your setting's page as well. That worked for me.
+
+Code Refresher 
+====
+
+====
+
+
+* *Step 4* : To confirm that it's working, head over to the image cache and you should only see a list of images that are currently on the page. When you refresh the page again, you would notice 
+that the images inside the cache would be different but still limited to what is on the page.
+
+* *Step 5* : To confirm again, go over to the setting's page and type in the test ID: *cache-clean*. We have *8 seconds* to test the clean up
+so the best way to do that is by *refreshing wittr*.  You should get the message: *Yay! The image cache is being cleaned!*
+
+=== How Jake did it!
+
+* First he created the array of images he wants to keep.
+
+----
+var imagesNeeded = [];
+----
+
+* Then create a transaction to look at the *'wittrs'* store.
+
+----
+var tx = db.transaction('wittrs');
+----
+
+* Then we want to return a promise that actually opens the *'wittrs'* store. We will use that to .getall() 
+----
+return tx.objectStore('wittrs').getAll()
+----
+
+* Now we can look into the database. For each message, I'll look to see if it has a photo property. 
+
+----
+.then(function(messages) {
+  messages.forEach(function(message) {
+    if (message.photo)
+    
+});
+----
+
+This contains the photo URL, but without the width bit at the end. 
+
+* Now with that, I'll add the photos to the array of images that I want to keep. 
+
+----
+imagesNeeded.push(message.photo);
+----
+
+''''
+* After the forEach, we want to open our images cache 
+
+----
+return caches.open('wittr-content-imgs')
+----
+
+* and get the requests that are stored in it using *cache.keys*.
+
+----
+.then(function(cache) {
+  return cache.keys().then(function(requests) {
+    //
+  })
+})
+----
+
+NOTE: The URLs on request objects are absolute so which means it'll include the local host port 8080 bit.
+
+* For each requests, we want to pass a URL 
+----
+requests.forEach(function(request) {
+  var url = new URL(request.url);
+})
+----
+
+* If the path name of the URL isn't in our array of images needed, we'll pass a request to cache.delete.
+----
+if (!imagesNeeded.includes(url.pathname)) cache.delete(request);
+
+----
+
+* All together should look like this! 
+
+----
+IndexController.prototype._cleanImageCache = function() {
+  return this._dbPromise.then(function(db) {
+    if (!db) return;
+
+    var imagesNeeded = [];
+
+    var tx = db.transaction('wittrs');
+    return tx.objectStore('wittrs').getAll().then(function(messages) {
+      messages.forEach(function(message) {
+        if (message.photo) {
+          imagesNeeded.push(message.photo);
+      });
+      return caches.open('wittr-content-imgs');
+    }).then(function(cache) {
+      return cache.keys().then(function(requests) {
+        requests.forEach(function(request) {
+          var url = new URL(request.url);
+          if (!imagesNeeded.includes(url.pathname)) cache.delete(request);
+        });
+      });
+    });
+  });
+};
+----
+
 == 4.13 : Quiz: Caching Avatars
+=== Setting up for adding avatars into our cache
+
+The previous one was a tough one, so I believe caching avatars might actually help us practice. 
+
+The difference here is that avatars actually change often. We don't want people to be stuck with their 
+old avatar after changing theirs.
+
+What we'll do with avatars is that we'll fetch a particular avatar from the cache, we'll also fetch it from the network 
+and update the cache.
+
+Avatars are also responsive images, but they vary by density rather than width. They're a bit like the photos, but 
+a slighltly different URL pattern. +
+
+example: + 
+----
+<img width ="40" height="40" src="/avatars/sam-1x.jpg"
+srcset="/avatars/sam-2x.jpg 2x,
+/avatars/sam-3x.jpg 3x">
+----
+
+We will cache the avatars in the same cache as photos. In *_cleanImageCache* in *indexController.js*. +
+The first thing we do is edit our cleanup code to include *avatars* for things we want to keep. We don't want our cleanup to delete them all.
+
+----
+images.Needed.push(message.avatar);
+----
+
+=== Now it's our job to finish the rest.
+
+* *Step 1* : To ready the template 
+----
+git reset --hard 
+git checkout task-cache-avatars
+----
+
+* *Step 2* : We will be working on service worker.+
+public > js> sw> index.js
+
 == 4.14 : Outro
