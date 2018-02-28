@@ -140,37 +140,68 @@ image:img/bashgui.png["screenshot"] +
 
 *3rd step:* Now that you're on the right directory, clone the project to that folder. 
 type: 
-****
+
+----
 git clone https://github.com/jakearchibald/wittr
-****
+
+----
+
+Or if you have an *ssh* setup for github. You go here: 
+----
+git@github.com:jakearchibald/wittr.git
+----
 
 *Summary:* Install node.js and clone the project.
 
-NOTE: Jake says if you want to learn git, there's a free class: link:https://www.udacity.com/course/how-to-use-git-and-github--ud775[udacity class]
+[NOTE]
+====
+Jake says if you want to learn git, there's a free class: link:https://www.udacity.com/course/how-to-use-git-and-github--ud775[udacity class]
 If you want a very quick one to teach you the basics in 15 minutes, I recommend link:https://try.github.io/levels/1/challenges/1[Try Git].   For this class, however, you don't really need to know git.
-All you really need to do is make sure you're in the correct directory, git reset --hard, and then git checkout with the proper task branch that they will give. 
+The only git commands you use for the lessons are: +
+----
+git reset --hard   (for resetting the files)
+git checkout branch-name (for getting the files to the proper state for that lesson)
+----
+IMPORTANT: When using *git reset --hard* you need to check you're in the correct directory. If you have other git folders and use git reset --hard, you're 
+not getting those edits after a commit back!
+====
 
 == 2.9: Quiz: Running the Demo app
 Same as the previous lesson, here are the steps to continue on.
 
 *Step 1*: After you've installed node.js and got the complete package of wittr, you'll see your folder added a new folder called "wittr".
 Now you need to navigate to the wittr folder.
-****
-cd wittr
-****
 
-*Step 2*: Once inside the folder, you need to type:
-****
+----
+cd wittr
+----
+
+*Step 2*: Once inside the folder, you need *npm* or *yarn* to build the server. Either will work.
+----
 npm install
-****
+----
+
+or 
+
+----
+yarn install
+----
+
 This will fetch all the 3rd party code that is needed to run the app.
 *note*: There may be some errors and warnings for optional dependencies. Just ignore them.
 
-*Step 3*: Once npm install is complete, type:
-****
+*Step 3*: Once npm/yarn install is complete, you can start the server by typing:
+----
 npm run serv
-****
-IMPORTANT: From here on, you will always need to navigate to the wittr folder and type *npm run serve* every single time
+----
+
+or 
+
+----
+yarn run serve
+----
+
+IMPORTANT: From here on, you will always need to navigate to the wittr folder and type *npm run serve* or *yarn run serve* every single time
 when resuming the lesson. Once you type it, the console will let you know two servers are running:
 *localhost:8888* and *localhost:8889*. If you ever need to restart or shut down the server, press *ctrl c*.
 If for whatever reason your server doesn't start, shut down the server, and type 

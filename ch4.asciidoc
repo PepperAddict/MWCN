@@ -642,7 +642,7 @@ ws.addEventListener('message', function(event) {
 })
 ----
 
-Then *._onSocketMessage* parses the data with JSON, then passes it to *addPost*.
+Then *.\_onSocketMessage* parses the data with JSON, then passes it to *addPost*.
 
 ----
 IndexController.prototype._onSocketMessage = function(data) {
@@ -703,7 +703,7 @@ The *openDatabase() function* is incomplete and it's our job to complete it.
   . *id* as its key
   . index is called *by-date* which will sort by the *time property*.
 
-In  *_onSocketMessage* the database has been fetched. +
+In  *\_onSocketMessage* the database has been fetched. +
 
 * *Step 2* : We need to add each of the messages to the wittr store.  
 * *Step 3* : Confirm that the changes were made by searching for the database that was added by *date*. 
@@ -781,7 +781,7 @@ return idb.open('wittr', 1, function(upgradeDb) {
 
 Everything works. The database is open and working, but now we just need to put *messages* in it.
 
-Inside *_dbPromise.then*'s function
+Inside *\_dbPromise.then*'s function
 
 ----
 var tx = db.transaction('wittrs', 'readwrite');
@@ -804,7 +804,7 @@ git checkout task-show-stored
 ----
 
 We are still working with wittr, so we'll be editing in *indexController.js*. On the previous lesson we were calling _opensocket in the constructor. Now
-we're calling *_showcachedMessages* [underline]#then# we will open the socket. 
+we're calling *\_showcachedMessages* [underline]#then# we will open the socket. 
 
 ----
 this._showCachedMessages().then(function() {
@@ -1210,14 +1210,14 @@ to clean the image cache.
 * *Step 1* : We are going to be working in our *indexController* for this one. +
 public >js > main>indexController.js 
 
-* *Step 2* : We are going to create a new method called *_cleanImageCache*.
+* *Step 2* : We are going to create a new method called *\_cleanImageCache*.
 
 ----
 IndexController.prototype._cleanImageCache = function() {//}
 ----
 
 * *Step 3* : When the page loads, it starts *IndexController* so inside there, we're going to add a call 
-for our new *_cleanImageCache* method. 
+for our new *\_cleanImageCache* method. 
 
 * *Step 4* : The cache can still go out of control if the user keeps the page open for ages. We can make it so it'll 
 call for the clean every five minutes.
@@ -1228,7 +1228,7 @@ setInterval(function() {
 }, 1000 * 60 * 5)
 ----
 
-* *Step 4* : Now we just need to implement our *_cleanImageCache*.
+* *Step 4* : Now we just need to implement our *\_cleanImageCache*.
 
 === Now we have to complete our _cleanImageCache
 
@@ -1243,7 +1243,7 @@ git checkout task-clean-photos
 * *Step 2* : We will be working in indexController.js + 
 public>js>main>indexController.js
 
-* *Step 3* : We have to implement *_CleanImageCache*. +
+* *Step 3* : We have to implement *\_CleanImageCache*. +
 
 Our TODO: We have to get all the messages from the database. Looking at what photos they need, then going through 
 the images cache and getting rid of ones you don't need anymore. Important note: The photo's property may not match the URL in the cache.
@@ -1385,7 +1385,7 @@ srcset="/avatars/sam-2x.jpg 2x,
 /avatars/sam-3x.jpg 3x">
 ----
 
-We will cache the avatars in the same cache as photos. In *_cleanImageCache* in *indexController.js*. +
+We will cache the avatars in the same cache as photos. In *\_cleanImageCache* in *indexController.js*. +
 The first thing we do is edit our cleanup code to include *avatars* for things we want to keep. We don't want our cleanup to delete them all.
 
 ----
@@ -1403,4 +1403,98 @@ git checkout task-cache-avatars
 * *Step 2* : We will be working on service worker.+
 public > js> sw> index.js
 
+* *Step 3* : There are two TODOS. 
+
+.  inside the *fetch* event listener, we need to call *serveAvatar* for avatar URLs.
+
+.  Then we need to implement the actual *serveAvatar*. 
+  .. It should return them from the cache if they're there. 
+  .. If not, get it from the network and put it in the cache. 
+  .. The difference here is that: Even if you return it from the cache, you need to go to the network 
+to update it for the next fetch. 
+  .. Reminder, we're removing the size specific parts of teh URL so use *storageUrl* to put and match in the cache. 
+  .. The solution will be similar to *servePhoto*, but not exactly the same. 
+
+''''
+
+Code Refresher 
+====
+Here's what servePhoto looks like: 
+----
+function servePhoto(request) {
+  var storageUrl = request.url.replace(/-\d+px\.jpg$/, '');
+
+  return caches.open(contentImgsCache).then(function(cache) {
+    return cache.match(storageUrl).then(function(response) {
+      if (response) return response;
+
+      return fetch(request).then(function(networkResponse) {
+        cache.put(storageUrl, networkResponse.clone());
+        return networkResponse;
+      });
+    });
+  });
+}
+----
+====
+
+* *Step 4* : Once you're done, you can confirm that that it's working when you see avatars being saved into *wittr-content-imgs* cache. 
+When you go to setting's page to test out *offline mode* and refresh the wittr page, you should still be able to see the avatars. 
+
+image:img/cleardata2.png[]
+
+* *Step 5* : To confirm again, go back over to the setting's page. Make sure you go back to online mode and type in the test ID: *cache-avatars* and should get the message: *Avatars are being cached, served and updated correctly!*
+
+
+=== Here's how Jake did it!
+
+Inside our *fetch* listener, we are going to react to URLs that starts with */avatars/* and respond with *serveAvatar*.
+----
+if (requestUrl.pathname.startsWith('/avatars/')) {
+  event.respondWith(serveAvatar(event.request));
+  return;
+  }
+----
+
+Over in *serveAvatar* we need to open up the image cache then look for a match for the *storageUrl*
+
+----
+return caches.open(contentImgsCache).then(function(cache) {
+  return cache.match(storageUrl)
+----
+
+The difference here is that we need to do a network fetch for the avatar. If we get a response, we put a clone in the cache using *storageUrl* and also return the original response.
+
+----
+.then(function(response) {
+  var networkFetch = fetch(request).then(function(networkResponse) {
+    cache.put(storageUrl, networkResponse.clone());
+    return networkResponse;
+    })
+----
+
+Now that we've got a response from the cache, though it may be undefined if there's no match 
+for this particular request. We also got a promise for the network response. So we'll return the cache response or the network response, and that's it. 
+
+----
+return response || networkFetch;
+----
+
+
+Here's how it looks together 
+
+----
+return caches.open(contentImgsCache).then(function(cache) {
+  return cache.match(storageUrl).then(function(response) {
+    var networkFetch = fetch(request).then(function(networkResponse) {
+      cache.put(storageUrl, networkResponse.clone());
+      return networkResponse;
+    });
+      return response || networkFetch;
+  })
+})
+----
+
 == 4.14 : Outro
+
+That's it! 
