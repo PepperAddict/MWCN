@@ -1,0 +1,369 @@
+:library: Asciidoctor
+:toc:
+:toc-placement!:
+
+
+= JavaScript Promises Notes: Lesson 1
+
+Creating Promises notes +
+To go back to the README where all the chapters are: click link:README.asciidoc[here].
+
+
+toc::[]
+
+== 1.1 : Course Introduction 
+
+Cameron Pittman is our instructor for this course. He goes on 
+to tell us that we need to understand asynchronous work and learn how to 
+handle them with confidence and ease. 
+
+Promises are the recommended option, because they give us flexibility, intuitive syntax, and easy error handling.
+
+
+This is where our instructor Cameron talks about our project for the course. 
+We will be using his web app called *exoplanet explorer*. It will help users learn about planets around other stars.
+For this class, we will be using promises to request real JSON data about exoplanets. The data is coming from NASA and CalTech.
+ We will use promises to turn that data into useful information in the app.
+
+== 1.2 : Callbacks vs Promises 
+
+[quote, MDN]
+____
+The Promise object is used for deferred and asynchronous computations
+____
+
+This section we're going to try and understand what *asynchronous* really means. Which is great because I'm a little lost. 
+
+here's a simple time chart explaining the difference between asynchronise and synchronise. +
+image:img/promise1.png[]
+
+ 
+
+* Synchronoise work. One statement executes like "var planetName = "Kepler 22b"; and there's a guarantee that the next statement executes imeediately afterwards. Threading on processors doesn't necessarily guarantee that, however, the JavaScript threading model ensures that for all intents and 
+ purposes, JavaScript runs in a single timeline.
+
+* Asynchronous work happens at an unknown or unpredictable time. Asynchronous code is not guaranteed to 
+execute in a single unbroken timeline. We should always assume that we have no idea when asynchronous operations will complete. 
+
+in a situation like this image + 
+image:img/promise2.png[] 
+
+We can't assume that just because we sent out the first request first and the second request second, that the 
+first request will return sooner than the second. We have to assume that either order is equally 
+likely, as the fact that one or both requests just might fail altogether. 
+
+''''
+
+Network requests aren't the only examples of asynchronous code. Any code that relies on processes like these: +
+
+* Events 
+* Threads
+* or some kind of unknowable finishing time 
+
+Are asynchronous. 
+
+Now the question is, what is the best way to handle asynchronous code? *Promises* yay! 
+
+
+== 1.3 : Callbacks vs Thens
+
+Callbacks are the default JavaScript technique for asynchronous work. 
+
+Here's an example of one. 
+----
+function loadImage(src, parent, callback) {
+    var img = document.createElement('img');
+    img.src = src;
+    img.onload = callback;
+    parent.appendChild(img);
+};
+----
+
+We pass the function to another function, and then call the callback function at some later time when 
+some conditions have been met.
+
+This works well but there are some questions without obvious answers. Such as, *"how do you handle errors?"*.
+
+We have to always assume that any operation could fail at any time. Especially when dealing with network requests. 
+So in the instance of our example code, +
+if an error occurs at *document.create('img');* 
+ 
+ * should we still execute the call back? 
+    . And if so, what value should it receive?
+    . If not, then what should happen?
+
+ * What if it's a JavaScript error? 
+    . Should it be handled differently than a network error?
+ 
+*Node* basically makes error first callbacks mandatory, but that doesn't really solve the problem. It's our job to define, and 
+implement an error handling strategy.
+
+''''
+Now let's assume that the code ran just fine with no errors and the callback *img.onload = callback;* ran when the onload handler gets called. Now we've chained 
+together two pieces of work, but what if the callback is also an asynchronous operation and we need something else to happen afterwards? Do we pass another function with another 
+callback with the *loadImage* function's callback? 
+
+Here's an example of something called a *Pyramid of Doom.* 
+
+----
+loadImage('above-the-fold.jpg', imgContainer, function() {
+    loadImage('just-below-the-fold.jpg', imgContainer2, function() {
+        loadImage('farther-down.jpg', imgContainer3, function() {
+            loadImage('this-is-getting-ridiculous.jpg', imgContainer4, function() {
+                loadImage('abstract-art.jpg', imgContainer5, function() {
+                    loadImage('egyptial-pyramids.jpg', imgContainer6, function() {
+                        loadImage('last-one.jpg', imgContainer7);
+                        
+                    })
+                })
+            })    
+        })
+    };
+}
+----
+
+Okay. I'm pretty sure I didn't need to type that out, but I decided to do it anyway just to get my 
+hands and eyes used to ES5's functions. 
+
+Okay, so the *pyramid of doom* are nasty nested callbacks within call backs, within callbacks and so on. 
+The code looks ugly and it's hard to write, and the major drawback is that it is incredibly frustrating to debug. 
+
+
+Now, this is the same kind of code, but this one is written with *promises* and it's definitely much shorter and far easier to understand. 
+
+----
+var sequence = get('example.json')
+.then(doSomething)
+.then(doSomethingElse);
+----
+
+We will eventually learn about *.then* later in the course. 
+
+
+== 1.4 : Course Map 
+
+Unfortunately we're still in the introduction stage of the course. Here, our instructor explains to us 
+how the course is divided. 
+
+1st Lesson + 
+
+* [ ] - *Wrapping* - Here we'll learn the syntax of constructing promises. The promise constructor in 
+and of itself isn't super useful.  So from there we'll learn how to react the resolution of the promise. 
+
+* [ ] - *Thening* - So if all goes well, we want to *.then* off the promise
+
+* [ ] - *Catching* - Now if something breaks, we want to *catch* the error.   
+
+
+2nd Lesson +
+* [ ] - *Chaining Stage* - Here we will learn how to create long sequences of asynchronous work.
+
+''''
+In the course we will learn some *new vocabulary*. We will also go over some promise vocabularies that was written by link:https://developers.google.com/web/fundamentals/primers/promises[Jake Archibald]
+
+Promises has *Four states*. We will learn more about them as we go along. +    
+
+.  *Fulfilled (Resolved):* - It worked  - Which means the action related to the promise succeeded. The state is also known as *resolved*. 
+.  *Rejected:* - It didn't work - Which means the action related to the promise failed. 
+. *Pending*: - Still waiting - Which means that the promise has not yet fulfilled or rejected.
+. *Settled*: - Something happened! -  Which means that the promise has either fulfilled or rejected.
+
+Okay now that that is out of the way, we just need to learn *how* and *when* promises are executed!
+
+== 1.5 : Promise Timeline 
+
+Using this diagram: +
+image:img/promise3.png[] + 
+
+* *Diagram A* has the Event listener after the event has already fired. In this case, nothing will happen. If the event doesn't get fired again, 
+then the event listener never gets called. 
+
+* *Diagram B* uses promises. If you set the action for resolution after when the promise resolves, it will still execute.  
+
+''''
+
+Here's an example code of a *promise constructor* 
+
+----
+new Promise(function(resolve, reject) {
+    resolve('hi'); // works
+    resolve('bye'); // can't happen a second time
+}
+----
+
+A promise can *only settle once*. In the code, the second resolve ('bye') is going to be ignored. Now if 
+we compare it to *Events*. An event can fire many times, but a promise can only settle once. 
+
+''''
+image:img/promise4.png[]
+
+Promises execute in the *main thread* which means that they are still potentially blocking. 
+If the work that happens inside the promise takes a long time, there's still a chance it could block the work 
+the browser needs tod o to render the page. 
+
+If that happens, the frame rate of your app is going to suffer, and the user will most likely get angry. 
+
+Promises are not a pass for safely executing long running operations. They're simply a technique for 
+what will happen when an asynchronous task settles. 
+Promises are mainly 
+
+----
+try {
+...
+} catch {
+...
+}
+----
+
+try catch wrappers around asynchronous work. 
+
+
+== 1.6 : Quiz : Async Scenarios 
+
+Quiz time! 
+
+Question: 
+====
+When should you consider using promises?
+
+Option 1: Working with information from an AJAX request
+----
+var data = get('data.json');
+data.onload = function() {
+    analyze(this.responseText);
+};
+----
+
+Option 2: Executing long-running image manipulation in the main thread.
+----
+hugeArrayOfImages.forEach(function(i) {
+    makeSepia(i);
+});
+----
+
+Option 3: creating a series of divs and appending to the body in a specific order.
+----
+data.foreach(function(d) {
+    var div = createDiv(d);
+    body.appendChild(div);
+});
+----
+
+Option 4: posting messages back and forth between main thread and a web worker.
+----
+var worker = new Worker('worker.js');
+worker.postMessage(data);
+worker.onmessage = doSomething;
+----
+====
+
+Answer: 
+====
+* Option 1 : Yes definitely because asynchronous is in the very definition of *AJAX*.
+* Option 2 : No because promises run in the main thread so we don't gain anything from wrapping 
+work in the main thread in a promise. The work will still happen synchronously and will lead to a _janky_ experience. 
+* Option 3 : No because, when you create and appending DOM elements, it is *synchronous* so there is no need to wrap them in promises.
+But if they were image elements or script elements with links to external resources, then loading the external resources themselves, are 
+*asynchronous* operations. You could use promises to chain actions after the resources load. If the data 
+came from an asynchronous resource, then we could wrap this in a promise, but that's not what's happening in Option 3. 
+* Option 4 : Yes because web workers run on separate threads and post data to the main thread. They are definitely asynchronous and perfect for promises.
+====
+
+== 1.7 : Syntax 
+
+Okay, we will try to to start learning the syntax for promises. The *Wrapping* stage. +
+So as a reminder, *promises* is a *try-catch* wrapper around code that will finish at an *unpredictable* time. 
+Here's an example: 
+
+----
+var promise = new Promise(function(resolve[, reject]) {
+    var value = doSomething();
+    if (thingWorked) {
+        resolve(value);
+    } else if (somethingWentWrong) {
+        reject();
+    }
+}).then(function(value) {
+    //success!
+    return nextThing(value);
+}).catch(rejectFunction);
+----
+
+* A promise is a constructor. We can store a promise as a variable like in the example, or we can simply work on it as soon as you create it. Either way works. +
+* We pass this promise function with two arguments *resolve* and *reject*. The two arguments are callbacks that we use to specify when a promise has either fulfilled or rejected. +
+
+Here's another promise code example: 
+----
+ new Promise(function(resolve, reject) {
+    var img = document.createElement('img');
+    img.src = 'image.jpg';
+    img.onload = resolve;
+    img.onerror = rject;
+    document.body.appendChild(img);
+})
+.then(finishLoading)
+.catch(showAlternateImage;
+----
+
+This example, he's wrapping an image tag loader in a promise because he wants to do some work after the image loads on a page. +
+* He used the image tag's *onload handler* to specify success. And that onload called *resolve* which loads the function passed to *.then* to execute after this function finishes executing. 
+* Being able to call *resolve* and *reject* is what makes promises great. It gives you flexibility to explicitly say what constitutes fulfillment and what constitutes rejection for the promise. 
+* When either resolve or reject has been called, the promise has been settled, and at that point, the next part of the chain which is usually a *.then* or it could be a *.catch* that will get executed. 
+
+[NOTE] 
+====
+An Important thing to note is that JavaScript engine does not immediately stop executing the main function upon calling *resolve*. So if there is 
+more code to execute after the *resolve* call, it will run that as well.  For example: +
+----
+new Promise(function(resolve) {
+  console.log('first');
+  resolve();
+  console.log('second');
+}).then(function() {
+  console.log('third');
+});
+----
+
+In this case, *first*, *second*, and *third* all get logged. Most notably *second* gets logged despite the fact 
+that it came after *resolve()*.
+
+====
+
+In the original example: 
+----
+var promise = new Promise(function(resolve[, reject]) {
+    var value = doSomething();
+    if (thingWorked) {
+        resolve(value);
+    } else if (somethingWentWrong) {
+        reject();
+    }
+}).then(function(value) {
+    //success!
+    return nextThing(value);
+}).catch(rejectFunction);
+----
+
+* Any value passed to *resolve* or *reject* will be received as an argument by this subsequent *.then* or *.catch*'s function. Such 
+as *value*
+* In the event that nothing is passed to resolve or reject as is the case here with the reject not having anything, the *.catch* just simply receives *undefined*. 
+* Now if the value that gets passed is a promise, then the promise will execute first and then whatever value it resolves to will be 
+passed to the next link in the chain. 
+* If there is a JavaScript error somewhere in the body of the promise, *.catch* will also automatically get called. 
+NOTE: Resolve and Reject has the same syntax. resolves leads to .then and reject leads to .catch.
+
+== 1.8 : Quiz : Write Your First Promise 
+
+We are going to try and learn how to write our own simple *promises*. We will not be working with error handling yet. 
+
+
+
+
+
+
+== 1.9 : Quiz : Wrapping readyState 
+== 1.10 IMPORTANT : Working w/ Exoplanet Explorer 
+== 1.11 : Quiz: Wrap an XHR 
+== 1.12 : Web Technologies 
+== 1.13 : Quiz: Fetch API 
+== 1.14 : What Happens Next?
