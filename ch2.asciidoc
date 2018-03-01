@@ -148,7 +148,7 @@ git clone https://github.com/jakearchibald/wittr
 
 Or if you have an *ssh* setup for github. You go here: 
 ----
-git@github.com:jakearchibald/wittr.git
+git clone git@github.com:jakearchibald/wittr.git
 ----
 
 *Summary:* Install node.js and clone the project.
