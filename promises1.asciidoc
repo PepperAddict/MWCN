@@ -356,13 +356,179 @@ NOTE: Resolve and Reject has the same syntax. resolves leads to .then and reject
 
 We are going to try and learn how to write our own simple *promises*. We will not be working with error handling yet. 
 
+I'm a bit bummed that we had to download a file to do this test. I guess I was a bit spoiled with the textboxes and stuff. Though, this does give it a much more authentic feel.
 
+Okay, so if you downloaded the file, the TODO is: 
 
+Instructions:
+
+. Wrap this setTimeout in a Promise. resolve() in setTimeout's callback.
+. console.log(this) inside the Promise and observe the results.
+. Make sure wait returns the Promise too!
+. Also, don't forget to un comment the test code.
+
+Code refresher: 
+
+They want us to put console.log inside the body of promise.
+----
+new Promise(function(resolve) {
+console.log(this);
+}
+----
+
+They made a *setTimout* callback function that they want us to put *resolve* in. And we put the callback inside the promise.
+
+----
+window.setTimeout(function() {
+put resolve here 
+}, ms);
+----
+
+Answer 
+====
+So here is how it would all look together: 
+----
+function wait(ms) {
+    return new Promise(function(resolve) {
+        console.log(this);
+        window.setTimeout(function() {
+            resolve();
+        }, ms);
+    });
+};
+----
+====
+
+Breakdown 
+
+What's going on with the code is + 
+* Create a new promise by using *new Promise* 
+----
+return new Promise(function)
+----
+* pass a function into the promise with the parameter *resolve*. Note that we're not 
+working on reject yet. 
+----
+function(resolve) {
+}
+----
+* Inside the function we have the console.log to check what *this* is and also the *setTimeout()*.
+----
+console.log(this);
+window.setTimeout(function, ms) 
+----
+* Inside the setTimeout is a callback function where we are calling *resolve();* to resolve the promise. In this case, it will resolve after
+the number of milliseconds that's getting passed into wait.
+
+----
+function() {
+resolve();
+}, ms
+----
+
+Under our promise, the code that we had to uncomment are: +
+
+----
+var milliseconds = 2000;
+wait(milliseconds).then(finish);
+----
+
+Means that after *2000* milliseconds, the *finish* function should get called. 
+
+This is the finish function 
+----
+		function finish() {
+			var completion = document.querySelector('.completion');
+			completion.innerHTML = "Complete after " + milliseconds + "ms.";
+		};
+----
 
 
 
 == 1.9 : Quiz : Wrapping readyState 
-== 1.10 IMPORTANT : Working w/ Exoplanet Explorer 
+
+Okay, now that we completed the previous, we are now in the *thening* stage.
+
+We will be matching jQuery's *.ready* feature by wrapping a check for *document.readyState* in a Promise. +
+They want us to use *then* to perform an action *after* a promised result. 
+
+document.readystate has 3 possible states. 
+
+. 'loading' - means the document is still loading. 
+. 'interactive' - means the document has loaded and been parsed, but subresources like images and style sheets have yet to be loaded. This is equivalent to the *dom content loaded* event.
+. 'complete' - means all the subresources including images and style sheets have loaded.
+
+Whenever the document's ready state changes, a *ready state change* event fires. Creating a promise to run on interactive is really useful if you want to run some code as soon as 
+all the initial dom elements have been loaded. 
+
+For the quiz...
+
+* The instructor gave us an event handler for *ready state change*. 
+
+----
+document.addEventListener('readystatechange', function() {
+
+};
+----
+
+* He wants us to wrap it in a promise so that it resolves when the dom is *interactive* or in other words, he wants it to resolve when the ready state is no longer loading.
+* Only work with *resolve* since reject won't be useful here. 
+* To test the code we use *.then* to chain the method wrapperResolved() when the document is ready.
+
+Code refresher 
+
+to create a promise with just *resolve*
+----
+return new Promise(function(resolve) {
+
+})
+----
+
+if statement 
+----
+if (something !== something else) {
+resolve();
+}
+----
+
+== Finished result 
+
+The breakdown 
+
+There are two parts to the ready method. 
+
+. Checks *readystatechange* when the readystatechange event fires 
+----
+document.addEventListener('readystatechange', checkState);
+----
+. And also checks the ready state immediately.
+----
+checkState();
+----
+By checking it immediately, the ready method will still work if the ready state becomes interactive before creating this promise.
+
+
+
+----
+return new Promise(function(resolve) {
+	function checkState() {
+		if (document.readyState !== 'loading') {
+			resolve();
+		}
+	}
+		document.addEventListener('readystatechange', checkState);
+			checkState();
+	});
+
+----
+
+and to test 
+
+----
+ready().then(wrapperResolved);
+----
+
+== 1.10 : IMPORTANT! Working w/ Exoplanet Explorer 
 == 1.11 : Quiz: Wrap an XHR 
 == 1.12 : Web Technologies 
 == 1.13 : Quiz: Fetch API 
