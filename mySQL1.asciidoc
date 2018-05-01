@@ -1,0 +1,8 @@
+:library: Asciidoctor
+:toc:
+:toc-placement!:
+
+This is my SQL learning quest
+
+toc::[]
+

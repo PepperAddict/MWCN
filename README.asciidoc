@@ -28,6 +28,13 @@ link:ch8.asciidoc[Chapter 8] aka Lesson 3 : Built-Ins +
 link:ch9.asciidoc[Chapter 9] : Professional Developer-fu +
 
 ''''
+
+== Udacity Mobile Web Nanodegree course notes. 
+
+link:Lesson2.asciidoc[Lesson 2] : Starting Small
+
+''''
+
 == Extra Courses for better understanding
 
 === Learning about promises

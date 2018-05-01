@@ -1,0 +1,190 @@
+:library: Asciidoctor
+:toc:
+:toc-placement!:
+
+
+= Udacity/GWG Mobile Web Nanodegree notes. Lesson 2
+
+Starting Small +
+To go back to the README where all the chapters are: click link:README.asciidoc[here].
+
+
+toc::[]
+
+== 2.1 Defining the Viewport
+
+In this lesson we will learn how to optimize our pages for different screen sizes.
+Whether it's desktop or mobile. We will learn the difference between CSS and device-independent pixels, and we will 
+learn how to choose the right sizes for different elements. 
+
+In the end of the lesson we will learn how to build a mobile version of the hometown site.
+
+
+The two instructors are discussing what the issue is with non mobile friendly websites and why
+they are like that. 
+
+The issue is that the viewport is not set properly. 
+Viewport defines the area of the screen that the browser can render content to.
+
+== 2.2 Pixels, pixels, and moar pixels!
+
+In this lesson we are going to try and understand pixels further. 
+
+In the example, they use a tablet. The tablet will have 1600 hardware pixels.
+The browser reports the width of the *device independent pixels* aka DIPs. In this
+lesson, this tablet only has 800 DIPs. 
+
+A device independent pixels is a unit of measurement, that actually relates pixels to a real distance. The 
+idea being that a device independent pixel will take up the same amount of space on a display
+regardless of the pixel density of the display.
+
+The browser has a viewport width of 1280 DIPs gets scaled up to 2560 hardware pixels. 
+
+Now, in the case that the viewport isn't set for a webpage, by default, the webpage will work on a screen 
+that is 980 DIPs wide.  If the website was a normal 1080px hardware pixel device pixel ratio: 3  and then it'll get 
+sent to mobile phone with the scaled 360 DIPs wide.. 
+the content will look horribly scaled. Like this: +
+
+image:img/lesson2/scaledprob.png[]
+
+It does have its own way of handling this with *font-boosting*. Font boosting is when it tries 
+to pick the primary content on the page and scale it up. 
+
+
+== 2.3 Quiz: Pixelation
+
+Question: You look up the tech specs for the screen of a mobile device and find 
+it has a resolution of *1920x1080 pixels*. What kind of *pixels* are the tech specs referencing?
+
+* A. Device Independent Pixels( DIPs) 
+* B. CSS Pixels. 
+* C. Hardware Pixels. 
+
+
+====
+The answer is: 
+C. Hardware Pixels. 
+
+A resolution of anything is the actual physical pixels on the device which is independent 
+from what the browser will use.
+====
+
+
+== 2.4 Quiz: Calculating DPR
+
+Question: Which of the following diagrams demonstrates a display with a device pixel ratio of 2?
+image:img/lesson2/quiz2-4.png[]
+
+
+====
+the answer is the 2x2 square box because it has 2 DIPs across and down.
+====
+
+== 2.5 Quiz: What's the difference
+
+Question: 
+
+Why would the same website look different on screens of identical resolutions?
+
+* A. CSS Styles aren't rendered predictably. 
+* B. The device pixel ratio differs between devices.
+* C. <meta>'s initial-scale causes inconsistent zooming on different devices.
+* D. The viewport wasn't set.
+
+====
+A. No, because in the situation between the two devices is not caused by the CSS. +
+B. Yes, because different device pixel ratios can definitely change the size of content on 
+the page if you don't handle it correctly. +
+C. No, because the initial scale isn't going to cause the inconsistent zooming that you see on the example. +
+D. Yes, because when you don't define the viewport, you're leaving it up to the browser to figure it out which will 
+cause a disparity that is seen there with font boosting.
+====
+
+== 2.6 Quiz: Calculating CSS Pixels
+
+Question: A mobile screen has a resolution of *1920 x 1080 px* with a *device pixel ratio of 2*. 
+What is the *maximum width of a viewport* in landscape mode measured in *CSS pixels*? 
+
+====
+The answer is 960 because 
+
+a device pixel of 2 tells us for every 1 css pixel there are 2 hardware pixels. 
+multiply 1920 by one half will give us 960 css pixels.
+
+====
+
+
+
+== 2.7 Quiz: How wide is the viewport?
+
+Calculate the width (in DIPs) of the viewport for all of the devices below. Type 
+your answer in the boxes on the left. 
+
+* Phone 650px wide, DPR = 2
+* Phablet 768px wide, DPR = 2.5
+* Tablet 1024px wide, DPR = 1 
+* Laptop browser, 800px wide, DPR = 1
+
+
+====
+
+The answers are:
+
+* 320
+* around 300
+* 1024
+* 800
+
+You divide hardware pixel with the DPR to get the viewport (DIPs) size.
+====
+
+== 2.8 Setting the Viewport
+
+Insert this meta to the head element: 
+
+----
+<meta name="viewport" content="width=device-width,initial-scale=1">
+----
+
+This will tell the browser that we know what we're doing. +
+
+* We need to use the meta viewport value with *=device-width* which will instruct the page to match 
+the screen's width in device independent pixels (DIPs).  This allows the page to 
+reflow content to match the screen sizes. Whether it is rendered on a small mobile device or a laptop computer.
+
+* Adding *initial-scale=1* instructs the browser to establish a 1 : 1 relationship between DIPs and CSS pixels. If you don't 
+give the initial scale=1 setting, some browsers will keep the page width constant when rotating to landscape mode. They also 
+scale the content rather than allowing it to reflow.
+
+NOTE: CSS pixels are what we are used to working with most of the time, and it's the only thing we need to worry about.
+
+== 2.9 Large Fixed Width Elements
+
+One of the instructors mention that *relative width* is good for responsive design. 
+
+The other instructor shows what happens when an image that is an absolute position is  very large and shown on different viewports. 
+
+
+== 2.10 Max-width on Elements
+
+It's important that the content fits within the viewport to prevent horizontal scrolling.
+
+We should use *relative units* when specifying widths for elements to prevent them from 
+accidentally overflowing the viewport.
+
+NOTE: Keep in mind, CSS does allow content to overflow its container.  For example the container(div) has a set 
+width and the content (image) is larger than that container, it will overflow.
+
+To avoid this from happening, a great thing to use is *max-width: 100%* . 
+
+As a catch all, the instructor recommends adding the max-width: 100% to 
+*images, embed, object, and video* elements. Just to be safe. 
+
+
+== 2.11 Quiz: Relative Sizes
+== 2.12 Tap Target Sizes 
+== 2.13 Quix: Tap Targets
+== 2.14 Start Small
+== 2.15 Quiz: Project Part 1
+== 2.16 Project Solution - Long 
+== 2.17 Lesson Summary
