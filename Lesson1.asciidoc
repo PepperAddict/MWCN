@@ -1,0 +1,101 @@
+:library: Asciidoctor
+:toc:
+:toc-placement!:
+
+
+= Udacity/GWG Mobile Web Nanodegree notes. Lesson 1
+
+Why Responsive +
+To go back to the README where all the chapters are: click link:README.asciidoc[here].
+
+
+toc::[]
+
+== 1.1 Sites On Mobile
+
+We first meet our two instructors for this lesson. 
+Pete LePage and Cameron Pittman. 
+
+We're here to figure out the best way to make the website look great across 
+many different devices and screen sizes. 
+
+Since Google is one of the best, it is used as an example. 
+Google news uses a fully responsive version for phones and tablets.
+Google news on desktops uses responsive layout that starts at a minimum size. 
+
+It works, but it adds a layer of complexity and extra work to keep things up to date.
+
+== 1.2 Quiz: Share Your Great & Awful Sites 
+
+Question: The first step to developing a responsive site is to get inspired 
+by other responsive sites. Do some research by surfing the web! When you've found a site 
+that respondds well to browsers of different dimensions, type in its URL below.
+
+I just put in gmail as the answer. I didn't do that much digging... 
+
+''''
+The instructor shows off the website link:alistapart.com[] as their responsive site example. 
+He shows its responsiveness by resizing the window to see the content reflow to fit the size of 
+the viewport.
+
+== 1.3 Intro to Project
+
+We will be working on a project from github called *"the Brighton Times"*. We will be trying to 
+improve that website's respnsiveness. 
+
+Cameron reminds us that there is no right solution to making it responsive since it is an *art*, not a *science*.
+
+When creating a website, we need to think *mobile first...*.
+
+== 1.4 Pan, Zoom, Touch, Ick
+
+The issues with non mobile friendly websites... 
+
+Pete says: "The mobile market is growing faster than any other market"  _Well, I'm excited knowing that_. 
+
+This little section pretty much explains what they've already mentioned. Which is, *"make your content work across any device"*.
+
+== 1.5 Emulators, Simulators and Real Devices
+
+When it comes to developing for mobile first, we need to test the changes. Best way to do that other than 
+purchasing all the many devices, we need to use emulators and/or simulators.
+
+For the course, we will be using an emulator that is built right into chrome. There is also 
+another solution for testing: link:https://www.browserstack.com/[].
+
+== 1.6 Setting up Chrome's Dev Tools
+
+The chrome's emulator is in dev tools +
+image:img/lesson2/devtools.png[] +
+
+at the top right: +
+image:img/lesson2/emulator.png[] +
+
+Pete mentions that when testing the emulator, it's best to view it in portrait mode, which means 
+the dev tools should be on the right side. It is typically by default, but just in case, here's where 
+to change the dock. +
+image:img/lesson2/dock.png[] +
+
+== 1.7 Remote Debugging Intro 
+
+Now that we learned how to use an emulator to test, they mention that using a real device is always 
+going to be better if you have it. To do so, we need to set up *remote debugging* in chrome for Android.
+
+== 1.8 Setup for mobile 
+
+skip...
+
+== 1.9 Using dev tools on mobile 
+
+skip... 
+
+== 1.10 Mobile tools for iOS
+
+skip... 
+
+== 1.11 Lesson Summary 
+
+In this lesson we learned: 
+
+* Responsive design and why it's so important. 
+* The right tools to get started with developing mobile first. 

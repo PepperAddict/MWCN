@@ -31,6 +31,7 @@ link:ch9.asciidoc[Chapter 9] : Professional Developer-fu +
 
 == Udacity Mobile Web Nanodegree course notes. 
 
+link:Lesson1.asciidoc[Lesson 1] : Why Responsive + 
 link:Lesson2.asciidoc[Lesson 2] : Starting Small
 
 ''''

@@ -175,16 +175,124 @@ accidentally overflowing the viewport.
 NOTE: Keep in mind, CSS does allow content to overflow its container.  For example the container(div) has a set 
 width and the content (image) is larger than that container, it will overflow.
 
-To avoid this from happening, a great thing to use is *max-width: 100%* . 
+To avoid this from happening, It's best to use *max-width: 100%* . 
 
 As a catch all, the instructor recommends adding the max-width: 100% to 
 *images, embed, object, and video* elements. Just to be safe. 
 
 
 == 2.11 Quiz: Relative Sizes
+
+Question: Which of the following snippets of code are responsive and will look 
+great on any device? Check all that apply.
+
+* A.
+
+----
+<img id="owl">
+#owl {
+    width: 640px;
+    max-width: 100%;
+}
+----
+
+* B. 
+
+----
+<div class="box"> </div> 
+.box {
+    width: 350px;
+}
+----
+
+* C. 
+
+----
+<img class="logo">
+.logo {
+    width: 126px;
+}
+----
+
+* D. 
+
+----
+<div class="city"> </div>
+.city {
+width: 100%;
+}
+----
+
+====
+Answers: A, C, and D. 
+
+While A and D has the relative width of 100% that the lessons been reminding us, C would also work because 
+the width is pretty small and wouldn't have issues with mobile devices.  B would kind of work, but the width of 
+350 can be bad since some screens can be lower than that.
+====
+
 == 2.12 Tap Target Sizes 
+
+Tap targets or anything that a user might touch, tap, click or try and do input on, need to 
+be big enough and easy to hit. They also need to be spaced so that you're not going to 
+accidentally hit two at the same time. 
+
+
+Pete tells us that our fingers are about *10 millimeters wide* or *1/2 inch* in CSS pixels, it is *40 CSS pixels*. 
+Cameron asks if the buttons should be _at least 40x40 pixels_. Pete tells us we should make them 
+*48x48 pixel* and at least *40 pixels* of room between any of your tap targets that way users don't accidentally 
+hit two other targets. 
+
+
 == 2.13 Quix: Tap Targets
+
+Question: What CSS styles would you include so that Cameron won't be tortured by tiny, impossible-to-hit 
+buttons? Type in the rules in the box below.
+
+====
+From what we've learned, they need to be *bigger* than 48x48 with a margin of 40px around it. 
+I initially wrote width and height, but this lesson wants you to use *min-width* and *min-height* instead
+because if you just use height and width alone, it won't allow the element to resize if the content inside of 
+it is bigger than the container.
+====
+
 == 2.14 Start Small
+When designing a responsive site, we use the same processes that we go through for a non responsive site. 
+
+* It's best to start the design with the smallest form factor, which is usually the phone. 
+* Next is the tablet. 
+* Lastly, the desktop. 
+
+When you start small like with a phone, we learn to *prioritize content*. Like, what is the most 
+important thing that they want to do or that they're going to see on the screen?
+
+The issue with starting big and then designing down, it can be too easy to just cut or hide content that 
+may be important.
+The benefit of starting small with prioritizing content, the key content is always onthe page and 
+the users get the full experience, no matter what device they're using. 
+
+
+For example, the design for one hardware store prioritizes information about the nearest store, its 
+address, hours, and phone number and puts it right at the top so its users can easily find it. 
+
+Beyond designing from small to large, Pete also code from small to large. That way he knows that his core styles 
+and layout will work for any device, even on legacy browsers that don't support media queries.
+
+Pete's favorite reason to start small and work up, is *performance*.  When designing for the smallest viewport 
+first, we are forced to think about performance from the beginning. We would have to think about prioritizing 
+content, and how much data we're sending to the user. 
+
 == 2.15 Quiz: Project Part 1
+
+For this quiz, we have to download the project and modify it to make it responsive. 
+
+TODO: 
+
+* Add `meta` viewport to the page with initial scale set. 
+* Adjust CSS and markup so that everything displays in a single column. Use relative widths 
+so that things stretch to fit across any viewport width. 
+* Make sure your touch targets are easy to hit. 
+* Test your site across different viewports. Try it on different phones, tablets, and desktops!
+
 == 2.16 Project Solution - Long 
 == 2.17 Lesson Summary
