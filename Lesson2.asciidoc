@@ -295,4 +295,19 @@ so that things stretch to fit across any viewport width.
 * Test your site across different viewports. Try it on different phones, tablets, and desktops!
 
 == 2.16 Project Solution - Long 
-== 2.17 Lesson Summary
+
+Cameron made some changes to the CSS through the dev tools, but later suggests it's better to actually do it in code. Though, it is nice to see 
+the changes and its highlight right into dev tools such as the border of padding. 
+
+* First thing you need to do is add the meta tag `<meta name="viewport" content="width=device-width, initial-scale=1.0">`.
+* So basically, whenever there was a set width pixel of a container or some type, he would change the width to 100%.
+* If there was a link, he would make sure the area is at least 48 x 48 px, so he would give it 1.5em padding. Sometimes it would have link:https://www.w3schools.com/cssref/css_inherit.asp[inherit]. 
+
+== Lesson Summary 
+
+I learned a lot in this lesson.. such as: 
+
+* Don't forget the meta tag! 
+* buttons need to be at least 48x48 px in size with at least 40px margin around the button. Cameron uses *em* to deal with this. I need to learn more about em.
+* The size of the container needs to use percentage that way it can flow with its viewport. 
+* You can ignore containers smaller than the width of a mobile size. Anything larger needs to be adjusted for responsiveness.

@@ -1,0 +1,229 @@
+:library: Asciidoctor
+:toc:
+:toc-placement!:
+
+
+= Udacity/GWG Mobile Web Nanodegree notes. Lesson 3
+
+Building Up +
+To go back to the README where all the chapters are: click link:README.asciidoc[here].
+
+
+toc::[]
+
+== 3.1 Lesson Intro
+
+lesson 2 was more about learning how to deal with mobile and how it should look like. In this lesson we're going to learn responsive designing beyond single elements.
+We will learn the how to do a right design pattern. 
+
+== 3.2 Basic Media Query Intro 
+
+A responsive website changes based on the characteristics of the device. Which means that our responsive site should apply *different styles for different devices*.
+There easiest way to do this is with *media queries*. Media queries apply different styles depending on device characteristics. You can set it to the its width, height, or device pixel ratio.
+You can change anything from background images to restructuring the site's layout and even more.
+
+You can link to a different stylesheet with media query like this:
+
+----
+<link rel="stylesheet" media="screen and (min-width: 300px)" href="patterns.css">
+----
+
+
+== 3.3 Adding a Basic Media Query 
+
+So if you want to set up a media query that only applies to viewport that is *wider* than 500 pixels: +
+`<link rel="stylesheet" media="screen and (min-width: 500px)" href="over500.css">`
+
+So in this case, if you edit *over500.css* and gave it the body a blue background, it will only affect the webpage if the viewport is over. 
+
+
+== 3.4 Adding a basic media query 2
+
+There are other ways to include a media query and not just by linking it in the stylesheet header. 
+
+You can also: 
+
+* embed them in an existing stylesheet with `@media` tag such as this: 
+
+----
+@media screen and (min-width: 500px) {
+    body {
+        background-color: green;
+    }
+
+}
+----
+
+* and you can also import them into an existing stylesheet with an `@import` tag like this: 
+
+----
+@import url("over500.css") only screen and (min-width: 500px);
+----
+
+WARNING: Pete suggests to avoid `@import` because of performance costs.
+
+
+Since we're avoiding our 3rd option of import, now we have to figure out which is better. linking it or @media? 
+
+* linking: 
+    ** *pro*: many small files 
+    ** *con*: also many HTTP requests
+
+* @media: 
+    ** *pro*: fewer HTTP requests 
+    ** *con*: files are bigger
+
+== 3.5 Next Step Media Queries 
+
+*min-width* and *max-width* is used most often for responsive designing in media queries.
+
+There are other options for: 
+* mm-aspect-ratio
+* min-color 
+* min-height 
+* min-resolution
+* scan 
+* aspect 
+* color
+* height 
+* width 
+* resolution 
+* grid 
+* max-aspect-ratio 
+* max-color 
+* max-height 
+* max-resolution 
+
+
+In this one we're mainly going to be talking about min-width and max-width. 
+
+Max-width rules are applied anytime the viewport width is *less* than the value specified. Such as this example: 
+
+----
+@media screen and (max-width: 500px) {
+
+    .yes {
+        opacity: 1;
+    }
+
+    .no {
+        opacity: 0;
+    }
+
+}
+----
+
+WARNING: It is also possible to create queries using _min-device-width_ and _max-device-width_, but it is discouraged because it is based on the size of the screen and *not* the size 
+of the browser window like what a normal *min-width/max-width* would use. This will cause problems for when you can resize the browser such as going window mode instead of full screen.
+ Also, there are some browsers such as _Legacy Android browser_ may report the wrong value. 
+
+
+== 3.6 Breakpoints 
+
+I think we're going to start learning about how to actually create layouts using media queries using min-width/max-width. The point at which the page changes 
+a layout is called a *breakpoint*. Depending on the how the site is laid out, we can have one or multiple breakpoints. 
+
+== 3.7 Breakpoints Pt. II 
+
+To further understand breakpoints, Cameron is going to use link:http://www.skinnyties.com[].
+
+Cameron first starts at a mobile size and stretches out the window to see how many breakpoints there are. At *480px* there's 1 breakpoint with 2 columns.. At *690px* there's
+another breakpoint with 3 columns. At *915px* the fonts become larger.
+
+''''
+
+Another site Cameron wants to check out is: link:http://edition.cnn.com[].
+
+Since there's a lot more going on in the website, it may be difficult to see every little changes depending on resolution. There was a change at larger than *725px* and 
+the social media icons are hidden unless hovered over. That is considered a *minor breakpoint*.  Cameron expands the page more to *800px* and now the _hamburger icon_ disappeared
+and put the navigation at the top that was originally in the hamburger. Another breakpoint is at *935px* when the layout changes again. At *960px* the new screen 
+real estate is being taken up by other top stories for today. Another minor breakpoint is at larger than *1024px*, an ad will show up on the right. 
+
+== 3.8 Quiz: Number of Breakpoints 
+
+For this quiz we need to figure out how many breakpoints there are with websites: link:http://www.medium.com[] and link:http://udacity.github.io/RWDF-samples/Lesson3/media-queries/min-max-width.html[this udacity site].
+
+NOTE: text reflowing doesn't count as a breakpoint.
+
+====
+Answer: Medium has 2 and the Udacity has 2. 
+====
+
+
+== 3.9 Picking Breakpoints 
+
+A good question to ask as a web designer is _"Where to put the breakpoints?"_
+Defining a breakpoint based on specific devices, products, brand names, etc is a bad idea because something better may come along tomorrow. So instead we should 
+create our breakpoints based on the content. 
+
+Scott Yale said,
+
+____
+ "We shouldn't choose break points at all. Instead, we should find them, using our content as a guide"
+____
+
+
+== 3.10 Picking Breakpoints 2 
+
+Here we are going to learn from Pete and how he controls his breakpoints with this responsive weather app page. 
+
+* *Step 1*: He starts with his desktop browser but will scale the browser to as small as it can get. 
+* *Step 2*: He likes to have the chrome's dev tools open that way he can see the screen resolution on the upper right corner while he resizes the window.
+* *Step 2*: He will slowly resize the window to see the content move with the browser. He then can tell when the breakpoints should take place. 
+* *Step 3*: He decided that at *550px* is a good start for a breakpoint and so he made a media query for that size and linked the stylesheet. 
+    ** `<link rel="stylesheet" media="screen and (min-width: 500px)" href="weather-medium.css">`
+* *Step 4*: Since 550px is a bit small still, he decides to do another round of content resize checking to see where another breakpoint would be handy. 
+* *Step 5*: He decides that at *700px* is another good size to set another breakpoint and linked to that style accordingly.
+    ** `<link rel="stylesheet" media="screen and (min-width: 700px)" href="weather-large.css">` 
+
+
+== 3.11 Quiz: Pick a Breakpoint 
+
+Using that same hometown webpage we were playing with earlier, we need to figure out which width would be a good time to place a breakpoint. 
+
+====
+Answer: I thought it was opinion, but I guess not! I put 600 and that was the correct answer. I thought at 500 would have been a good start, but the test said I was wrong LOL. 
+Cameron thinks the breakpoint should be at *850px*. 
+====
+
+
+== 3.12 Complex Media Queries 
+
+the examples we've been looking at only had 1 media query. In this one he shows a more complicated one such as: 
+
+----
+@media screen and (max-width: 500px) and (max-width: 600px) {
+
+}
+----
+
+So in this case, it is applied twice in those two widths. In between 500 - 600 will be the default style. 
+
+== 3.13 Quiz: What Styles Are Applied?
+
+We have to write a different media querry for *AA*, *BB*, *CC*, and *DD* according to the diagram Cameron setup for us.
+
+NOTE: In order for the class to display, we have to set the display to block. *display: block;*. 
+
+image:img/lesson2/mediaq.png[]
+
+====
+Answer: 
+
+
+* *AA*: `@media screen and (max-width: 400px)`
+* *BB*: `@media screen and (min-width: 301px) and (max-width: 600px)`
+* *CC*: `@media screen and (min-width: 601px)`
+* *DD*: `@media screen and (min-width: 961px)`
+====
+
+== 3.14 Grids
+
+
+
+== 3.15 Flexbox Intro 
+== 3.16 Flexbox Container 
+== 3.17 Flex Item 
+== 3.18 Deconstructuring a Flexbox Layout 
+== 3.19 Quiz: Deconstructuring a Flexbox Layout 
+== 3.20 Lesson Summary

@@ -1,0 +1,162 @@
+:library: Asciidoctor
+:toc:
+:toc-placement!:
+
+This is my notes on link:http://www.howtographql.com[graphQL].
+
+toc::[]
+
+== Introduction 
+
+* GraphQL is a new *API* standard that was invented & open-sourced by Facebook. 
+* In its core, graphQL enables *declarative data fetching* where a client can specify exactly what data it needs from the API. 
+* So instead of multiple endpoints that return fixed data like REST, graphQL server exposes single endpoint and responds with precisely the data 
+that the client asked for. 
+
+=== This is how it works
+So most information are stored remotely in a database that is accessible over the internet which is what servers do. So whenever a client needs an information 
+that it wants displayed to a user, it will send a request to the server. The server is programmed in a way that it can respond to the request by retrieving 
+the information from the database and then sends it back to the client. 
+
+=== Let's understand more about REST 
+
+REST was a popular way to expose data from a server. It was a good fit for many applications, however, with the changes in technology, it challenged how APIs are designed. 
+For example: 
+
+* Increased mobile usage (those with slower internet) creates a need for efficient data loading
+
+With graphQL it limits the data that needs to be transferred over the network. 
+
+* Variety of different frontend frameworks and platforms on the client-side
+
+Front-end frameworks and platforms that run client applications make it difficult to build and maintain one API that would fit all the requirements of all. With GraphQL, 
+each client can access precisely the data it needs. 
+
+* Fast development speed & expectation for rapid feature development. 
+
+Continuous deployment has become a standard for many companies. Now data is constantly iterating and updating. With REST API, it needed to be modified to account for specific 
+requirements and there needed to be design changes on the client side. This hurts fast development practices and product iterations.
+
+=== GraphQL's history
+
+GraphQL has been around since 2012 but was later publicized in 2015 when they mentioned they were going to opensource. They as in Facebook, of course. 
+GraphQL is not limited to only ReactJs but can be used with any programming language and framework that communicates with an API. Coursea and Netflix also 
+tried to make a similar thing to GraphQL. After graphql was publicized, coursera ditched theirs and went with graphQL. 
+
+
+== GraphQL is the better REST
+
+=== REST API call
+GraphQL was developedt o cope with the need for more flexibility and efficiency in client-server communication. It solves many of the shortcomings and 
+inefficiences that developers experienced with REST API. 
+
+In the example, there are 3 API endpoints to get information from a user with REST 
+
+# /users/<id>
+# /users/<id>/posts 
+# /users/<id>/followers
+
+We want displayed, name, title of posts, and followers
+
+The issue with REST is that when we input the information `/users/<id>` we will end up getting additional information that is unecessary. 
+
+example of only interested in name but getting more information
+----
+{
+    "user" : {
+    "id": "352353235"
+    "name" : "Mary", 
+    "address" : {...}  
+    }
+}
+----
+
+=== GRAPHQL API call 
+
+With the same thing with REST, you will send a single request instad of 3 like REST did just to get name, title of posts and followers.
+
+For GraphQL, we will send a *post request* to the server. In the query it will describe all the data requirements of the client. 
+
+----
+query {
+    User(id: "235532532") {
+    name
+    posts {
+        title
+    }
+    followers(last: 3) {
+        name
+    }
+    
+    }
+}
+----
+
+The request is self explanatory. With that ID, we want the name of the user, the title of posts, and the last 3 follower's names. 
+
+The server will then process and fetch exactly the requested information and read it from the database. It will then package it up into a JSON object that 
+will return to the client. The response will look like this: 
+
+----
+{
+    "data": {
+        "User" : {
+            "name" : "Mary",
+            "posts" : [
+                { title: "Learn GraphQL today"},
+                { title: "React & GraphQL - A declarative love story" },
+                { title: "Why GraphQL is better than REST" },
+                { title: "Relay vs Apollo - GraphQL Clients" }
+            ],
+            "followers" : [
+                {name: "John"},
+                { name: "Alice"},
+                { name: "Sarah"}
+            
+            ]
+        }
+    }
+}
+----
+
+This JSON information has the root field called *data*. Data returns to us all of the information that was requested in the query. 
+
+=== Pros of GraphQL
+
+* Elimite Over and Under fetching data. 
+    ** Overfetching means downloading unnecessary data. 
+    ** Underfetching means an endpoint doesn't return enough information or you need to send multiple requests (n + 1- requests problem)
+* great for rapid Product Iterations. changes in the client side can be made without any extra work on the server. This is good for faster feedback cycles and product 
+iterations. 
+* Insightful Analytics. 
+* Its Schema & Types. 
+    ** GraphQL uses strong type system to define capabilities of an API. All of the types that are exposed in an API are written down in a schema using the 
+    graphQL's schema definition language. 
+    ** The same schema is how a client can access the data. When the schema is defined, the team's working on the front end and the back end can do their work 
+    without further communication. 
+
+=== QUIZ
+
+Question: What is a benefit of the GraphQL schema and strong type system?
+
+# They work well with the javascript type system 
+# It solves the n+1 request problem 
+# Once the schema is defined, frontend and backend teams can work independently from one another 
+# Trick question: GraphQL doesn't havea type system.
+
+====
+Answer: 3. Once the schema is defined, frontend and backend teams can work independently from one another. 
+====
+
+
+== Core Concepts 
+
+
+
+
+== Big Picture (Architecture)
+== Clients 
+== Server
+== Tooling and Ecosystem
+== Security
+== Common Questions

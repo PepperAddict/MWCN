@@ -33,36 +33,10 @@ link:ch9.asciidoc[Chapter 9] : Professional Developer-fu +
 
 link:Lesson1.asciidoc[Lesson 1] : Why Responsive + 
 link:Lesson2.asciidoc[Lesson 2] : Starting Small
+link:Lesson3.asciidoc[Lesson 3] : Building Up
 
 ''''
 
-== Extra Courses for better understanding
-
-=== Learning about promises
-link:https://www.udacity.com/course/javascript-promises--ud898[JavaScript Promises] +
-
-link:promises1.asciidoc[Lesson 1] : Creating Promises
-
-''''
-link:https://www.udacity.com/course/object-oriented-javascript--ud015[Object Oriented JavaScript] +
-
-
-link:https://www.udacity.com/course/responsive-images--ud882[Responsive Images]
-
-== Useful Links and Tips
-
-* A quick and easy place for JavaScript sandboxing: link:https://repl.it/[Repl]
-* Also For Javascript testing, I recommend using link:https://developers.google.com/web/tools/chrome-devtools/snippets[snippet]. It offers the authentic devtools feel and can be accessed from any page.
-* If only there's a cheat for regular expressions. OH WAIT THERE IS! link:https://regexr.com/[regexr] !!
-
-''''
-Here's how to use snippet in devtools:
-
-image:img/devtoolsSNIP.png[] +
-
-* A: Here's how to find it. Chrome devtools > Sources > Snippet +
-* B: Here is where you create a *New* snippet. You can right click and click *New* and you can also just click on *+ New snippet* +
-* C: When you right click the file, you can run, rename, remove, and save it on your disk.+
-* D: Here is where the JavaScript code will be in. +
-* E: To run the code, right click the file at *C* and select *run*, select *Evaluate in console*. Be sure to save the file first. *ctrl s*. +
-* F: Here is where snippet shines over the rest. You can see the detail of the code in devtool's console.
+== Misc
+I wanted to learn more about GraphQL and found this website: link:http://www.howtographql[How-to-GraphQL]. Here will be my notes on the subject.
+link:graphql_1.asciidoc[GraphQL Fundamentals] 
