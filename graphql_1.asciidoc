@@ -52,9 +52,9 @@ inefficiences that developers experienced with REST API.
 
 In the example, there are 3 API endpoints to get information from a user with REST 
 
-# /users/<id>
-# /users/<id>/posts 
-# /users/<id>/followers
+* `/users/<id>`
+* `/users/<id>/posts`
+* `/users/<id>/followers`
 
 We want displayed, name, title of posts, and followers
 
@@ -139,24 +139,670 @@ iterations.
 
 Question: What is a benefit of the GraphQL schema and strong type system?
 
-# They work well with the javascript type system 
-# It solves the n+1 request problem 
-# Once the schema is defined, frontend and backend teams can work independently from one another 
-# Trick question: GraphQL doesn't havea type system.
+. They work well with the javascript type system 
+. It solves the n+1 request problem 
+. Once the schema is defined, frontend and backend teams can work independently from one another 
+. Trick question: GraphQL doesn't havea type system.
 
 ====
-Answer: 3. Once the schema is defined, frontend and backend teams can work independently from one another. 
+Answer: Once the schema is defined, frontend and backend teams can work independently from one another. 
 ====
 
 
 == Core Concepts 
 
+In this lesson, we are going to learn about GraphQL's language. We are going to learn about how graphQL define types 
+as well as sending _queries_ and _mutations_. 
+
+=== The Schema Definition Language (SDL)
+The syntax for writing schema is called *SDL*.  Here's an example of how to use SDL with these two simple types.
+
+''''
+
+----
+type Person {
+    name: String! 
+    age: Int!
+
+}
+----
+
+* This one has two fields. key *name* and *age* and the values *string* and *int*. 
+* The *!* with it means that it is required.
+
+''''
+
+----
+type Post {
+    title: String!
+}
+----
+
+* This one only has one field with key *title* and value *String*. 
+* Again, *!* means it's required. 
+
+=== Connecting the types into a Relation
+
+We can define relationships between the two. GraphQL calls that *relations*. To add a relation to this example between *Person* and *Post*, we need to express that one 
+person can be the *author* of many posts.  
+
+* We add the *author* field to the Post type like this: 
+
+----
+type Post {
+    title: String!
+    author: Person!
+}
+----
+
+Now, every post that is created needs to be associated with a person who is the author of it. 
+
+* We add the *posts* field to the Person type to show that a person can write multiple posts. 
+
+----
+type Person {
+    name: String!
+    age: Int! 
+    posts: [Post!]!
+}
+----
+
+NOTE: the *[]* bracket tells it that it will be a list. 
+
+After the connection has been made, now there is a _one-to-many-relationship_ between *Person* and *Post*.  They say one-to-many because of the 
+expected array inside of Person. 
+
+=== Fetching Dta with Queries 
+
+Rest's fetching is encoded in the URL that it connects to. GraphQL's method is a whole lot more different. GraphQL doesn't have multiple endpoints like REST does, but 
+just one single endpoint.  This works because the data is not fixed, but actually more flexible and let's the client decide on the requested data.  The downside to that 
+is that the client needs to send more information to the server to get what the client wants. 
+
+the process is called a *Query*. Here is an example of a query: 
+
+----
+{
+    allPersons {
+        name
+    }
+
+}
+----
+
+* The *root* of the query is named *allPersons*. 
+* Anything that follows after the root field is called the *payload* of the query. 
+* This query will return a list of all the persons that are stored in the database and will only show their *name*. 
+
+Here's it's output example in JSON: 
+
+----
+{
+    "allPersons": [
+        {"name": "Johnny"},
+        {"name": "Sarah"},
+        {"name": "Alice"}
+    ]
+
+}
+----
+
+''''
+
+If you wanted to add allPerson's age as well as their name, all you need to do is add *age* into the payload like this: 
+
+----
+{
+    allPerson {
+        name 
+        age
+    }
+
+}
+----
+
+and it will output this: 
+
+----
+{
+    "allPersons": [
+        {"name": "Johnny", "age": 23},
+        {"name": "Sarah", "age": 20},
+        {"name": "Alice", "age": 20}
+    ]
+}
+----
+
+''''
+
+You can actually control how much is output for the requested query. Such as if you want to limit to *only the last 2 names* instead of giving all of the results. 
+
+----
+{
+    allPersons(last: 2) {
+        name
+        age
+    }
+}
+----
+
+This will list the last two names that were stored in the database. This will be great to show the newest users or something. 
+
+----
+{
+    "allPersons": [
+        {"name": "Sarah", "age": 20},
+        {"name": "Alice", "age": 20}
+    ]
+}
+----
+
+Basically using the *last 2* took out poor Johnny. 
 
 
+=== Querying nested information 
+
+You can also query using nested information. 
+
+In the example, we want to load all the posts that each person has written. Here is how the query would look like: 
+
+----
+{
+    allPersons {
+        name
+            posts {
+                title
+            }
+    }
+}
+
+----
+
+Here is how the server is going to output the query request in JSON: 
+
+----
+{
+    "allPerson": [
+        {
+            "name": "Johnny",
+            "posts": [
+                {"title": "graphQL is awesome"},
+                {"title": "Relay is a powerful graphql client"}
+            ]
+        
+        },
+        {
+            "name": "Sarah",
+            "posts": [
+                {"title": "How to get started with React & GraphQL"}
+            ]
+        
+        }
+    ]
+}
+
+----
+
+There we see that it only shows the title of the posts nested with the user's name. 
+
+=== Mutating a response 
+
+We learned about requesting data, now we will learn about making changes to the data that is stored. With GraphQL, we make these changes using 
+so called *mutations*. There are three kinds of mutations: 
+
+. *creating* new data
+. *updating* existing data 
+. *deleting* existing data 
+
+To modify the data, it is actually written the same way you would when making a request except that you need to start it with the mutation keyword. Example: 
+
+----
+mutation {
+    createPerson(name: "Bob", age: 36) {
+        name
+        age
+    }
+}
+----
+
+* Just like the request, mutation also has a root field, and this root field is called *createPerson*. 
+* Inside the paranthesis are arguments that will be placed into the payload. The arguments are: *name: "Bob", age: 36*. 
+* The payload's key will then look at the argument's values to replace with it. 
+
+the output for the mutation will look like this: 
+
+----
+{
+    "createPerson": {
+        "name": "Bob",
+        "age": 36
+    }
+}
+----
+
+=== Unique IDs 
+
+GraphQL types have unique IDs that are generated by the server: 
+
+----
+type Person {
+    id: ID!
+    name: String! 
+    age: Int!
+}
+----
+
+When we were making a mutation, we can also request an ID when we were creating a person. 
+
+----
+mutation {
+    createPerson(name: "Bob", age: 36) {
+        id
+    }
+}
+----
+
+=== real-time connection to server 
+
+One absolute necessity is to have a real-time connection to the server to get immediate information about changes. 
+
+For this use case, graphql offers the concept of subscriptions. When a client subscribes to an event, it will initiate and hold 
+a steady connection to the server. 
+
+In this example, the client subscribes on the server to get informed about new users being created. 
+
+----
+subscription {
+    newPerson {
+        name
+        age
+    }
+}
+----
+
+So now when a new user is created, the server will push the data to the client. 
+Unlike queries and mutations that follow a typical response cycle, subscriptions will have a continuous stream of data sent over to the client. 
+
+Again, so with that subscription setup with the root *newPerson*, the client will receive a user's name and age every single time a new user is created. 
+
+=== The GraphQL Schema 
+
+* The schema defines the capabilities of the API by specifying how a client can fetch, mutate, and subscribe the data. 
+* It is also a contract between the client and the server. 
+* It is also a collection of GraphQL types with special root types. 
+
+The schema will have different root types that define its entry points for the API. 
+
+* type *Query* sends requests for data to be read. 
+* type *Mutation* modifies the data.
+* type *Subscription* is like query except it sets up a constant connection for when changes happen.
+
+''''
+Query type: 
+
+----
+{
+    allPersons {
+        name
+    }
+}
+----
+
+----
+type Query {
+    allPersons(last: Int): [Person!]!
+}
+----
+
+* (last: Int) is to limit the result. You can even use *first*..
+
+''''
+Mutation type: 
+
+----
+mutation {
+    createPerson(name: "Bob", age: 36) {
+        id
+    }
+}
+----
+
+----
+type Mutation {
+    createPerson(name: String!, age: Int!: Person!)
+}
+----
+
+''''
+
+Subscription type:
+
+----
+subscription {
+    newPerson {
+        name
+        age
+    }
+}
+----
+
+----
+type Subscription {
+    newPerson: Person!
+}
+----
+
+''''
+
+The full schema of what it's using: 
+
+----
+type Person {
+    id: ID!
+    name: String!
+    age: Int!
+    posts: [Post!]!
+}
+----
+
+----
+type Post {
+    title: String!
+    author: Person!
+}
+----
+
+* When you see *Person!* , it is linked to *Person* and is being sent there. 
+* When you see *[Person!]*, it is also linked but is receiving it. 
+
+=== CRUD
+Right now it doesn't really do anything, but we can define a CRUD style API by adding a new fields to the schemas's root types. 
+CRUD is short for *create, read, update, delete* which actually refers to the type of operations we will use with GraphQL.
+
+So right now we want to add the new field to the *query* type to retrieve all of the stored posts from the server. The field is called 
+*allPosts* and looks very similar to the *allPersons* field. 
+
+----
+type Query {
+    allPersons(last: Int): [Person!]!
+    allPosts(last: Int): [Post!]!
+}
+----
+
+All this does is ask for all the posts and all of the persons that are stored in the database. However, this way is not possible to query 
+individual posts or person objects. 
+
+To complete the CRUD API for the person type, we can do so by adding two more mutations. One for updating and one for deleting person objects. 
+
+----
+type Mutation {
+    createPerson(name: String!, age: String!): Person!
+    updatePerson(id: ID!, name: String!, age: String!): Person!
+    deletePerson(id: ID!): Person!
+}
+----
+
+* updatePerson has to look up the *ID* which will allow us to specify which person that needs to be updated, and also supplied the new arguments to change.
+* deletePerson only needs the ID to tell the server which person to delete. 
+
+Now, the same must be done for *posts*. 
+
+----
+createPost(title: String!): Post!
+updatePost(id: ID!, title: String!): Post!
+deletePost(id: ID!): Post!
+----
+
+* For the update and delete mutation to work, we need to specify an ID. 
+
+''''
+Now to update the subscription, we need to add all the persons and posts type that were created and existing. 
+
+----
+type Subscription {
+    newPerson: Person!
+    updatedPerson: Person!
+    deletedPerson: Person!
+    newPost: Post!
+    updatedPost: Post!
+    deletedPost: Post!
+}
+----
+
+=== Quiz 
+
+Question: What are GraphQL subscriptions used for?
+
+. Event-based realtime functionality
+. You use them to subscribe to the GraphQL Weekly newsletter
+. Schema-based realtime functionality
+. They combine Queries and Mutations and allow you to read and write data. 
+
+====
+Answer: Event-based realtime functionality
+====
 
 == Big Picture (Architecture)
+
+An important thing to note is that graphQL was only released as a *specification*. Which means it tells how the graphql server has to behave. 
+We can read the specification here: link:http://facebook.github.io/graphql/[graphql github]. 
+
+If we want to use graphql in a project, we have to build the graphql server ouselves. We can do that with any programming language. 
+
+We can also use a service graphql that provides a powerful server out of the box. 
+
+=== Architectural use cases
+
+There are three main architectural use cases. 
+
+. GraphQL server with a connected database
+    ** this is a simple setup that the lesson will cover later (hopefully.. this is what I'm interested in). 
+    ** this is more common with _greenfield_ projects. 
+    ** the setup is: you have 1 web server that implements the graphQL specification. Query arrives at graphQL's server, the server 
+    reads it and fetches the data. This is called *resolving the query*. 
+    ** GraphQL is actually *transport layer agnostic*. 
+        *** GraphQL can be used with any available network protocol, so you can implement a graphql server on TCP, websockets, or any transport. 
+    ** GraphQL doesn't care about the format that the database stores its data. We can use SQL database like AWS, aurora, or even a noSQL database like MongoDB. 
+. GraphQL server to integrate existing system. 
+    ** a bunch of other third party systems will get computed to a single graphQL API. 
+    ** great for companies with legacy infrastructures and many different APIs. 
+    ** GraphQL can be used to unify those existing systems and hide the messy backend.
+    ** GraphQL will communicate with the existing systems and packages it up to the graphQL's response format. 
+    ** GraphQL doesn't care about the data sources are, such as databases, web services, 3rd party APIs, etc). 
+    ** here's a visual example of what goes on: +
+    image:img/graphql/graphql2.png[] +
+    ** You can also combine one with graphql and still communicate with the others. 
+    ** GraphQL handles this with *Resolver functions*. The purpose of a resolver function is to retrieve the data for its corresponding field. 
+. A hybrid approach with a connected database and integration of existing system. 
+
+=== GraphQL Clients 
+
+GraphQL is great for frontend developers as data fetching complexity can be pushed to the server-side. The server machine will be dealing with the heavy work.  
+
+* *Imperative data fetching* : With REST, you used to have to create a fetch request and then parse the server response and then would have to be stored locally. Only after then, it will be 
+displayed in the UI. 
+
+* *Declarative data fetching* : It has to describe its data requirements with query, mutation, or subscription. Then it can display information in the UI. The in 
+between steps are handled by the GraphQL client. This is what graphQL client libraries will handle such as Relay or Apollo. 
+
+=== Quiz 
+Question: What is a resolver function?
+
+. A function that a GraphQL client uses to resolve a query on the frontend.
+. It's a synonym for serverless functions. 
+. A function that solves all your problems. 
+* A function on GraphQL server that's responsible for fetching the data for a single field.
+
+====
+Answer: A function on a GraphQL server that's responsible for fetching the data for a single field. 
+====
+
 == Clients 
+
+Some infrastructure feature that is needed for our app is: 
+
+* directly sending queries and mutations without constructing HTTP requests. 
+* view-layer integration. 
+* caching
+* validating and optimizing queries based on the schema. 
+
+=== UI updates
+With graphQL's client we no need to do an HTTP fetch and parse anymore. But how do we get it to show up in the UI? If we use ReactJS, the graphQL 
+will fetch the needed data under the hood and make it available in the *props* of our component. The declarative nature ties well with 
+link:https://en.wikipedia.org/wiki/Functional_reactive_programming[functional reactive programming] techniques. 
+
+=== Caching query results: Concepts and strategies. 
+
+It's good practice to store the data that was retrieved somewhere with the user to save load times and whatnot. A good way to do this is to 
+_normalize_ the data beforehand. Which means that the query result gets flattened and the store will only contain individual records that can be 
+referenced with a globally unique ID. 
+
+=== Build-time-schema validation and optimizations. 
+
+When the build environment has access to the schema, it can parse all of the graphQL code that's located in the project and compare it 
+against the information from the schema. This catches any typos and other errors before it is put in production where the users can see this error.
+
+=== Colocating Views and Data Dependencies 
+
+The great thing about GraphQL is that it has a split view. One is the written data requirements and the other is the UI code. This split view 
+gives you a better visualization of the data and will give a better understanding of its data.
+
+=== Quiz 
+
+What does a GraphQL client usually do before caching the results of a query?
+
+. Validating the query results against the schema 
+. Calling a resolver function 
+. Normalizing the data 
+. Making the data available in the props of a React Component 
+
+====
+Answer: Normalizing the data
+====
+
 == Server
+
+=== GraphQL execution 
+
+The query is traversed field by field, executing "resolvers" for each field. So, here's an example of a schema: 
+
+----
+type Query {
+    author(id: ID!): Author
+}
+type Author {
+    posts: [Post]
+}
+
+type Post {
+    title: String
+    content: String
+}
+----
+
+And then here is an actual query that we will send to the server with the schema above:
+
+----
+query {
+    author(id: "abc") {
+        posts {
+            title 
+            content 
+        }
+    }
+}
+----
+
+You can also set the query up with the associated type. 
+
+----
+query: Query {
+    author(id: "abc"): Author {
+        posts: [Post] {
+            title: String 
+            content: String
+        }
+    }
+
+}
+----
+
+What will then happen is the resolvers will run for every field sequentually like a list. So this is how it will be executed: 
+
+----
+Query.author(root, { id: 'abc' }, context) -> author
+Author.posts(author, null, context) -> posts
+for each post in posts
+  Post.title(post, null, context) -> title
+  Post.content(post, null, context) -> content
+----
+
+So after that, the system will put everything together into the correct shape for the result and returns a JSON format. 
+
+=== Batched Resolving 
+
+So there's a bit of an issue if we wanted to retrive data like this: 
+
+----
+query {
+  posts {
+    title
+    author {
+      name
+      avatar
+    }
+  }
+}
+----
+
+Well, if it was a blog, it's most likely that most of the posts will have the same authors. So if we need to make an API call to get each author obect, we might accidentally 
+make multiple requests for the same one... so for example: 
+
+----
+fetch('/authors/1')
+fetch('/authors/2')
+fetch('/authors/1')
+fetch('/authors/2')
+fetch('/authors/1')
+fetch('/authors/2')
+----
+
+To avoid this problem, we should wrap our fetching function in a utility that will wait for all of the resolvers to run, then make sure to only fetch each item once.
+
+----
+authorLoader = new AuthorLoader()
+
+// Queue up a bunch of fetches
+authorLoader.load(1);
+authorLoader.load(2);
+authorLoader.load(1);
+authorLoader.load(2);
+
+// Then, the loader only does the minimal amount of work
+fetch('/authors/1');
+fetch('/authors/2');
+----
+
+If the API supports batched requests, we can just do one fetch to the backend, like this: 
+
+----
+fetch('/authors?ids=1,2')
+----
+
+In JavaScript, the above methods can be implemented using a utility called link:https://github.com/facebook/dataloader[dataloader]. 
+
+=== Quiz 
+
+Which statement about GraphQL servers is correct?
+
+. A single record is never fetched more than once for a given query. 
+. Resolvers can be defined on a field graularity
+. Query fields are resolved depth-first 
+. A GraphQL server that doesn't use DataLoader isn't a GraphQL server. 
+
+====
+Answer: Resolvers can be defined on a field granularity
+====
+
 == Tooling and Ecosystem
 == Security
 == Common Questions
