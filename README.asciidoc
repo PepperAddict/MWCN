@@ -32,11 +32,12 @@ link:ch9.asciidoc[Chapter 9] : Professional Developer-fu +
 == Udacity Mobile Web Nanodegree course notes. 
 
 link:Lesson1.asciidoc[Lesson 1] : Why Responsive + 
-link:Lesson2.asciidoc[Lesson 2] : Starting Small
-link:Lesson3.asciidoc[Lesson 3] : Building Up
+link:Lesson2.asciidoc[Lesson 2] : Starting Small +
+link:Lesson3.asciidoc[Lesson 3] : Building Up +
 
 ''''
 
 == Misc
-I wanted to learn more about GraphQL and found this website: link:http://www.howtographql[How-to-GraphQL]. Here will be my notes on the subject.
-link:graphql_1.asciidoc[GraphQL Fundamentals] 
+I wanted to learn more about GraphQL and found this website: link:http://www.howtographql[How-to-GraphQL]. Here will be my notes on the subject. +
+link:graphql_1.asciidoc[GraphQL Fundamentals] +
+link:graphql_2.asciidoc[Getting Started] +

@@ -6,6 +6,9 @@ This is my notes on link:http://www.howtographql.com[graphQL].
 
 toc::[]
 
+This mainly teaches us the history of GraphQL and what is going on. Honestly I don't think I quite understand it unless I touch it or see more examples of it 
+being used. 
+
 == Introduction 
 
 * GraphQL is a new *API* standard that was invented & open-sourced by Facebook. 
@@ -804,5 +807,271 @@ Answer: Resolvers can be defined on a field granularity
 ====
 
 == Tooling and Ecosystem
+
+In this lesson we will find out why GraphQL is great for developing tools. 
+
+GraphQL's Type system allows us to quickly define the surface area of our API and it allows developers to define the capabilities of an API. 
+GraphQL allows clients to ask a server for information about its schema. It is called *introspection*. 
+
+=== Introspection 
+
+To let the client know what is accessible through a graphQL API, we ask graphQL for this information by querying the `\__schema` meta-field which 
+is available on the root type of a Query. 
+
+----
+query {
+    __schema {
+        types {
+            name
+        }
+    }
+}
+----
+
+So here's this schema definition: 
+
+----
+type Query {
+  author(id: ID!): Author
+}
+
+type Author {
+  posts: [Post!]!
+}
+
+type Post {
+  title: String!
+}
+----
+
+With the *introspection query* that we wrote out and used it with the schema above, we would get this result: 
+
+----
+{
+  "data": {
+    "__schema": {
+      "types": [
+        {
+          "name": "Query"
+        },
+        {
+          "name": "Author"
+        },
+        {
+          "name": "Post"
+        },
+        {
+          "name": "ID"
+        },
+        {
+          "name": "String"
+        },
+        {
+          "name": "__Schema"
+        },
+        {
+          "name": "__Type"
+        },
+        {
+          "name": "__TypeKind"
+        },
+        {
+          "name": "__Field"
+        },
+        {
+          "name": "__InputValue"
+        },
+        {
+          "name": "__EnumValue"
+        },
+        {
+          "name": "__Directive"
+        },
+        {
+          "name": "__DirectiveLocation"
+        }
+      ]
+    }
+  }
+}
+----
+
+What we did was we queried *for all types* on the schema. We get both the object types that were defined like `"Author"` and scalar types. 
+
+''''
+
+There's more than to just _name_ for introspection types. Here's an example: 
+
+----
+{
+    __type(name: "Author") {
+        name
+        description
+    }
+}
+----
+
+This example we query a single type using the `\__type` meta-field and we ask for its name and description. 
+
+----
+{
+  "data": {
+    "__type": {
+      "name": "Author",
+      "description": "The author of a post.",
+    }
+  }
+}
+----
+
+The great thing about Introspection  is that it's great for autocomplete, code generating, etc. I wish they would actually talk more about this, actually. What a short chapter. 
+
+=== GraphQL Playground 
+
+There's a special IDE for playing with GraphQL called link:https://github.com/graphcool/graphql-playground[GraphQL Playground]. The IDE you can make queries, mutations, subscriptions,
+autocomplete, and validation. There's even a documenation explorer to refer to which is powered by introspection.  It also has query history so it lets you work with multiple graphQL api's side by side. 
+It seamlessly integrates with `graphql-config`.  This tool is great to work with a graphql server without writing plain graphQL queries over _curl_. 
+
+=== Quiz 
+
+Question: What mechanism is used by most tools to discover a GraphQL server's type system? 
+
+. The IDL 
+. GraphQL 
+. Introspection 
+. Subscriptions 
+
+====
+Answer: Introspection
+====
+
 == Security
+
+With the client's freedom, GraphQL's server must be ready to handle those that want to abuse the power or those who submit very large queries. These cases can 
+take a GraphQL server down. 
+
+There are ways to avoid this issue. 
+
+=== Timeout 
+
+Using a timeout is the easiest way to handle overload queries. For example we can configure with a *5 second timeout* would stop the execution of any query that 
+is taking more than 5 seconds to execute. 
+
+* Pros: 
+** Simple to implement.
+** Most strategies will still use a timeout as a final protection. 
+
+* Cons: 
+** Damage can already be done even when the timeout kicks in. 
+** Sometimes hard to implement. Cutting connections after a certain time may result in strange behaviors. 
+
+=== Maximum Query Depth 
+
+GraphQL will let us craft any complex query which means we can nest within nest within nest. So there can be a way to limit a query depth. 
+GraphQL can reject or accept a request based on its depth. 
+
+Let's say the server was configured witha  maximum Query Depth of *3*. Everything within the red maker of this image is considered *too deep* and the query is *invalid*. +
+image:img/graphql/querydepth.png[] +
+
+* Pros: 
+** Since the AST of the document is analyzed statically, the query does not even execute, which adds no load on the graphql server. 
+
+* Cons: 
+** Depth alone is often not enough to cover all abusive queries. For example a query requesting an enormous amount of nodes on the root will be very expensive 
+but unlikely to be blocked by a query depth analyzer. 
+
+=== Query Complexity 
+
+To minimize load, try to be specific with the request to get a singular result rather than a list of items. 
+
+Here's an example of a query and its complexity: 
+
+----
+query {
+  author(id: "abc") {    # complexity: 1
+    posts(first: 5) {    # complexity: 5
+      title              # complexity: 1
+    }
+  }
+}
+----
+
+* Pros: 
+** Covers more cases than a simple query depth. 
+** Reject queries before executing them by statically analyzing the complexity. 
+
+* Cons: 
+** Hard to implement perfectly. 
+** If complexity is estimated by developers, how do we keep it up to date? How do we find the costs in the first place? 
+** Mutations are hard to estimate. what if they have a side effect that is hard to measure like queuing a background job?
+
+=== Throttling 
+
+We can throttle a request based on time. 
+
+In the example, our maximum server time (Bucket Size) allowed is set to `1000ms`, the clients gain `100ms` of server time per second (leak rate) and this mutation: 
+
+----
+mutation {
+  createPost(input: { title: "GraphQL Security" }) {
+    post {
+      title
+    }
+  }
+}
+----
+
+This mutation will take an average `200ms` to complete. The client will operate the request more than 5 times within 1 second until more available server time is added to the 
+client. 
+
+After two seconds (`200ms`), our client could call the `createPost` a single time. Throttling will be good because we can use it less often and smaller queries may be 
+called more often since they will be very fast to compute.
+
+=== Throttling based on Query complexity 
+
+This query complexity example: 
+
+----
+query {
+  author(id: "abc") {    # complexity: 1
+    posts {              # complexity: 1
+      title              # complexity: 1
+    }
+  }
+}
+----
+
+Has a total of `3` query cost based on its complexity.  We can set a maximum cost of `9` and our client could run this query only three times before the leak 
+rate forbids them to query more. 
+
+The client can calculate the costs of their queries themselves without needing to estimate server time. 
+
+There's a github public API that uses this approach to throttle their clients. Here's how they did it: link:https://developer.github.com/v4/guides/resource-limitations/[]. 
+
+=== Quiz 
+
+Question: Which one of these strategise is not a valid way to defend against abusive or large queries?
+
+. Calculating query complexity 
+. Adding more servers 
+. Maximum query depth 
+. Timeout 
+
+====
+Answer: Adding more servers
+====
+
 == Common Questions
+
+=== Quiz
+
+Question: How does a GraphQL server deal with failures?
+
+. A GraphQL server never fails 
+. It returns a dedicated errors object in the server response 
+. It uses HTTP status codes to inidcate what went wrong 
+. It starts crying and hides under the bed 
+
+====
+Answer: It returns a dedicated errors object in the server response
+====

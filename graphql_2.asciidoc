@@ -1,0 +1,58 @@
+:library: Asciidoctor
+:toc:
+:toc-placement!:
+
+This is my notes on link:http://www.howtographql.com[graphQL].
+
+toc::[]
+
+= React + Apollo
+
+== Introduction 
+
+This is exciting! We're going to actually create something. A clone of link:https://news.ycombinator.com/[Hackernews] to be more precise. Here is what it should feature: 
+
+* Display a list of link
+* Search the list of links 
+* Users can authenticate 
+* Authenticated users can create new links 
+* Authenticated users can upvote links (one vote per link and user)
+* Realtime updates when other users upvote a link or create a new one
+
+This is what we will be using
+
+* Frontend 
+** React: Frontend framework for building user interfaces. We will create the project with `create-react-app`. 
+** link:https://github.com/apollographql/apollo-client[Apollo Client 2.0]: Production-ready, caching GraphQL client. Will make our life easier. 
+
+* Backend
+** `graphql-yoga`: Fully featured GraphQL server with focus on easy setup, performance & great developer experience. 
+* link:https://www.prisma.io/[Prisma]: Open-source GraphQL API Layer that turns your database into a GraphQL API. 
+
+=== Quiz 
+
+Question: What's a major benefit of using a GraphQL client library?
+
+. It makes it easy to use animations inside your app 
+. It saves you from writing infrastructure code for networking and caching. 
+. A GraphQL client is mainly used to improve security 
+. GraphQL clients don't provide actual advantages but it's always good to use 3rd party libraries. 
+
+====
+Answer: It saves you from writing infrastructure code for networking and caching. 
+====
+
+== Getting Started 
+
+
+
+
+== Queries: Loading Links 
+== Mutations: Creating Links 
+== Routing 
+== Authenitication 
+== More Mutations and Updating the Store
+== Filtering: Searching the list of Links 
+== Realtime Updates with GraphQL Subscriptions 
+== Pagination 
+== Summary
