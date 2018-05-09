@@ -1,0 +1,666 @@
+:library: Asciidoctor
+:toc:
+:toc-placement!:
+
+This is my notes on link:http://www.howtographql.com[graphQL].
+
+If this is not where you want to be, head on over to the link:README.asciidoc[Readme].
+
+toc::[]
+
+= GraphQL + Node.js
+
+== Introduction 
+
+For this lesson, the final project can be seen here for reference if we get stuck: link:https://github.com/howtographql/graphql-js[].
+
+This tutorial we will learn how to build an *idiomatic GraphQL server* entirely from scratch. We will be using these technologies: 
+
+* `graphql-yoga`: Fully featured GraphQL server with focus on easy setup, performance & great developer experience. It is build on top of link:https://expressjs.com/[Express], `apollo-server`, and `graphql-js`, and more. 
+* link:https://www.prisma.io/[Prisma]: GraphQL db proxy that turns your database into a graphql API. This API provides powerful, realtime *CRUD* operations for our data model.
+* `graphql-config` and link:https://github.com/graphql-cli/graphql-cli[GraphQL CLI]: These are graphQL tools.
+* `GraphQL bindings`: The binding generates dedicated JavaScript functions for each API operation.
+* link:https://github.com/graphcool/graphql-playground[GraphQL Playground]: A GraphQL IDE that allows to interactively explore the functionality of graphQL API by 
+sending queries and mutations to it. This playground does: 
+    ** auto-generates a comprehensive documentation for all available API operations.
+    ** provides an editor where you can write queries, mutations, subscriptions with auto completion(introspection) and syntax highlighting.
+    ** also let's you easily share your API operations. 
+
+=== What to expect
+
+We will be creating a clone of link:https://news.ycombinator.com/[Hacker News]. 
+
+. This lesson we will learn the basics of how a GraphQL server works simply by defining a GraphQL schema for the server. In the beginning these resolvers will only work with 
+data that's stored in memory.
+
+. So since nobody wants a server that's not able to store and persist data, we will add a database layer to it! The database layer is powered by *Prisma* and will be connected to your 
+GraphQL server via *Prisma bindings*. We will think of these _bindings_ as a *GraphQL ORM* that helps you properly resolve incoming queries. 
+
+. Once we have the DB connected, we will add more advanced features to the API. 
+
+. We wil implement signup/login functionality that enables users to authenticate against the API. This will also allow you to check permissions of your users for certain API 
+ooperations. 
+
+. Next part is we add *realtime functionality* to the API using GraphQL *subscriptions*!
+
+. Last we will allow the consumers of the API to constrain the list of times they retrieve from the API by adding *filtering* and *pagination* capabilities to it! 
+
+Woo! This is exciting. Can't wait to get started on this project!
+
+=== Quiz 
+
+Question: What is a GraphQL Playground 
+
+. A GraphQL IDE to work with a GraphQL API 
+. A REST Client 
+. A tool to generation GraphQL operations. 
+. The successor of Postman 
+
+====
+Answer: A GraphQL IDE to work with a GraphQL API
+====
+
+
+== Getting Started 
+
+First navigate to the folder where you want the project to be. They want you to name it *hackernews-node*. You can do this manually or through the terminal. You then want 
+to navigate into hackernews-node folder and insert the link:https://yarnpkg.com/en/[yarn package manager] into it with `yarn init -y`. That will create a `package.json` file inside of it!
+
+----
+mkdir hackernews-node
+cd hackernews-node 
+yarn init -y
+----
+
+
+=== Create the server 
+
+Now we need an entry point for our GraphQL server. The file will be called *index.js* and it must be located in the src folder. You can do this manually or you can do it 
+through the terminal like this while in the root of hackernews-node: 
+
+----
+mkdir src 
+touch src/index.js
+----
+
+Now if we can start the app by executing `node src/index.js` inside *hackernews-node* (where package.json is). Of course it won't do anything since *index.js* is empty. 
+
+=== Building up the Dependencies with graphQL-yoga
+
+Let's actually get started witha  GraphQL server! The first thing to do is add a dependency to the project. In the terminal root folder type this: 
+
+`yarn add graphql-yoga`
+
+This will create a folder *node_modules* with a bunch of items in it. You will also see a new dependency option inside `package.json` with this entry: 
+
+----
+  "dependencies": {
+    "graphql-yoga": "^1.13.1"
+  }
+----
+
+GraphQL-yoga is a fully featured GraphQL server. It is based on Express.js and a few other libraries to help us build production-ready graphQL servers. 
+
+So here's a list of its features: 
+
+* GraphQL spec-compliant 
+* supports file upload 
+* realtime functionality with GraphQL subscriptions 
+* Works with Typescript typings
+* out-of-the-box support for GraphQL Playground 
+* Extensible via Express middlewares
+* Resolves custom directives in your graphQL schema 
+* Query performance tracing
+* Accepts both `application/json` and `application/graphql` content-types 
+* Runs everywhere: Can be deployed via `now`, `up`, AWS Lambda, Heroku, etc.
+
+=== Let's write something into the Index.js file 
+
+Inside the index.js file that was created in the *src* folder, insert this:
+
+----
+const { GraphQLServer } = require('graphql-yoga')
+
+// 1
+const typeDefs = `
+type Query {
+  info: String!
+}
+`
+
+// 2
+const resolvers = {
+  Query: {
+    info: () => `This is the API of a Hackernews Clone`
+  }
+}
+
+// 3
+const server = new GraphQLServer({
+  typeDefs,
+  resolvers,
+})
+server.start(() => console.log(`Server is running on http://localhost:4000`))
+----
+
+Luckily they numbered it so let's find out what is going on: 
+
+. The *typeDefs* constant defines the GraphQL schema. Here, it defines a simple `query type` with one field called `info`. The field has the type `String!`. The `!` means the type 
+is required which also means it can never be `null`. 
+
+. The `resolvers` object is the actual implementation of the GraphQL schema. Notice how its structure is identical to the top one? 
+
+. the schema and resolvers are bundled and passed to the `GraphQL Server` which is imported from `graphql-yoga`. This tells the server what API operations are accepted and how they 
+should be resolved. 
+
+=== Now let's test it! 
+
+Now in the root of the project, type this: 
+
+`node src/index.js`
+
+In the terminal you should get the message: `Server is running on http://localhost: 4000`
+
+When you go to link:http://localhost:4000[localhost:4000] you should get this GraphQL Playground IDE page: 
+
+image:img/graphql/graphqlplayground.png[] 
+
+If you click on the green button on the right, it will show us the API documentation. The documenation is auto-generated based on the schema definition 
+and displays all API operations and data types of our schema! Well since we only made `info: String!`, we will only get that: 
+
+image:img/graphql/qplayground2.png[] +
+
+
+=== Now let's use what we have 
+
+in the editor of the playground insert this query: 
+
+`query {
+  info
+}` 
+
+Press the *play* button in the center or you can use the keyboard shortcut: *CMD + Enter*. 
+
+You should get this result in JSON: 
+
+----
+{
+  "data": {
+    "info": "This is the API of a Hackernews Clone"
+  }
+}
+----
+
+So earlier she mentioned that String! where the exclamation mark means it cannot be `null`. she wants us to test it out and give it `null` instead of the string inside 
+*index.js*. After putting in `null` make sure you restart the server by going to the terminal and close it by *CTRL + C* and then run it again by `node src/index.js` again. 
+
+Again once you're in the playground you should get run the editor again. You should get the error message inside the JSON: `Error: Cannot return null for non-nullable field Query.info.`
+
+
+What is going on here is that the underlying `graphql-js` reference implementation ensures that the return types of the resolvers adher to the type definitions from our 
+graphQL schema. It protects us from making mistakes. 
+
+This is the great thing about GraphQL. It enforces that the API actually behaves in the way that is *promised by the schema definition!* This way, everyone who has access to the GraphQL 
+schema can always be 100% sure about the API operations and data structures that are returned by the API. 
+
+=== More on GraphQL schema 
+
+At the core of every GraphQL API, there is a graphql schema. 
+
+Okay so most of this is talked about in the introduction that I took notes on link:graphql_1.asciidoc[here] 
+
+The schema has 3 different root types: 
+
+. Query 
+. Mutation 
+. Subscription 
+
+The fields on these root types are called *root field* and define the available API operations. 
+
+An example, consider the simple GraphQL schema we used above: 
+
+----
+type Query {
+    info: String!
+}
+----
+
+In the example above it only has *one root field* and it is called `info`. When sending queries, mutations, or subscriptions to a GraphQL API, these always need to start with 
+a root field. 
+
+Here is a more advanced example: 
+
+----
+type Query {
+  users: [User!]!
+  user(id: ID!): User
+}
+
+type Mutation {
+  createUser(name: String!): User!
+}
+
+type User {
+  id: ID!
+  name: String!
+}
+----
+
+Here we have the root types: *Query* and *Mutation*.  Query has users and user. Mutation has createUser. The additional definition of the `User` type is required 
+because otherwise the schema definition would be incomplete.
+
+Now we learned that it always has to have a root type, but what we didn't learn is when the *root field is itself another object type*. This is the case here where 
+the types of the root field is `[User!]!`, `User` and `User!`.  In the `info` example from before, the type of the root field was a `String` which is called a 
+scalar type.
+
+When the type of a root field is an object type, you can further expand the query/mutation/subscription with fields of that object type. The expanded part is called 
+*selection set*.  Here are the operations that are accepted by GraphQL API that implements the above schema:
+
+
+If we want to learn more about schema, we can go here: link:https://blog.graph.cool/graphql-server-basics-the-schema-ac5e2950214e[]
+
+=== Quiz 
+
+Question: What role do the root fields play for a GraphQL API 
+
+. The three root fields are: Query, Mutation, and Subscription
+. Root fields define the available API operations 
+. Root fields iimplement the available API operations 
+. Root field is another term for resolver
+
+====
+Answer: Root fields define the available API operations
+====
+
+== A Simple Query 
+
+In this we will query a feed of links that were posted by other users.
+
+=== The schema portion
+
+we will implement a `feed` query which allows to retrieve a list of `link` ements. In general, when adding a new feature to the API, the process will look 
+pretty similar every time: 
+
+. Extend the GraphQL schema definition with a new root field( and a new dta types if needed) 
+. Implement corresponding resolver functions for the added fields. 
+
+The process is also referred to as *schema-driven* or *schema-first* development.
+
+Inside *index.js* we need to update the `typeDefs` constant to look like this: 
+
+----
+const typeDefs = `
+type Query {
+  info: String!
+  feed: [Link!]!
+}
+
+type Link {
+  id: ID!
+  description: String!
+  url: String!
+}
+`
+----
+
+Basically all we added was we defined a new type called `Link` that represents 
+the links that can be posted to Hacker News. Each link has an *id*, a *description*, and 
+an *url*. So for the root type we have to add a root field that allows to 
+retrieve a list of `Link` elements. This list is guranteed to never be `null` which 
+is why there's two exclamation mark.
+
+=== The resolver function portion 
+
+Now that we added `feed` to the schema, we need to add it to the resolver function 
+as well. Resolver functions need to be done for all Root types so which means 
+we will have to write one up for *Link* as well. 
+
+. Let's create a *link* variable to store the links at runtime. For now 
+everything is stored only _in-memory_ rather than being persisted in a database. 
+
+----
+let links = [ {
+    id: 'link-0',
+    url: 'http://www.howtographql.com',
+    description: 'Fullstack tutorial for GraphQL'
+}]
+----
+
+. We will add a new resolver for the `feed` root field for *Query*. Notice that a resolver 
+always has to be named after the corresponding field from the schema! 
+
+----
+feed: () => links,
+----
+
+. Now we add for *type Link* the same way we did for *Type Query*. 
+
+----
+  Link: {
+      id: (root) => root.id,
+      description: (root) => root.description,
+      url: (root) => root.url,
+  }
+----
+
+They will discuss what *root* is for later.. 
+
+Now! Let's test everything out! 
+
+Restart the server by *ctrl c* and type in `node src/index.js` and head back over to the playground at localhost:4000 
+
+You should get a new option on the right like this: 
+
+image:img/graphql/qlink.png[]
+
+''''
+
+Now we can run something in the editor to test it out: 
+
+----
+query {
+  feed {
+    id
+    url
+    description
+  }
+}
+----
+
+should give you this in JSON from `Links`: 
+
+----
+{
+  "data": {
+    "feed": [
+      {
+        "id": "link-0",
+        "url": "http://www.howtographql.com",
+        "description": "Fullstack tutorial for GraphQL"
+      }
+    ]
+  }
+}
+----
+
+=== The query resolution process 
+
+What we defined in the schema such as *feed*, *id*, *url*, and *description* can also 
+be found in the *schema definition* that was in the Playgroundd. We learned that every 
+field inside the schema definition is backed by one resolver function whose 
+responsibility is to return the data for precisely that field. 
+
+The GraphQL server has tod o is invoke all resolver functions for the field that are contained 
+in the query and then package up the response according to the query's shape. 
+
+=== What was that root thing for the Link resolvers?
+
+Let's rewind a bit and try and understand what was going on with this: 
+
+----
+  Link: {
+      id: (root) => root.id,
+      description: (root) => root.description,
+      url: (root) => root.url,
+  }
+----
+
+Every GraphQL resolver function actually receives *four* input arguments. 
+As the remaining three are not needed in our scenario right now, we're simply
+omitting them. 
+
+the first argument is commonly called *root* or *parent*. 
+
+A thing to remember is that queries can be nested. 
+
+So in summary: because the implementation of `Link` resolvers is complicated, 
+we can actually omit them and the server will work in the same way as it did 
+before.
+
+Okay honestly the way the tutorial described this didn't help me understand it any 
+further. They did however link to an article that will hopefully explain it better 
+here: link:https://blog.graph.cool/graphql-server-basics-the-schema-ac5e2950214e[]. 
+
+=== Quiz 
+
+Question: How are GraphQL queries resolver?
+
+. With schema-driven development 
+. By Invoking the resolver function of the root field 
+. By invoking all available resolver functions 
+. By invoking the resolver functions for the fields contained in the query 
+
+====
+Answer: By invoking the resolver functions for the fields contained in the query
+====
+
+== A Simple Mutation 
+
+Now we will learn about *mutation*. Like with *Query* we will add a *Mutation type* 
+to the `index.js` file inside the variable `typeDefs` this: 
+
+----
+type Mutation {
+    post(url: String!, description: String!): Link!
+}
+----
+
+The file is starting to get a little too large so we're going to pull 
+the schema out into its own file and refractor it. 
+
+We create a new file inside the `src` folder called `schema.graphql` . You can do 
+that via command line like this: 
+
+----
+touch src/schema.graphql
+----
+
+Inside that file we are going to coopy the whole entire schema definition 
+that was stored inside `typeDefs` into the new `schema.graphql` file. 
+
+----
+type Query {
+  info: String!
+  feed: [Link!]!
+}
+
+type Link {
+    id: ID!
+    description: String!
+    url: String!
+}
+
+type Mutation {
+    post(url: String!, description: String!): Link!
+}
+----
+
+Now inside `index.js` we can delete the entire `typeDefs` variable and content. Now that the schema is 
+in its own file, we need to tell the server where it is. 
+
+Inside the constructor `server = new GraphQLServer` change `typeDefs`'s value to the schema location like this: 
+
+`typeDefs: './src/schema.graphql'`
+
+=== Implementing the resolver function 
+
+First we delete the *Link* resolver because it is not needed anymore. GraphQL server 
+infers what they look like. 
+
+* We are definitely going to need different ID so the best way is to have something 
+increment. So for what they used they have `links.length` stored in the variable `idCount`.
+
+----
+let idCount = links.length
+----
+
+* Inside the Mutation resolver, we implement a `post` resolver first which creates a 
+new `link` object then adds it to the existing links list which will then later return the 
+new link. 
+
+----
+Mutation: {
+  post: (root, args) => {
+    const link = {
+      id: `link-${idCount++}`,
+      description: args.description,
+      url: args.url,
+    }
+    links.push(link) 
+    return link
+  }
+}
+----
+
+''''
+
+We learned about `root` for the resolvers parameter, now here we will learn about `args`. 
+`args` carries the arguments for the operation. In our case the `url` and `description` of 
+the `link` to be created. We didn't see it for feed and info resolvers because the 
+corresponding root field didn't specify any arguments in the schema definition.
+
+=== Let's test it out! 
+
+The usual. Restart the server. 
+
+Inside the playground put this in: 
+
+----
+mutation {
+  post(
+    url: "www.prisma.io"
+    description: "Prisma turns your database into a GraphQL API"
+  ) {
+    id
+  }
+}
+----
+
+The result should look like this: 
+
+----
+{
+  "data": {
+    "post": {
+      "id": "link-1"
+    }
+  }
+}
+----
+
+If you press the play button again, it will be *link-2* and so on..
+
+So for every mutation that we send, the idCount will keep increasing so it will help to 
+give us a unique ID. 
+
+=== Confirm that it worked 
+
+When we added (mutation) one, we should now see it in query by typing this: 
+
+----
+query {
+  feed {
+    id 
+    url 
+    description
+  }
+}
+----
+
+You should get this result: 
+
+----
+{
+  "data": {
+    "feed": [
+      {
+        "id": "link-0",
+        "url": "http://www.howtographql.com",
+        "description": "Fullstack tutorial for GraphQL"
+      },
+      {
+        "id": "link-1",
+        "url": "www.prisma.io",
+        "description": "Prisma turns your database into a GraphQL API"
+      },
+      {
+        "id": "link-2",
+        "url": "www.prisma.io",
+        "description": "Prisma turns your database into a GraphQL API"
+      }
+    ]
+  }
+}
+----
+
+You'll see that prismo.io shows up twice since I pressed play twice with mutation but 
+at least the id is different which is what matters. 
+
+
+NOTE: When you restart the server the new mutation will be gone since it was stored in memory.
+
+=== Quiz 
+
+Question: What is the second argument that's passed into GraphQL resolvers used for?
+
+. It carries the return value of the previous resolver execution level 
+. It is an object that all resolvers can write to and read from 
+. It carries the arguments for the incoming GraphQL operation 
+. It carries the AST of the incoming GraphQL operation
+
+====
+Answer: It carries the arguments for the incoming GraphQL operation
+====
+
+== Adding a Database 
+
+For this we are going to be using Prisma. 
+
+Mainly because in real world applications we're likely to encounter many scenarios which 
+will make creating resolvers more and more complex. Especially since schemas can 
+be nested to multiple levels deep. The implementation can be tricky and may lead 
+to performance problems.
+
+Also we may need to add additional workflows to the mix such as authentication, 
+authorization (permissions), pagination, filtering, realtime, integrating with 3rd party 
+services or legacy systems. 
+
+When we implement resolvers and connect to database, we have two options: 
+
+. Access the database directly (by writing SQL or using another noSQL database API)
+  ** The issue with the first option is that dealing with SQL in resolvers is that 
+it can get really complex. Also SQL queries are commonly submitted to the database 
+as plain strings. String don't adhere to any structure. So the tool won't be able 
+to help you find any issues with them or provide any perks like autocompletion in editors. 
+Writing SQL queries is tedious and error-prone. 
+
+
+. Use an ORM that provides an bastraction for your database and let's you access it 
+directly.
+  ** ORM might be a good solution at first, but the approach falls short as well. ORM 
+  has the problem that they're implementing rather simple solutions for 
+  database access. Which when using graphQL won't work due to the complexities of queries and 
+  the various edge cases. 
+
+
+Prisma solves this problem by providing you with a GraphQL query engine which is 
+taking care of resolving queries for you (oh thank goodness. i don't think I fully 
+learned how to write resolvers). Thanks to *Prisma bindings*, query delegating is a 
+simple process where most resolvers can be implemented as a simple one liner. 
+
+=== Prisma's architecture 
+
+If we were to build a server with Prisma, here's how it would look like: 
+
+image:img/graphql/qlprisma.png[] +
+
+An important thing to note when using prisma is that now we're dealing with *two* GraphQL API layers.
+
+. The application layer: The first graphql api layer 
+
+
+== Connecting Server and Database with Prisma Bindings 
+== Authentication 
+== Realtime GraphQL Subscriptions 
+== Filtering, Pagination & Sorting 
+== Summary 

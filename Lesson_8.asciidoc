@@ -1,0 +1,195 @@
+:library: Asciidoctor
+:toc:
+:toc-placement!:
+
+
+= Udacity/GWG Mobile Web Nanodegree notes. Lesson 8
+
+= Images with Markup
+
+To go back to the README where all the chapters are: click link:README.asciidoc[here].
+
+Sorry! I just received an email saying I was taking a little too long and I'm falling behind. 
+I'm only going to be writing notes on things that I didn't know beforehand. 
+toc::[]
+
+== 8.1 Performance 
+== 8.2 Text Problems 
+
+Text in the image is a bad idea because when scaled, you can see the artifacts. Also, 
+it increases latency and page loads which is always bad. 
+
+Another bad thing about that is that the text that are graphics cannot be found by search engines.
+Also, it cannot be seen by screen readers or other similar technologies. 
+
+Preferrably it's best to use fewer images. 
+
+== 8.3 CSS Techniques
+
+Using cool CSS effects will affect load time. 
+
+* Gradient = 0.05
+* keyframe animation = 0.05
+* border radius = 0.06
+* Box shadow = 0.12 
+
+* combined = 0.19
+
+It won't make much of a difference on desktop, but definitely on mobile. 
+
+== 8.4 CSS background Images 
+== 8.5 Quiz: CSS background images techniques 
+
+Question: "The image is sized so that it is as small as possible while still 
+completely filling its container" 
+
+. contain 
+. cover 
+
+Question: "The image is sized so that it is as large as possible while still being 
+completely visible inside its container."
+
+. contain
+. cover 
+
+====
+
+Answer: Cover
+
+Answer: contain 
+====
+
+== 8.6 Symbol characters 
+
+To avoid using more images, there's a nifty site for simple images: 
+
+link:http://unicode-table.com/en/[]
+
+
+== 8.7 Quiz: Unicode Treble Clef 
+
+There are more than 110,000 unicode characters. 
+
+In order to use these unicodes, be sure to set it the charset to *utf-8*
+
+`<meta http-equiv="Content-Type" content="text/html; charset=utf-8">`
+
+Question: What is the HTML code for: 𝄞  (Treble Clef)
+====
+----
+Answer: &#119070;
+----
+====
+== 8.8 Icon Fonts 
+
+There's a cool website for icons and they are icon fonts. No need for images
+for these little icons anymore:  link:http://www.weloveiconfonts.com[]
+
+''''
+The instructor shows that the CSS for the icon next to the text uses the *:before* pseudo on 
+the class name *zocial-*.
+
+----
+[class*="zocial-"]:before {
+    display: inline-block;
+    font-family: 'zocial', sans-serif;
+    text-shadow: 3px 3px 3px #aaa;
+    width: 20vw;
+}
+----
+
+so now anything with *zocial-* in their class name will import that as well. 
+
+at the top has an import to an external css file 
+
+`@import url(http://weloveiconfonts.com/api/?family=zocial)`
+
+== 8.9 Inlining images with SVG and data URLs 
+
+
+When it comes to inlining images, there's *SVG* and there's *Data URI* 
+
+
+*SVG PROS:*
+
+* Optimization tools can help reduce svg size. 
+* Powerful.
+* Interactive 
+* Responsive
+* Small file
+* Can be inline in CSS
+* Reduces HTTP request
+
+*SVG CONS:*
+
+* It has good support but missing Opera Mini. 
+
+
+*DATA URI PROS:*
+
+* slightly smaller than svg
+* Responsive 
+* Well supported. Even opera mini supports it.
+* Can be inline in CSS
+* Reduces HTTP request 
+
+*DATA URI CONS:*
+* you can include the file data as inline as a base 64 encoded string. 
+----
+`<img src="data:image/svg+xml;base64,[data]">`
+----
+
+* The full version is about 5k characters
+
+== 8.10 Quiz: Strategy Quiz 1
+
+== 8.11 Quiz: Strategy Quiz 2 
+== 8.12 Quiz: Strategy Quiz 3 
+== 8.13 Quiz: Strategy Quiz 4
+== 8.14 Quiz: Project Part 2 
+
+I had a bit of trouble with this. Remember, they want it done their way even if this 
+lesson showed it differently. 
+
+====
+Answer:
+Meta has to have *charset="utf-8"*. Make it minimal:
+
+`<meta charset="utf-8">`
+
+
+''''
+zocial:
+
+css:
+----
+  @import url(http://weloveiconfonts.com/api/?family=zocial);
+
+    [class*="zocial-"]:before {
+    display: inline-block;
+    font-family: 'zocial', sans-serif;
+    text-shadow: 3px 3px 3px #aaa;
+    width: 20vw;
+    }
+----
+
+html:
+----
+  <ul>
+      <li> <a class="zocial-twitter" href="http://www.twitter.com">twitter</a></li>
+      <li> <a class="zocial-digg" href="www.digg.com">digg</a></li>
+      <li> <a class="zocial-facebook" href="www.facebook.com">Facebook</a></li>
+      <li> <a class="zocial-google" href="http://www.google.com">Google+</a></li>
+</ul>
+----
+
+The smiley icon: 
+
+😊
+
+
+The winning code: 
+
+markupisprettyawesome
+====
+== 8.15 Lesson Summary

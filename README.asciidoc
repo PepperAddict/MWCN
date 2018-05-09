@@ -34,10 +34,18 @@ link:ch9.asciidoc[Chapter 9] : Professional Developer-fu +
 link:Lesson1.asciidoc[Lesson 1] : Why Responsive + 
 link:Lesson2.asciidoc[Lesson 2] : Starting Small +
 link:Lesson3.asciidoc[Lesson 3] : Building Up +
+link:Lesson_4.asciidoc[Lesson 4] : +
+link:Lesson_5.asciidoc[Lesson 5] : Optimization +
+link:Lesson_7.asciidoc[Lesson 7] : Units, Formats, Environments +
+link:Lesson_8.asciidoc[Lesson 8] : Images with Markup +
+link:Lesson_9.asciidoc[Lesson 9] : Full Responsiveness +
+link:Lesson_10.asciidoc[Lesson 10] : Accessibility Overview +
+link:Lesson_11.asciidoc[Lesson 11] : Focus
 
 ''''
 
 == Misc
 I wanted to learn more about GraphQL and found this website: link:http://www.howtographql[How-to-GraphQL]. Here will be my notes on the subject. +
 link:graphql_1.asciidoc[GraphQL Fundamentals] +
-link:graphql_2.asciidoc[Getting Started] +
+link:graphql_3.asciidoc[GraphQL + Node.js] + 
+link:graphql_2.asciidoc[React + Apollo] +

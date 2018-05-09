@@ -1,0 +1,154 @@
+:library: Asciidoctor
+:toc:
+:toc-placement!:
+
+
+= Udacity/GWG Mobile Web Nanodegree notes. Lesson 7
+
+= Units, Formats, Environments
+
+To go back to the README where all the chapters are: click link:README.asciidoc[here].
+
+Sorry! I just received an email saying I was taking a little too long and I'm falling behind. 
+I'm only going to be writing notes on things that I didn't know beforehand. 
+toc::[]
+
+== 7.1 Quiz: Sizing Intro 
+== 7.2 All about Bits and Pixels 
+== 7.3 Requests and Revenue 
+
+Average websites make around 50 requests for images. 
+An image does take up page loads and if a page loads too slow, you can lose traffic. 
+
+If there was a 0.4 second to a 0.9 second increase, traffic and ad revenues drop 20%
+
+For amazon, for every second increase of page load, the sale drops down to 1%. 
+
+Page load times = loss of sales. 
+
+== 7.4 Relative Sizing 
+
+* fixed size: If you give an image a fixed size such as the horse of 640x360px . Looks good on large viewports, 
+but on smaller viewport, the image will be cropped and there would be a scroll. 
+
+* relative size: if you set the image to 100% . It will look good on mobile and small 
+viewport, but if you increase the viewport, you can see the quality of the image is not 
+so good. 
+
+* relative size but with max-width: 100%. So a better approach would be to use max width. 
+that way when you do resize to a larger viewport, it will cap to however its natural 
+width is. 
+
+If you want two images side by side, you need to use relative sizing for both. width: 50%
+What if you want a margin in between of 10px. You can use *calc*!!
+
+----
+width: calc((100% - 10px)/2)
+----
+
+Now to make sure there's no space on the right side of the image and only in between, 
+use *last-of-type* pseudo. 
+
+----
+img:last-of-type {
+    margin-right: 0px;
+}
+----
+
+
+== 7.5 IMPORTANT! Udacity Front End Feedback Extension 
+== 7.6 Quiz: calc() 
+
+----
+
+
+    body {
+      margin: 0;
+    }
+    img {
+    float: left;
+	min-width: calc((100% - 20px)/3);
+	margin-right: 10px;
+    }
+	img:last-of-type {
+	margin-right: 0px;
+}
+    /*
+    Hmmmmm... you might need another CSS class too.
+    */
+  
+----
+
+====
+Answer: myrelativesarewide
+====
+
+
+== 7.7 Landscape and Portrait 
+== 7.8 Less Well Known CSS Units 
+
+* Let's say you want an image to take up the whole height. 
+You can simply do that by setting the height: 100%, but that 
+would require the body, html, and its container to be height: 100% 
+as well. 
+
+A simple way to do that is by using *vh* which 
+stands for *viewport height*. 
+
+You can do the same for *vw*  viewport width. 
+
+`width: 100vw;
+or
+height: 100vh`
+
+this will help it resize the image responsively.
+
+
+* Now what if you want the viewport to fit the size 
+of the smaller part to avoid scrolling: 
+You can achieve this by giving it *100vmim*(viewport minimum)
+ for both 
+the width and the height: 
+
+----
+height: 100vmim;
+width: 100vmim;
+----
+
+* If you want the image to take up the whole image 
+without stretching or squashing. Just like vmin, 
+there's *vmax*:
+
+----
+width: 100vmax;
+height: 100vmax;
+----
+
+== 7.9 Raster and Vector 
+== 7.10 Quiz: Raster or Vector Banner?
+== 7.11 Quiz: Raster and Vector Identification 
+== 7.12 File Formats 
+
+For photographic images, use JPEG or *WebP* if 
+supported. WebP supports alpha transparency, 
+animation and lossless compression. 
+
+For Vector, use SVG, but if you can't, then switch to PNG. 
+
+never use gif. 
+
+== 7.13 Quiz: Spot the Differences 
+== 7.14 Quiz: Spot the Differences 2 
+== 7.15 Image Compression 
+== 7.16 Quiz: Project Part 1
+
+grunt task:
+----
+width: 1600,
+suffix: '_large_2x',
+quality: 30
+----
+
+Answer: ready!set!responsiveimages!
+
+== 7.17 Lesson Summary 

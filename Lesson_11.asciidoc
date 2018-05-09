@@ -1,0 +1,34 @@
+:library: Asciidoctor
+:toc:
+:toc-placement!:
+
+
+= Udacity/GWG Mobile Web Nanodegree notes. Lesson 11
+
+= Focus
+
+To go back to the README where all the chapters are: click link:README.asciidoc[here].
+
+Sorry! I just received an email saying I was taking a little too long and I'm falling behind. 
+I'm only going to be writing notes on things that I didn't know beforehand. 
+
+toc::[]
+
+== 11.1 Introduction to Focus 
+== 11.2 What is Focus?
+== 11.3 Quiz: Experiencing Focus 
+== 11.4 DOM Order Matters 
+== 11.5 Quiz: Fixing DOM Order 
+== 11.6 Using Tabindex 
+== 11.7 Deciding what's in focus 
+== 11.8 Quiz: Which Elements Should Have Focus?
+== 11.9 Managing Focus 
+== 11.10 Quiz: Manage Focus Yourself
+== 11.11 Skip Links 
+== 11.12 Focus in Complex Components 
+== 11.13 Keyboard Design Patterns 
+== 11.14 Quiz: Implementing Keyboard Event Listeners 
+== 11.15 Offscreen Content 
+== 11.16 Quiz: Implementing Offscreen Content 
+== 11.17 Modals and Keyboard Traps 
+== 11.18 Lesson 2 Outro

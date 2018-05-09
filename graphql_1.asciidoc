@@ -4,6 +4,8 @@
 
 This is my notes on link:http://www.howtographql.com[graphQL].
 
+If this is not where you want to be, head on over to the link:README.asciidoc[Readme].
+
 toc::[]
 
 This mainly teaches us the history of GraphQL and what is going on. Honestly I don't think I quite understand it unless I touch it or see more examples of it 

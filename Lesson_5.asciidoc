@@ -1,0 +1,119 @@
+:library: Asciidoctor
+:toc:
+:toc-placement!:
+
+
+= Udacity/GWG Mobile Web Nanodegree notes. Lesson 5
+
+= Optimizations
+
+To go back to the README where all the chapters are: click link:README.asciidoc[here].
+
+
+toc::[]
+
+Sorry! I just received an email saying I was taking a little too long and I'm falling behind. 
+I'm only going to be writing notes on things that I didn't know beforehand. This chapter 
+had a bunch of information that I already knew or it's not even relevant anymore. 
+
+== 5.1 Lesson Intro 
+== 5.2 Images 
+== 5.3 Responsive Tables Intro 
+
+There are ways to deal with tables for responsive designing. 
+
+* Hidden columns: It will show only the important content depending on the width of the viewport. 
+For example if there was originally 10 columns, when the screen is small, it'll show only 3 columns. 
+
+For an example of this, if it was a sport score, the important thing to show for 
+smaller viewports would be the *shortname* and the *final score*. For everything else, 
+they would have the display property of none. 
+
+`display: none;` 
+
+** The drawback to this is that we are hiding information. 
+
+== 5.4 Responsive Tables - Hidden Columns 
+== 5.5 Quiz: Hide Some Columns 
+== 5.6 Responsive Tables - No More Tables 
+
+So instead of hiding information when the viewport is small, we can turn the table into rows instead of columns. 
+
+So instead we can change it out of table by doing this: 
+
+----
+table, thread, tbody, th, td, tr {
+    display: block;
+}
+----
+
+We also need to get rid of the display header 
+
+----
+thread tr {
+
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+}
+----
+
+NOTE: He mentions that we could do display:none for this but that would be a problem 
+for those with screen readers. It wouldn't read the header to people. so the best approach 
+is to chuck it out of the way visually. 
+
+Now we need to actually make it look nice. 
+
+----
+td {
+    position: relative;
+    padding-left: 50%;
+}
+----
+
+So now to add the row labels, we are going to use the pseudo *:before* 
+
+----
+td:before {
+    position: absolute;
+    left: 6px;
+    content: attr(data-th);
+    font-weight: bold;
+}
+----
+
+NOTE: we can give the content automatically from the data from the th element. That is 
+super neat!
+
+== 5.7 Responsive Tables - Contained Scrolling
+
+The easiest way to contain a table to the viewport is to wrap it in a div container and give 
+the container this:
+
+----
+div.container {
+    width: 100%;
+    overflow-x: auto;
+}
+
+----
+
+== 5.8 Fonts 
+
+There's actually a rule for how wide an area should be for long texts like stories. 
+
+* If it's too narrow of a width it'll break the sentence.
+* If it's too wide some people would lose their place and would just end up _skimming_. 
+
+The ideal is having *45 - 90* characters per line.  *65 CPL* is the best. 
+
+A base font size should be *16px* with a line-height of *1.2em*. 
+
+If there's a lot of reading, go up to *18px*.
+
+14px is actually considered too small. 
+
+== 5.9 Minor Breakpoints 
+
+== 5.10 Quiz: Final Project Updates 
+== 5.11 Wrap Up 

@@ -1,0 +1,86 @@
+:library: Asciidoctor
+:toc:
+:toc-placement!:
+
+
+= Udacity/GWG Mobile Web Nanodegree notes. Lesson 4
+
+= Responsive Patterns 
+
+To go back to the README where all the chapters are: click link:README.asciidoc[here].
+
+
+toc::[]
+
+
+Sorry! I just received an email saying I was taking a little too long and I'm falling behind. 
+I'm only going to be writing notes on things that I didn't know beforehand. This chapter 
+had a bunch of information that I already knew or it's not even relevant anymore. 
+
+
+== 4.1 Intro to Patterns 
+== 4.2 Pattern - Column Drop
+== 4.3 Pattern- Mostly Fluid 
+== 4.4 Quiz: Mostly Fluid Part 1 
+== 4.5 Quiz: Mostly Fluid Part 2
+== 4.6 Quiz: Combining Fluid Layouts 
+== 4.7 Pattern - Layout Shifter 
+== 4.8 Quiz: Which is Which 
+== 4.9 Pattern - Off Canvas 
+Off Canvas elements are those that are hidden when the screen is a certain width such as 
+navigation items that can be pulled down with a drop down. When the screen is large enough, the 
+off canvas becomes on canvas element.
+
+In order for off canvas elements to work (as in they take up the whole area when 
+they appear) be sure to add height and width to html,body and main:
+
+----
+html, body, main {
+    height: 100%;
+    width: 100%;
+}
+----
+
+Here's the style for the off canvas navigation: 
+
+----
+nav {
+    width: 300px;
+    height: 100%;
+    position: absolute;
+    transform: translate(-300px, 0);
+    transition: transform 0.3s ease;
+}
+----
+
+When we want it to appear we use *open* that will reset the transform. 
+
+----
+nav.open {
+    transform: translate(0,0);
+}
+----
+
+For the main container, make sure you give it a flex-grow of 1 will let it 
+take up the full remaining width.
+
+----
+main {
+width: auto;
+flex-grow: 1;
+}
+----
+
+Now we can give it a shot by giving it a javascript even listener on click 
+
+----
+menu.addEventListener('click', function(e) {
+    drawer.classList.toggle('open');
+    e.stopPropagation();
+
+}
+----
+
+== 4.10 Quiz: Off Canvas Visualization 
+== 4.11 Quiz: Project Update Part 2 
+== 4.12 Lesson Summary 

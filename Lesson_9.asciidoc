@@ -1,0 +1,91 @@
+:library: Asciidoctor
+:toc:
+:toc-placement!:
+
+
+= Udacity/GWG Mobile Web Nanodegree notes. Lesson 9
+
+= Full Responsiveness
+
+To go back to the README where all the chapters are: click link:README.asciidoc[here].
+
+Sorry! I just received an email saying I was taking a little too long and I'm falling behind. 
+I'm only going to be writing notes on things that I didn't know beforehand. 
+toc::[]
+
+== 9.1 Responding to Screen Capability & View 
+== 9.2 srcset 
+When you have something like this: 
+
+`<img src="wallaby_1x.jpg" srcset="wallaby_1x.jpg 1x, wallaby_2x.jpg 2x" alt="Wallaby">`
+
+The srcset here will let the browser choose which one to display. The 1x nd 2x here 
+is called the *pixel density descriptor*. 
+
+So instead of pixel density as a factor for which to load, there's also the width one:
+
+`<img src="small.jpg" srcset="small.jpg 500w, medium.jpg 1000w, large.jpg 1500w" alt="Wallaby">`
+
+
+
+== 9.3 Sizes Attribute
+
+So what if the image was set to 50%. Would the browser load the large, medium, or large 
+resolution image?
+
+So what goes on is the browser will read the screen resolution, the image dimensions in 
+srcset, but it doesn't know the image display size. The browser assumes 
+the image is going to be the full width of the viewport.  It could get the information 
+from the CSS, but it loads the CSS after so it wouldn't be able to read the data from 
+there. 
+
+It is better to pass that information to the html instead of the CSS that way it can 
+get the information as soon as possible. 
+
+NOTE: The size attribute doesn't resize the image. that has to be done in the CSS. 
+
+
+We will have to add a *sizes* attribute to the image html. 
+
+`<img src="small.jpg" srcset="small.jpg 500w, medium.jpg 1000w, large.jpg 1500w sizes="50vw"
+alt="wallaby" />`
+
+
+If you want different images to be shown for different viewports, that needs to be 
+handled in media screen queries in CSS and HTML.
+
+`sizes="(max-width: 250px) 100vw, 50vw"`
+
+== 9.4 Quiz: srcset Quiz 
+== 9.5 Quiz: srcset and sizes 
+== 9.6 The Picture Element 
+
+== 9.7 The Full Monty 
+
+Art direction is when you choose something for certain viewports using *picture* element. 
+
+example: 
+
+----
+<picture>
+<source media="(min-width: 650px)" srcset="kitten-large.png">
+<source media="(min-width: 465px)" srcset="kitten-medium.png">
+<img src="kitten-small.png" alt="Cute kitten">
+</picture>
+
+----
+
+Not every browser supports this though, but luckily there's a polyfill that can 
+help those legacy browser. The javascript file is called *picturefill.min.js*. link:http://scottjehl.github.io/picturefill/[]
+
+== 9.8 Accessibility 
+
+All images should have an alt and something to describe the image for those visually impaired.
+
+== 9.9 Quiz: Accessibility Promise 
+
+== 9.10 Quiz: Project Part 3
+
+Answer: allthepictures,allthetime
+
+== 9.11 Course Conclusion

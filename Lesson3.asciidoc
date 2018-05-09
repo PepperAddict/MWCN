@@ -219,11 +219,80 @@ Answer:
 
 == 3.14 Grids
 
+Pete talks about a great practice to make a website more responsive. 
+His favorite is called the *Grid Fluid System*. 
 
+Grid Fluid System's columns wrap to the next line as the browser width becomes 
+smaller. 
+
+Cameron went to go look at a site that has this system which is called: link:http://www.html5rocks.com/en/[]. 
 
 == 3.15 Flexbox Intro 
+
+Flexbox is great because:
+
+* it will help expand or shrink to fit its viewport. 
+* What's also great about flexbox is that it is supported by most browsers. We no longer need to use floats. 
+* You can change the order of the elements
+
 == 3.16 Flexbox Container 
+
+Pete goes to show how css flexbox works. 
+
+In a normal div setup like this:
+----
+<div>
+<div></div>
+<div></div>
+<div></div>
+</div>
+----
+
+The inside divs would be stacked one after the other. 
+
+However, if in the css the parent container adds this:
+
+----
+display: flex
+----
+
+The child div elements will be side by side in a row. That is because the default 
+css flexbox is to stick them in one row with nowrap. It doesn't matter what the 
+width would be. So by default even if you resize the viewport, the flexbox would still 
+be in one row.
+
+If you want to change this default and have the items wrapped to a different row if 
+there's no more room, just add this to the parent:
+
+----
+flex-wrap: wrap;
+----
+
+This will tell the browser that the elements inside the parent can wrap to the next line 
+if the viewport becomes too small for them. It will only resize the elements if it's down 
+to a single column.
+
 == 3.17 Flex Item 
+
+Another css property that Pete likes is messing with the order attribute. 
+
+When the viewport changes size, you can set an order to where you want to place 
+the child div.
+
+----
+order: #;
+----
+
+of course # could be any number you want to give it. 
+
+
 == 3.18 Deconstructuring a Flexbox Layout 
+
+
 == 3.19 Quiz: Deconstructuring a Flexbox Layout 
+
+
 == 3.20 Lesson Summary
+
+I just couldn't get this lesson over with. So far we learn about flexbox and Query. Stuff 
+most students already know. 

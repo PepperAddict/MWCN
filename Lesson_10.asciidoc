@@ -1,0 +1,57 @@
+:library: Asciidoctor
+:toc:
+:toc-placement!:
+
+
+= Udacity/GWG Mobile Web Nanodegree notes. Lesson 10
+
+= Accessibility Overview
+
+To go back to the README where all the chapters are: click link:README.asciidoc[here].
+
+Sorry! I just received an email saying I was taking a little too long and I'm falling behind. 
+I'm only going to be writing notes on things that I didn't know beforehand. 
+
+toc::[]
+
+== 10.1 Introduction to Accessibility 
+
+A11y is short for accessibility! 
+
+What accessible really means is that the site and content should be available for 
+anyone. 
+
+== 10.2 What is Accessibility 
+
+
+== 10.3 Understanding the diversity of users
+== 10.4 Quiz: Diversity of Users (Broken Arms) 
+== 10.5 Quiz: Diversity of Users (Blindness)
+== 10.6 Quiz: Diversity of Users (Audio) 
+== 10.7 Quiz: Diversity of Users (Baby) 
+== 10.8 Quiz: Diversity of Users (Concussion) 
+== 10.9 Quiz: Diversity of Users (RSI) 
+== 10.10 Using a Screen Reader 
+== 10.11 Quiz: Experiencing a screen Reader
+== 10.12 Checklist 
+
+These are the Web Content Accessibility Guidelines (WCAG)
+
+* Perceivable 
+** Make sure it's perceivable for those who are blind, deaf, etc..
+* Operable 
+** Can users use and navigate the content?
+* Understandable 
+** Can all users understand the interface 
+* Robust
+** does it work with assistance technology?
+
+Together this forms *POUR* 
+
+== 10.13 Quiz: Using WebAIM Checklist 
+
+====
+Rule Number: 2.4.2
+POUR Section: Operable
+====
+== 10.14 Gear Shift into Course practicalities. 
