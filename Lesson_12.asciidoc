@@ -1,0 +1,86 @@
+:library: Asciidoctor
+:toc:
+:toc-placement!:
+
+
+= Udacity/GWG Mobile Web Nanodegree notes. Lesson 12
+
+= Semantics Basics
+
+To go back to the README where all the chapters are: click link:README.asciidoc[here].
+
+Sorry! I just received an email saying I was taking a little too long and I'm falling behind. 
+I'm only going to be writing notes on things that I didn't know beforehand. 
+
+toc::[]
+
+== 12.1 Semantics Introduction 
+== 12.2 Assistive Technology
+== 12.3 Affordances 
+== 12.4 Quiz: Experiencing Affordances 
+== 12.5 Semantics and Assistive Technology
+
+
+
+== 12.6 Quiz: Experience Using a Screen Reader 
+== 12.7 Role, Name, Value 
+== 12.8 Quiz: Experience a Screen Reader 2 
+== 12.9 The Accessibility Tree 
+== 12.10 Quiz: Matching simple DOM and A11y
+== 12.11 Semantics in Native HTML
+
+The DOM has *implicit semantic meaning*. 
+
+== 12.12 Quiz: Writing Semantic HTML Quiz 
+
+Just change it to <button></button>  
+
+answer: MARSUPIAL
+
+== 12.13 Writing Semantic HTML: The Name Game 
+
+We have to have the name of the element discoverable as well. It 
+is the first guideline 1.1
+
+____
+Text Alternatives: Provide text alternatives for any non-text content. 
+____
+
+
+There are two types of labels. 
+
+. visible labels 
+** Used by all users to associate what the element's name is. 
+. Text alternatives 
+** When there is no need for a visual label. example an image. 
+
+To best handle giving names to non-text content: 
+
+====
+All images, form image buttons, and image map hot spots have appropriate, 
+equivalent alternative text. 
+
+. Images that do not convey content, are decorative, or contain 
+content that is already conveyed in text are given null 
+alt text (alt="") or implemented as CSS backgrounds. All linked images have 
+descriptive alternative text. 
+
+. Form buttons have a descriptive value. 
+.. Easiest one since buttons have their name inside the element tag. ex: <button>name</button>
+
+
+. Form inputs have associated text labels. 
+.. We have a visual label, but not a programatically accessible label for it. We 
+would need to create a label for the element to give it a name. Easiest way to do that 
+is by wrapping it in a *label element*.  or you can create a label with *for* and a shared attribute. 
+while the input element will be *id*. 
+====
+
+
+
+
+
+== 12.14 Quiz: Labeling Input Elements 
+== 12.15 Text Alternatives 
+== 12.16 Quiz: Labeling Images With Alt Text 
+== 12.17 Lesson Outro

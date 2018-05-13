@@ -15,14 +15,79 @@ I'm only going to be writing notes on things that I didn't know beforehand.
 toc::[]
 
 == 11.1 Introduction to Focus 
+
+Web AIM WCAG 2.0 Checklist *2.1.1* 
+
+____
+All page functionality is available using the keyboard, unless the functionality 
+cannot be accomplished in any known way using a keyboard. 
+____
+
+This is why *focus* is so important for accessibility. 
+
 == 11.2 What is Focus?
+
+Focus determines where *keyboard events* go in the page. 
+
+Typically a focused item will be highlighted. Such as an input box to enter a message.
+
+
+keyboard shortcuts for *tab order*: 
+
+* tab = moves to the next focus 
+* shift + tab = move focus backwards. 
+* Use arrow keys = move focus *within a component*. 
+
+
+There are some html elements that get automatically put into the tab order and keyboard event handling such as:
+
+* Input 
+* Button
+* drop downs.
+
+Unfortunately, not everything is focusable such as *headers* and *images*. 
+
 == 11.3 Quiz: Experiencing Focus 
 == 11.4 DOM Order Matters 
+
+Even though visually changing something around, the focus still depends on the DOM order.
+
+
 == 11.5 Quiz: Fixing DOM Order 
 == 11.6 Using Tabindex 
+
+* *tabindex* can be put in any html element and can be given any value. 
+
+* `tabindex="-1"` 
+** Not in the natural tab order 
+** Can be programmatically focused with *focus()* method. 
+----
+ document.querySelector('#modal').focus()
+----
+
+* `tabindex="0"`
+** In the natural tab order 
+** Can be programmatically focused 
+
+* `tabindex="greater than 0"`
+** In the natural tab order 
+** Jumped to the front of the tab order 
+** Anti-pattern!
+
+WARNING: It's discouraged to try and change the order with greater than 0. If you need 
+to change the order, it's best to do it in the DOM 
+
 == 11.7 Deciding what's in focus 
+
+It's better to only use tabindex on interactive controls that users can interact with such 
+as buttons, dropdowns, and inputs. 
+
+
 == 11.8 Quiz: Which Elements Should Have Focus?
 == 11.9 Managing Focus 
+
+
+
 == 11.10 Quiz: Manage Focus Yourself
 == 11.11 Skip Links 
 == 11.12 Focus in Complex Components 
@@ -30,5 +95,99 @@ toc::[]
 == 11.14 Quiz: Implementing Keyboard Event Listeners 
 == 11.15 Offscreen Content 
 == 11.16 Quiz: Implementing Offscreen Content 
+
+To find out what the current focus on, type: `document.activeElement` or use 
+the extension tool link:https://chrome.google.com/webstore/detail/accessibility-developer-t/fpkknkljclfencbdbgkenhalefipecmb?hl=en[here]
+
 == 11.17 Modals and Keyboard Traps 
+
+A keyboard trap is when after selecting from a drop down it still thinks you're trying to 
+select something. 
+
+2.1.2 says No Keyboard Trap: 
+* Keyboard focus is never locked or trapped at one particular page element. The user 
+can navigate to and from all navigable page elements using only a keyboard.
+
+
+Sometimes it's good to have a keyboard trap such as when a modal appears you shouldn't 
+be able to continue to tab. 
+
+
+When he creates this modal there should be two divs. One for the actual modal, and 
+the other is the grayed back rea where if you click it, it should also close the modal. 
+
+The javascript for this modal would look like this: 
+
+----
+var focusedElementBeforeModal;
+
+var modal = document.querySelector('.modal');
+var modalOverlay = document.querySelector('.modal-overlay');
+
+var modalToggle = document.querySelector('.modal-toggle');
+modalToggle.addEventListener('click', openModal);
+
+function openModal() {
+focusedElementBeforeModal = document.activeElement;
+modal.addEventListener('keydown', trapTabKey);
+modalOverlay.addEventListener('click', closeModal);
+
+var signUpBtn = modal.querySelector('#signup');
+signUpBtn.addEventListener('click', closeModal);
+}
+
+var focusableElementsString = `a[href], area[href], input:not([disabled]), select:not([disabled]),
+textarea:not([disabled]), button:not([disabled]), iframe, object, embed, [tabindex="0"], 
+[contentitable]`;
+
+var focusableElements = modal.querySelectorAll(focusableElementsString);
+
+focusableElements = Array.prototype.slice.call(focusableElements);
+
+var firstTabStop = focusableElements[0];
+var lasttabStop = focusableElements[focusableElements.length -1];
+
+modal.style.display = 'block';
+modalOverlay.style.display = 'block';
+
+firstTabStop.focus();
+
+function trapTabKey(e) {
+
+if (e.keyCode === 9) {
+
+    if (e.shiftKey) {
+    
+        if (document.activeElement === firstTabStop) {
+        
+            e.preventDefault();
+            lastTabStop.focus();
+        
+        }
+    
+    } else {
+        if (document.activeElement === lastTabStop) {
+            e.preventDefault();
+            firstTabStop.focus();
+        
+        }
+    }
+}
+
+if (e.keyCode === 27) {
+closeModal();
+}
+
+}
+
+function closeModal() {
+
+    modal.style.display = 'none';
+    modalOverlay.style.display = 'none';
+
+    focusedElementBeforeModal.focus();
+}
+
+----
+
 == 11.18 Lesson 2 Outro

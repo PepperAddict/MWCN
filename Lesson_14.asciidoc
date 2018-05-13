@@ -1,0 +1,178 @@
+:library: Asciidoctor
+:toc:
+:toc-placement!:
+
+
+= Udacity/GWG Mobile Web Nanodegree notes. Lesson 14
+
+= ARIA
+
+To go back to the README where all the chapters are: click link:README.asciidoc[here].
+
+Sorry! I just received an email saying I was taking a little too long and I'm falling behind. 
+I'm only going to be writing notes on things that I didn't know beforehand. 
+
+toc::[]
+
+== 14.1 Intro to Semantics: ARIA 
+== 14.2 Why ARIA 
+
+It's encouraged to use native elements to tell what the elements are. such as: 
+
+----
+<label>
+    <input type="radio" checked name="tType" value="0"> Round Trip
+</label>
+----
+
+Above will have the name: Round trip, what it is: radio button, and its state: selected.
+
+Sometimes html won't help completely, so we need help from *Web Accessibility Initiative  Accessible Rich Internet Applications*. 
+
+Short term: *ARIA* or *WAI ARIA*. 
+
+ARIA needs explicit values. So if you're working on a custom checkbox that was 
+created, you need to actually tell the screen reader it is a *checkbox* and 
+what state it is in whether it is true or false: 
+
+----
+<div tabindex="0" class="checkbox" role="checkbox" aria-checked="true">
+----
+
+== 14.3 Quiz: First Steps with ARIA
+
+
+
+== 14.4 What can ARIA do for you
+
+
+If the button isn't an image, we can use ARIA to give it a label such like this: 
+
+----
+<button class="glyph" aria-label="Filter">
+<div class="menu-glyph"></div>
+</button
+----
+
+
+We can also add semantic relationships between elements 
+
+----
+<button aria-expanded="false" aria-controls="advanced-settings">
+    <h2> Advanced settings</h2>
+</button>
+
+<div id="advanced-settings">
+    <label><input type="checkbox"> Offer to ... </label>
+    <label><input type="checkbox"> send usage.. </label>
+</div>
+----
+
+== 14.5 Roleplaying 
+
+The role is what it does. Such as a role is a checkbox then it must 
+follow the rules such as telling the user it is checked or unchecked. 
+
+
+When setting up a role, it should be at the same place as the tabindex. 
+
+
+== 14.6 Quiz: Custom radio button group with ARIA 
+== 14.7 More Ways to Label 
+
+You can also give it a label inside the element by using *aria-label*
+
+----
+<button aria-label="close"> x </button>
+----
+
+*aria-labelledby* is a lot like <label> except it's reversed. 
+
+----
+<div role="radio" aria-labelledby="1b01"></div>
+<span id="1b01">Coffee</span>
+----
+
+aria-labelledby overwrites other name sources. so in this example, it will be 
+*hot dogs* 
+
+----
+<div id="secret" hidden> Hot dogs </div> 
+
+
+<button aria-label="menu" aria-labelledby="secret" class="hamburger"> </button>
+----
+
+== 14.8 Quiz: Name that Element! 
+
+
+== 14.9 Breather 
+== 14.10 Default Semantics and Landmarks 
+== 14.11 ARIA Relationships 
+
+ARIA 1.0 relationship attributes: 
+
+* aria-activedescendant -> ID reference
+* aria-describedby -> ID reference list 
+* aria-labelledby -> ID reference list 
+* aria-owns -> ID reference list 
+* aria-posinset -> integer 
+* aria-setsize -> integer 
+
+
+a major thing that people like to use is *aria-owns*. example: 
+
+----
+<div role="menu">
+    <div role="menuitem"
+            aria-haspopup="true">
+            New 
+    </div>
+    <div aria-owns="submenu">
+    </div> 
+
+    <div role="menu" id="submenu">
+    <div role="menuitem">
+    Document
+    </div>
+</div>
+----
+
+with aria owns, it will tell that *submenu* is actually a child of the div 
+that has *aria-owns*. 
+
+''''
+*aria-describedby* will give a short description if it needs it. 
+
+example: 
+----
+<input type="password" id="pw" aria-describedby="pw-help">
+<div id="pw-help">
+Password must be at least 12 characters
+</div>
+----
+
+
+== 14.12 Quiz: Combo Box 
+== 14.13 Hidden in Plain Sight 
+== 14.14 Quiz: Name That Element Round 2 
+== 14.15 Recap so far 
+== 14.16 Introducing ARIA Live 
+
+*aria-live* is when we're dealing with live messages or alerts. off is the default 
+attribute. *polite* is when it should show the new live message when you're done. 
+*assertive* is for urgent messages that needs to be read such as server error to 
+let the user know the changes aren't being changed. 
+
+----
+<div class="alertbar" aria-live="assertive">
+Could not connect!
+</div>
+----
+
+== 14.17 Atomic Relevant Busy 
+
+
+== 14.18 Recap 
+== 14.19 Quiz: Modal Dialog Quiz 
+== 14.20 Outro Lesson 5

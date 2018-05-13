@@ -1,0 +1,53 @@
+:library: Asciidoctor
+:toc:
+:toc-placement!:
+
+
+= Udacity/GWG Mobile Web Nanodegree notes. Lesson 15
+
+= Style
+
+To go back to the README where all the chapters are: click link:README.asciidoc[here].
+
+Sorry! I just received an email saying I was taking a little too long and I'm falling behind. 
+I'm only going to be writing notes on things that I didn't know beforehand. 
+
+toc::[]
+
+== 15.1 Introduction to Style 
+== 15.2 Working with focus styles 
+
+
+
+== 15.3 Quiz: Write your own focus styles 
+== 15.4 Input Modality 
+== 15.5 Styling with Aria 
+== 15.6 Quiz: Quiz: Styling with ARIA 
+== 15.7 Responsive design for multi-devices 
+== 15.8 Responsive design for multi-devices part 2
+== 15.9 Mobile Screen Readers 
+== 15.10 Mobile Screen Readers iOS 
+== 15.11 Mobile Screen Readers Android 
+== 15.12 Quiz: Using Mobile Screen Readers
+== 15.13 Seque to Color & Contrast 
+== 15.14 Meeting Contrast Requirements 
+
+body text: It requires a minimum of 4.5:1 color ratio. 
+Large text: requires a minimum of at least 3:1 color ratio. 
+
+on a white background, the color of the text (if grey) shouldn't be any 
+lighter to 666666
+
+
+For those that need enhanced contrast, body text should be at least 7:1 
+and large texts should be at least 4.5:1
+
+== 15.15 Quiz: Contrast Audit 
+== 15.16 Don't convey info with color alone 
+
+color alone should not be the sole factor in conveying content or 
+distinguishing visual elements. 
+
+== 15.17 High Contrast Mode 
+== 15.18 Lesson 6 Outro 
+== 15.19 Course Outro 
